@@ -33,10 +33,10 @@ const addFood = async (req, res) => {
       });
     }
 
-    // Image: either from multer upload (file) or a provided URL
+    // Image: either from multer+Cloudinary upload (file) or a provided URL
     let imageValue = image;
     if (req.file) {
-      imageValue = req.file.filename;
+      imageValue = req.file.cloudinaryUrl || req.file.filename;
     }
 
     if (!imageValue) {

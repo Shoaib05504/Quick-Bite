@@ -104,96 +104,80 @@ export const connectDB = async () => {
     // Comprehensive list of all 42 expected foods (32 original items + 2 Pizza items + 8 Coffee & Refreshments items)
     const allExpectedFoods = [
       // Salad
-      { name: "Greek salad", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "food_1.png" },
-      { name: "Veg salad", price: 25, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "food_2.png" },
-      { name: "Clover Salad", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "food_3.png" },
-      { name: "Chicken Salad", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "food_4.png" },
+      { name: "Greek salad", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://res.cloudinary.com/demo/image/upload/v1/quickbite/food/greek_salad" },
+      { name: "Veg salad", price: 25, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://res.cloudinary.com/demo/image/upload/v1/quickbite/food/veg_salad" },
+      { name: "Clover Salad", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://res.cloudinary.com/demo/image/upload/v1/quickbite/food/clover_salad" },
+      { name: "Chicken Salad", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://res.cloudinary.com/demo/image/upload/v1/quickbite/food/chicken_salad" },
       // Rolls
-      { name: "Lasagna Rolls", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "food_5.png" },
-      { name: "Peri Peri Rolls", price: 70, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "food_6.png" },
-      { name: "Chicken Rolls", price: 90, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "food_7.png" },
-      { name: "Veg Rolls", price: 70, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "food_8.png" },
+      { name: "Lasagna Rolls", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&q=80" },
+      { name: "Peri Peri Rolls", price: 70, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80" },
+      { name: "Chicken Rolls", price: 90, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80" },
+      { name: "Veg Rolls", price: 70, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&q=80" },
       // Deserts
-      { name: "Ripple Ice Cream", price: 40, description: "Food provides essential nutrients for overall health and well-being", category: "Deserts", image: "food_9.png" },
-      { name: "Fruit Ice Cream", price: 45, description: "Food provides essential nutrients for overall health and well-being", category: "Deserts", image: "food_10.png" },
-      { name: "Jar Ice Cream", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Deserts", image: "food_11.png" },
-      { name: "Vanilla Ice Cream", price: 35, description: "Food provides essential nutrients for overall health and well-being", category: "Deserts", image: "food_12.png" },
+      { name: "Ripple Ice Cream", price: 40, description: "Food provides essential nutrients for overall health and well-being", category: "Deserts", image: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=400&q=80" },
+      { name: "Fruit Ice Cream", price: 45, description: "Food provides essential nutrients for overall health and well-being", category: "Deserts", image: "https://images.unsplash.com/photo-1488900128323-21503983a07e?w=400&q=80" },
+      { name: "Jar Ice Cream", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Deserts", image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80" },
+      { name: "Vanilla Ice Cream", price: 35, description: "Food provides essential nutrients for overall health and well-being", category: "Deserts", image: "https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=400&q=80" },
       // Sandwich
-      { name: "Chicken Sandwich", price: 100, description: "Food provides essential nutrients for overall health and well-being", category: "Sandwich", image: "food_13.png" },
-      { name: "Vegan Sandwich", price: 80, description: "Food provides essential nutrients for overall health and well-being", category: "Sandwich", image: "food_14.png" },
-      { name: "Grilled Sandwich", price: 75, description: "Food provides essential nutrients for overall health and well-being", category: "Sandwich", image: "food_15.png" },
-      { name: "Bread Sandwich", price: 70, description: "Food provides essential nutrients for overall health and well-being", category: "Sandwich", image: "food_16.png" },
+      { name: "Chicken Sandwich", price: 100, description: "Food provides essential nutrients for overall health and well-being", category: "Sandwich", image: "https://images.unsplash.com/photo-1539252554453-80ab65ce3586?w=400&q=80" },
+      { name: "Vegan Sandwich", price: 80, description: "Food provides essential nutrients for overall health and well-being", category: "Sandwich", image: "https://images.unsplash.com/photo-1553909489-cd47e0907980?w=400&q=80" },
+      { name: "Grilled Sandwich", price: 75, description: "Food provides essential nutrients for overall health and well-being", category: "Sandwich", image: "https://images.unsplash.com/photo-1528736235302-52922df5c122?w=400&q=80" },
+      { name: "Bread Sandwich", price: 70, description: "Food provides essential nutrients for overall health and well-being", category: "Sandwich", image: "https://images.unsplash.com/photo-1521986329282-0436c1f1e212?w=400&q=80" },
       // Cake
-      { name: "Cup Cake", price: 40, description: "Food provides essential nutrients for overall health and well-being", category: "Cake", image: "food_17.png" },
-      { name: "Vegan Cake", price: 35, description: "Food provides essential nutrients for overall health and well-being", category: "Cake", image: "food_18.png" },
-      { name: "Butterscotch Cake", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Cake", image: "food_19.png" },
-      { name: "Sliced Cake", price: 45, description: "Food provides essential nutrients for overall health and well-being", category: "Cake", image: "food_20.png" },
+      { name: "Cup Cake", price: 40, description: "Food provides essential nutrients for overall health and well-being", category: "Cake", image: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=400&q=80" },
+      { name: "Vegan Cake", price: 35, description: "Food provides essential nutrients for overall health and well-being", category: "Cake", image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&q=80" },
+      { name: "Butterscotch Cake", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Cake", image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400&q=80" },
+      { name: "Sliced Cake", price: 45, description: "Food provides essential nutrients for overall health and well-being", category: "Cake", image: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400&q=80" },
       // Pure Veg
-      { name: "Garlic Mushroom ", price: 75, description: "Food provides essential nutrients for overall health and well-being", category: "Pure Veg", image: "food_21.png" },
-      { name: "Fried Cauliflower", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Pure Veg", image: "food_22.png" },
-      { name: "Mix Veg Pulao", price: 40, description: "Food provides essential nutrients for overall health and well-being", category: "Pure Veg", image: "food_23.png" },
-      { name: "Rice Zucchini", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Pure Veg", image: "food_24.png" },
+      { name: "Garlic Mushroom ", price: 75, description: "Food provides essential nutrients for overall health and well-being", category: "Pure Veg", image: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&q=80" },
+      { name: "Fried Cauliflower", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Pure Veg", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&q=80" },
+      { name: "Mix Veg Pulao", price: 40, description: "Food provides essential nutrients for overall health and well-being", category: "Pure Veg", image: "https://images.unsplash.com/photo-1645696301019-35adcc18fc9e?w=400&q=80" },
+      { name: "Rice Zucchini", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Pure Veg", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&q=80" },
       // Pasta
-      { name: "Cheese Pasta", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Pasta", image: "food_25.png" },
-      { name: "Tomato Pasta", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Pasta", image: "food_26.png" },
-      { name: "Creamy Pasta", price: 65, description: "Food provides essential nutrients for overall health and well-being", category: "Pasta", image: "food_27.png" },
-      { name: "Chicken Pasta", price: 85, description: "Food provides essential nutrients for overall health and well-being", category: "Pasta", image: "food_28.png" },
+      { name: "Cheese Pasta", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Pasta", image: "https://images.unsplash.com/photo-1551183053-bf91798d792b?w=400&q=80" },
+      { name: "Tomato Pasta", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Pasta", image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&q=80" },
+      { name: "Creamy Pasta", price: 65, description: "Food provides essential nutrients for overall health and well-being", category: "Pasta", image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&q=80" },
+      { name: "Chicken Pasta", price: 85, description: "Food provides essential nutrients for overall health and well-being", category: "Pasta", image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=400&q=80" },
       // Noodles
-      { name: "Buttter Noodles", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Noodles", image: "food_29.png" },
-      { name: "Veg Noodles", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Noodles", image: "food_30.png" },
-      { name: "Somen Noodles", price: 40, description: "Food provides essential nutrients for overall health and well-being", category: "Noodles", image: "food_31.png" },
-      { name: "Cooked Noodles", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Noodles", image: "food_32.png" },
+      { name: "Buttter Noodles", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Noodles", image: "https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=400&q=80" },
+      { name: "Veg Noodles", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Noodles", image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&q=80" },
+      { name: "Somen Noodles", price: 40, description: "Food provides essential nutrients for overall health and well-being", category: "Noodles", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&q=80" },
+      { name: "Cooked Noodles", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Noodles", image: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=80" },
       // Pizza
-      { name: "margherita pizza", price: 150, description: "A simple and delicious classic Italian pizza with rich mozzarella cheese and fresh basil.", category: "Pizza", image: "https://th.bing.com/th/id/R.f64028935afcaa8eedbe7f148cedf46b?rik=NIvgQl8d7rsFaQ&riu=http%3a%2f%2fwww.tefal.com.au%2fcdn%2fshop%2farticles%2fMargherita_Pizza.webp%3fv%3d1744080384%26width%3d2048&ehk=GuOP9nnS0L19T1XUsyGMpN1NIZUgjkSau64uo%2bDOdqg%3d&risl=&pid=ImgRaw&r=0" },
-      { name: "Cheese Pizza", price: 180, description: "Classic hot pizza loaded with extra melted mozzarella cheese.", category: "Pizza", image: "https://static.vecteezy.com/system/resources/thumbnails/047/021/782/small_2x/a-slice-of-freshly-baked-cheese-pizza-with-melted-mozzarella-free-photo.jpeg" },
+      { name: "margherita pizza", price: 150, description: "A simple and delicious classic Italian pizza with rich mozzarella cheese and fresh basil.", category: "Pizza", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80" },
+      { name: "Cheese Pizza", price: 180, description: "Classic hot pizza loaded with extra melted mozzarella cheese.", category: "Pizza", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80" },
       // Coffee & Refreshments
-      { name: "Cold Coffee", price: 120, description: "Refreshing blended iced coffee with milk and rich chocolate syrup.", category: "☕ Coffee & Refreshments", image: "food_33.png" },
-      { name: "Cappuccino", price: 140, description: "Classic espresso with steamed milk and a thick layer of foam.", category: "☕ Coffee & Refreshments", image: "food_34.png" },
-      { name: "Café Latte", price: 150, description: "Smooth espresso blended with steamed milk and light foam.", category: "☕ Coffee & Refreshments", image: "food_35.png" },
-      { name: "Espresso", price: 110, description: "Rich and bold single shot of pure espresso coffee.", category: "☕ Coffee & Refreshments", image: "food_36.png" },
-      { name: "Fresh Lime Soda", price: 90, description: "Fizzy lime beverage served sweet or salted to refresh your senses.", category: "☕ Coffee & Refreshments", image: "food_37.png" },
-      { name: "Virgin Mojito", price: 130, description: "Refreshing lime and mint mocktail served over crushed ice.", category: "☕ Coffee & Refreshments", image: "food_38.png" },
-      { name: "Mango Smoothie", price: 160, description: "Thick and creamy tropical smoothie made with sweet mangoes.", category: "☕ Coffee & Refreshments", image: "food_39.png" },
-      { name: "Chocolate Milkshake", price: 170, description: "Indulgent milkshake with rich Belgian chocolate and vanilla cream.", category: "☕ Coffee & Refreshments", image: "food_40.png" }
+      { name: "Cold Coffee", price: 120, description: "Refreshing blended iced coffee with milk and rich chocolate syrup.", category: "☕ Coffee & Refreshments", image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400&q=80" },
+      { name: "Cappuccino", price: 140, description: "Classic espresso with steamed milk and a thick layer of foam.", category: "☕ Coffee & Refreshments", image: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=400&q=80" },
+      { name: "Café Latte", price: 150, description: "Smooth espresso blended with steamed milk and light foam.", category: "☕ Coffee & Refreshments", image: "https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400&q=80" },
+      { name: "Espresso", price: 110, description: "Rich and bold single shot of pure espresso coffee.", category: "☕ Coffee & Refreshments", image: "https://images.unsplash.com/photo-1507133750040-4a8f57021571?w=400&q=80" },
+      { name: "Fresh Lime Soda", price: 90, description: "Fizzy lime beverage served sweet or salted to refresh your senses.", category: "☕ Coffee & Refreshments", image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&q=80" },
+      { name: "Virgin Mojito", price: 130, description: "Refreshing lime and mint mocktail served over crushed ice.", category: "☕ Coffee & Refreshments", image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&q=80" },
+      { name: "Mango Smoothie", price: 160, description: "Thick and creamy tropical smoothie made with sweet mangoes.", category: "☕ Coffee & Refreshments", image: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400&q=80" },
+      { name: "Chocolate Milkshake", price: 170, description: "Indulgent milkshake with rich Belgian chocolate and vanilla cream.", category: "☕ Coffee & Refreshments", image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&q=80" }
     ];
 
-    // Seed missing items
+    // Seed missing items AND update existing items with new image URLs
     let seededCount = 0;
+    let updatedCount = 0;
     for (const foodInfo of allExpectedFoods) {
       const exists = await foodModel.findOne({ name: { $regex: new RegExp(`^${foodInfo.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i') } });
       if (!exists) {
         const item = new foodModel(foodInfo);
         await item.save();
         seededCount += 1;
+      } else if (exists.image !== foodInfo.image && !exists.image.startsWith('http')) {
+        // Update existing items that still have old local filename images
+        exists.image = foodInfo.image;
+        await exists.save();
+        updatedCount += 1;
       }
     }
 
-    if (seededCount > 0) {
-      console.log(`Seeded ${seededCount} missing food items successfully. ✅`);
-    } else {
-      console.log("All expected food items already exist in DB. ✅");
-    }
+    if (seededCount > 0) console.log(`Seeded ${seededCount} missing food items successfully. ✅`);
+    if (updatedCount > 0) console.log(`Updated ${updatedCount} food items with new image URLs. ✅`);
+    if (seededCount === 0 && updatedCount === 0) console.log("All expected food items already exist and are up to date. ✅");
 
-    // Always update existing Coffee & Refreshments image references to point to local files
-    const seededCoffeeItems = await foodModel.find({ category: '☕ Coffee & Refreshments' });
-    const nameToImageMap = {
-      "Cold Coffee": "food_33.png",
-      "Cappuccino": "food_34.png",
-      "Café Latte": "food_35.png",
-      "Espresso": "food_36.png",
-      "Fresh Lime Soda": "food_37.png",
-      "Virgin Mojito": "food_38.png",
-      "Mango Smoothie": "food_39.png",
-      "Chocolate Milkshake": "food_40.png"
-    };
-    for (const foodItem of seededCoffeeItems) {
-      const targetFilename = nameToImageMap[foodItem.name];
-      if (targetFilename && foodItem.image !== targetFilename) {
-        foodItem.image = targetFilename;
-        await foodItem.save();
-      }
-    }
-    console.log('Database coffee image mappings updated successfully! ✅');
   } catch (error) {
     console.error("Database connection/seeding failed:", error);
   }
