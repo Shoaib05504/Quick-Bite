@@ -2,18 +2,23 @@ import express from 'express';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import authMiddleware from '../middleware/auth.js';
 import adminMiddleware from '../middleware/admin.js';
 import { clearCache } from '../middleware/cache.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { addFood, listFood, deleteFood } from '../controllers/foodController.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.resolve(__dirname, '../uploads');
+
 // ── Multer — safe file uploads ───────────────────────────────────────────────
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 const storage = multer.diskStorage({
-  destination: 'uploads',
+  destination: uploadsDir,
   filename: (req, file, cb) => {
     // Use UUID filename — prevents path traversal and original filename injection
     const ext = path.extname(file.originalname).toLowerCase();

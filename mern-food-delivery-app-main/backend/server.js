@@ -81,7 +81,7 @@ app.use(generalLimiter);
 connectDB();
 
 // ── Static uploads (images served publicly) ─────────────────────────────────
-app.use('/images', express.static('uploads'));
+app.use('/images', express.static(path.resolve(__dirname, 'uploads')));
 
 // ── API routes ───────────────────────────────────────────────────────────────
 app.use('/api/food', foodRouter);

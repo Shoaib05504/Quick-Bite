@@ -31,10 +31,14 @@ const normalizeMongoUri = (uri) => {
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
+import { fileURLToPath } from 'url';
 import foodModel from "../models/foodModel.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.resolve(__dirname, '../uploads');
+
 const downloadImage = async (url, filename) => {
-  const uploadsDir = path.resolve('uploads');
   const filepath = path.join(uploadsDir, filename);
   try {
     if (!fs.existsSync(uploadsDir)) {
