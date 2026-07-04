@@ -18,8 +18,12 @@ dist-ssr
 .env.production
 
 # Uploaded files (use cloud storage in production)
+# Keep original seed images committed so Render can serve them
 uploads/*
 !uploads/.gitkeep
+!uploads/food_*.png
+!uploads/food_*.jpg
+!uploads/menu_*.png
 
 # Editor directories and files
 .vscode/*

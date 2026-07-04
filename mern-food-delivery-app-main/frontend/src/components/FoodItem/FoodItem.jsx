@@ -10,7 +10,7 @@ import { assets } from "../../assets/assets";
 const FoodItem = ({ id, name, price, description, image }) => {
   const { cartItems, addToCart, url } = useContext(StoreContext);
   const navigate = useNavigate();
-  const API_URL = url || import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_URL = url;
 
   const imageSrc =
     image && image.startsWith('http')
