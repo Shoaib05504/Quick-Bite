@@ -104,10 +104,10 @@ export const connectDB = async () => {
     // Comprehensive list of all 42 expected foods (32 original items + 2 Pizza items + 8 Coffee & Refreshments items)
     const allExpectedFoods = [
       // Salad
-      { name: "Greek salad", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://res.cloudinary.com/demo/image/upload/v1/quickbite/food/greek_salad" },
-      { name: "Veg salad", price: 25, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://res.cloudinary.com/demo/image/upload/v1/quickbite/food/veg_salad" },
-      { name: "Clover Salad", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://res.cloudinary.com/demo/image/upload/v1/quickbite/food/clover_salad" },
-      { name: "Chicken Salad", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://res.cloudinary.com/demo/image/upload/v1/quickbite/food/chicken_salad" },
+      { name: "Greek salad", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80" },
+      { name: "Veg salad", price: 25, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80" },
+      { name: "Clover Salad", price: 30, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?w=400&q=80" },
+      { name: "Chicken Salad", price: 50, description: "Food provides essential nutrients for overall health and well-being", category: "Salad", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80" },
       // Rolls
       { name: "Lasagna Rolls", price: 60, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&q=80" },
       { name: "Peri Peri Rolls", price: 70, description: "Food provides essential nutrients for overall health and well-being", category: "Rolls", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80" },
