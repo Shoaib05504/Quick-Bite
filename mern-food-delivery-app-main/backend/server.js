@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { createServer } from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
 import foodRouter from './routes/foodRoute.js';
 import userRouter from './routes/userRoute.js';
@@ -12,6 +14,9 @@ import chatbotRouter from './routes/chatbotRoute.js';
 import groupOrderRouter from './routes/groupOrderRoute.js';
 import { generalLimiter } from './middleware/rateLimiter.js';
 import { initSocket } from './config/socket.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ── Validate required environment variables at startup ──────────────────────
 const REQUIRED_ENV = [
@@ -74,10 +79,43 @@ app.use('/api/order', orderRouter);
 app.use('/api/chatbot', chatbotRouter);
 app.use('/api/group-order', groupOrderRouter);
 
-// ── Health check ─────────────────────────────────────────────────────────────
-app.get('/', (req, res) => {
+// ── Serve static frontend and admin builds if they exist ─────────────────────
+import fs from 'fs';
+const frontendDistPath = path.resolve(__dirname, '../frontend/dist');
+const adminDistPath = path.resolve(__dirname, '../admin/dist');
+
+if (fs.existsSync(adminDistPath)) {
+  console.log('Serving production admin static files from:', adminDistPath);
+  app.use('/admin', express.static(adminDistPath));
+  
+  // Fallback for Admin SPA routing
+  app.get('/admin/*', (req, res) => {
+    res.sendFile(path.resolve(adminDistPath, 'index.html'));
+  });
+}
+
+if (fs.existsSync(frontendDistPath)) {
+  console.log('Serving production frontend static files from:', frontendDistPath);
+  app.use(express.static(frontendDistPath));
+} else {
+  app.get('/', (req, res) => {
+    res.json({ status: 'ok', service: 'QuickBite API (Development Mode)', version: '2.0.0' });
+  });
+}
+
+app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'QuickBite API', version: '2.0.0' });
 });
+
+// Fallback for Frontend SPA routing
+if (fs.existsSync(frontendDistPath)) {
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api') || req.url.startsWith('/images')) {
+      return next();
+    }
+    res.sendFile(path.resolve(frontendDistPath, 'index.html'));
+  });
+}
 
 // ── Global error handler ─────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
