@@ -1,0 +1,22 @@
+.logout-page {
+  min-height: 75vh;
+  display: grid;
+  place-items: center;
+  color: #e2e8f0;
+}
+
+.logout-card {
+  padding: 40px 42px;
+  border-radius: 28px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.logout-card h2 {
+  margin-bottom: 14px;
+}
+
+.logout-card p {
+  color: #94a3b8;
+}

@@ -1,0 +1,123 @@
+.add,
+.order {
+  padding: 0;
+  margin: 0;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.list {
+  color: #e2e8f0;
+}
+
+.list > p {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 28px;
+  letter-spacing: 0.05em;
+}
+
+.list-table {
+  display: grid;
+  gap: 12px;
+}
+
+.list-table-format {
+  display: grid;
+  grid-template-columns: 0.8fr 1.5fr 1.2fr 0.9fr 0.6fr;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.85);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.list-table-format.title {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(108, 92, 231, 0.2);
+  padding: 14px 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+}
+
+.list-table-format:not(.title):hover {
+  background: rgba(52, 103, 255, 0.08);
+  border-color: rgba(108, 92, 231, 0.3);
+  box-shadow: 0 8px 24px rgba(108, 92, 231, 0.1);
+}
+
+.list-table-format img {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.list-table-format p {
+  margin: 0;
+  color: #e2e8f0;
+}
+
+.list-table-format p:last-child {
+  text-align: center;
+  cursor: pointer;
+  color: #f87171;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+
+.list-table-format p:last-child:hover {
+  color: #dc2626;
+  transform: scale(1.15);
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .list-table-format {
+    grid-template-columns: 0.8fr 1.2fr 0.8fr 0.6fr;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .list-table-format.title {
+    display: none;
+  }
+
+  .list-table-format img {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 600px) {
+  .list > p {
+    font-size: 1.35rem;
+    margin-bottom: 18px;
+  }
+
+  .list-table-format {
+    grid-template-columns: 0.8fr 1fr 0.8fr;
+    gap: 10px;
+    padding: 12px 14px;
+    font-size: 0.85rem;
+  }
+
+  .list-table-format img {
+    width: 44px;
+    height: 44px;
+  }
+}

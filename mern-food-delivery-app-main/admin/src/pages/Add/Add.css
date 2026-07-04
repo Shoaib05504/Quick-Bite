@@ -1,0 +1,124 @@
+.add-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background: rgba(15, 23, 42, 0.95);
+  min-height: calc(100vh - 120px);
+}
+
+.add-card {
+  background: rgba(30, 44, 72, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 30px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+}
+
+.add-card h2 {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #fff;
+  font-size: 1.75rem;
+  letter-spacing: 0.05em;
+}
+
+.add-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.add-card label {
+  color: #cbd5e1;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.add-card input,
+.add-card textarea,
+.add-card select {
+  padding: 14px 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.add-card input:focus,
+.add-card textarea:focus,
+.add-card select:focus {
+  outline: none;
+  border-color: rgba(108, 92, 231, 0.4);
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 0 20px rgba(108, 92, 231, 0.15);
+}
+
+.add-card textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.row div {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-card button {
+  background: linear-gradient(135deg, #6c5ce7, #00b894);
+  color: white;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+}
+
+.add-card button:hover {
+  box-shadow: 0 12px 30px rgba(108, 92, 231, 0.3);
+  transform: translateY(-2px);
+}
+
+.add-card button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  .add-page {
+    padding: 20px 15px;
+  }
+
+  .add-card {
+    padding: 30px 20px;
+  }
+
+  .add-card h2 {
+    font-size: 1.35rem;
+    margin-bottom: 24px;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}

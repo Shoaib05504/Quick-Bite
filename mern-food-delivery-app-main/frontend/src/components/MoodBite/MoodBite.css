@@ -1,0 +1,365 @@
+.mood-bite-section {
+  position: relative;
+  padding: 60px 22px;
+  margin: 30px auto;
+  max-width: 1320px;
+}
+
+.mood-bite-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top center, rgba(255, 187, 117, 0.18), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 245, 0.99));
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mood-bite-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 28px;
+}
+
+.mood-bite-copy,
+.mood-bite-results {
+  border: 1px solid rgba(244, 163, 88, 0.16);
+  background: #ffffff;
+  border-radius: 32px;
+  box-shadow: 0 24px 60px rgba(245, 143, 55, 0.08);
+  padding: 32px;
+}
+
+.mood-bite-header {
+  display: grid;
+  gap: 16px;
+}
+
+.mood-bite-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: #fff5eb;
+  color: #b55a15;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  border: 1px solid rgba(242, 158, 79, 0.35);
+  width: fit-content;
+}
+
+.mood-bite-header h2 {
+  font-size: clamp(2rem, 2.5vw, 2.8rem);
+  line-height: 1.08;
+  color: #222222;
+}
+
+.mood-bite-header p {
+  color: #555555;
+  max-width: 720px;
+  font-size: 1rem;
+}
+
+.mood-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.mood-card {
+  border: 1px solid rgba(243, 156, 58, 0.18);
+  background: #ffffff;
+  border-radius: 24px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  cursor: pointer;
+  color: #2d2d2d;
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
+}
+
+.mood-card:hover {
+  border-color: rgba(255, 151, 73, 0.5);
+  box-shadow: 0 18px 38px rgba(242, 137, 58, 0.12);
+  transform: translateY(-3px) scale(1.01);
+}
+
+.mood-card.selected {
+  border: 1px solid transparent;
+  background: linear-gradient(180deg, rgba(255, 248, 239, 1), rgba(255, 242, 229, 0.95));
+  box-shadow: 0 22px 48px rgba(248, 145, 61, 0.16);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.mood-card.selected .mood-card-icon {
+  animation: floatMood 4s ease-in-out infinite;
+}
+
+.mood-card-icon {
+  font-size: 2rem;
+}
+
+.mood-card-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.mood-bite-results {
+  display: grid;
+  gap: 20px;
+}
+
+.mood-bite-result-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.mood-bite-result-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.mood-bite-result-top h3 {
+  color: #1f1f1f;
+  font-size: clamp(1.6rem, 2vw, 2.25rem);
+  margin: 0;
+}
+
+.mood-bite-subheading {
+  color: #6a6a6a;
+  margin-top: 8px;
+}
+
+.mood-bite-badge {
+  align-self: center;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(255, 228, 199, 0.95), rgba(255, 234, 218, 0.95));
+  color: #b75c1d;
+  font-weight: 700;
+  font-size: 0.88rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 166, 98, 0.28);
+}
+
+.mood-bite-message {
+  color: #4c4c4c;
+  font-size: clamp(1rem, 1.05vw, 1.14rem);
+  line-height: 1.8;
+  min-height: 64px;
+  background: #fff8f2;
+  border: 1px solid rgba(245, 160, 85, 0.18);
+  border-radius: 22px;
+  padding: 18px 20px;
+}
+
+.mood-food-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.mood-food-card {
+  background: #ffffff;
+  border: 1px solid rgba(245, 146, 70, 0.12);
+  border-radius: 26px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mood-food-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 52px rgba(224, 135, 59, 0.14);
+}
+
+.mood-food-image-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 220px;
+  background: #fff5ef;
+}
+
+.mood-food-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.mood-food-card:hover .mood-food-image {
+  transform: scale(1.05);
+}
+
+.mood-food-favorite {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  color: #ff7f45;
+  box-shadow: 0 14px 28px rgba(244, 137, 77, 0.18);
+}
+
+.mood-food-body {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  color: #343434;
+}
+
+.mood-food-headline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mood-food-headline h4 {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.3;
+}
+
+.mood-food-headline p {
+  margin: 0;
+  font-weight: 800;
+  color: #ff7f1d;
+}
+
+.mood-food-rating img {
+  width: 80px;
+}
+
+.mood-food-body p {
+  margin: 0;
+  color: #6d6d6d;
+  line-height: 1.7;
+  min-height: 56px;
+}
+
+.mood-food-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.mood-food-add,
+.mood-food-order {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.mood-food-add {
+  background: linear-gradient(135deg, #ff8d42, #ffbf73);
+  color: #ffffff;
+}
+
+.mood-food-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(255, 146, 73, 0.25);
+}
+
+.mood-food-order {
+  background: rgba(255, 236, 220, 0.95);
+  color: #d36a1f;
+}
+
+.mood-food-order:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(255, 170, 106, 0.18);
+}
+
+.mood-empty-state {
+  padding: 34px 26px;
+  border-radius: 24px;
+  background: #fff6f1;
+  color: #7a5230;
+  text-align: center;
+  border: 1px solid rgba(245, 151, 78, 0.16);
+}
+
+.mood-bite-grid-anchor {
+  width: 100%;
+}
+
+@keyframes floatMood {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 1090px) {
+  .mood-cards-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .mood-food-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 770px) {
+  .mood-bite-section {
+    padding: 46px 16px;
+  }
+
+  .mood-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mood-bite-result-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mood-food-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .mood-bite-copy,
+  .mood-bite-results {
+    padding: 22px;
+  }
+
+  .mood-bite-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .mood-card {
+    border-radius: 20px;
+    min-height: 108px;
+    padding: 18px;
+  }
+
+  .mood-food-card {
+    min-height: auto;
+  }
+}
+

@@ -1,0 +1,2 @@
+# This file keeps the uploads directory tracked by git while ignoring its contents.
+# In production, use Cloudinary or S3 instead of local file storage.

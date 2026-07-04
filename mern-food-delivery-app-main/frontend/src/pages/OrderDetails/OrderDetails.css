@@ -1,0 +1,416 @@
+/* Immersive Premium Glassmorphism Gradient Background Wrapper */
+.order-details-page-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e8f5e9 0%, #e3f2fd 50%, #f5f5f5 100%);
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Master Glass Container Card */
+.order-details.glass-container {
+  max-width: 650px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 28px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 20px 50px rgba(255, 129, 81, 0.05),
+    0 4px 20px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  animation: detailsFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes detailsFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Top bar styled with Back button and ID */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2b2b3a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 140, 81, 0.08);
+  color: #ff7a35;
+  transform: translateX(-3px);
+}
+
+.order-id-badge {
+  font-family: monospace;
+  font-weight: 700;
+  color: #ff7a35;
+  background: rgba(255, 122, 53, 0.1);
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 122, 53, 0.15);
+  font-size: 0.9rem;
+}
+
+/* Soft 3D Glass Cards inside content */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 
+    0 10px 25px rgba(255, 122, 53, 0.02),
+    0 4px 12px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 18px 30px rgba(255, 140, 81, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.glass-card h3 {
+  font-size: 1rem;
+  color: #2b2b3a;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.section-title-icon {
+  color: #ff7a35;
+  font-size: 1.1rem;
+}
+
+/* Status Header */
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.eta-badge {
+  background: rgba(255, 122, 53, 0.12);
+  color: #ff7a35;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 122, 53, 0.18);
+}
+
+/* Steps progress tracker styling */
+.progress-tracker {
+  position: relative;
+  margin: 28px 10px 10px 10px;
+}
+
+.progress-bar-line {
+  position: absolute;
+  top: 18px;
+  left: 15px;
+  right: 15px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.progress-line-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff8c42, #ffb86d);
+  border-radius: 2px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.step-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 75px;
+}
+
+.step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  transition: all 0.4s ease;
+}
+
+.step-node.active .step-icon {
+  background: linear-gradient(135deg, #ff8c42, #ffb86d);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 8px 16px rgba(255, 129, 81, 0.22);
+  transform: scale(1.12);
+}
+
+.step-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #62627a;
+  margin-top: 8px;
+  transition: color 0.4s ease;
+  white-space: nowrap;
+}
+
+.step-node.active .step-label {
+  color: #2b2b3a;
+  font-weight: 700;
+}
+
+/* Restaurant details card */
+.restaurant-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-badge {
+  background: #fff8e6;
+  color: #b45309;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.cuisine-badge {
+  color: #4b5563;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* Address details card */
+.address-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #3b3b4d;
+  font-size: 0.92rem;
+}
+
+.recipient-name {
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-number {
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-icon {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.address-text-block {
+  margin-top: 6px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.address-text-block p {
+  margin: 2px 0;
+}
+
+.address-text-block .country {
+  font-weight: 700;
+  color: #6b7280;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Items Box Styling */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.item-row:last-child {
+  border: none;
+  padding-bottom: 0;
+}
+
+.item-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.item-icon-pill {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 140, 81, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: inset 0 1px 3px rgba(255, 140, 81, 0.1);
+}
+
+.item-details h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #2b2b3a;
+  font-weight: 700;
+}
+
+.qty-label {
+  margin: 2px 0 0 0;
+  font-size: 0.78rem;
+  color: #55556d;
+  font-weight: 600;
+}
+
+.item-price {
+  font-weight: 700;
+  color: #111827;
+  font-size: 1rem;
+}
+
+/* Bill summary receipt card */
+.bill-box.receipt-card {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1.5px dashed rgba(255, 122, 53, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.01);
+  padding: 24px;
+}
+
+.bill-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+  color: #55556d;
+}
+
+.bill-value {
+  font-weight: 600;
+  color: #3b3b4d;
+}
+
+.receipt-divider {
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  margin: 8px 0;
+}
+
+.bill-row.total {
+  color: #1e1b4b;
+}
+
+.bill-row.total h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.grand-total-val {
+  color: #ff7a35;
+}
+
+.payment-method-pill {
+  margin-top: 12px;
+  background: rgba(255, 122, 53, 0.08);
+  padding: 10px 16px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  border: 1px solid rgba(255, 122, 53, 0.1);
+}
+
+.payment-method-pill span {
+  font-weight: 600;
+  color: #4b4b62;
+}
+
+.payment-method-pill strong {
+  color: #ff7a35;
+  font-weight: 700;
+}
+
+/* Modern Animations */
+.animate-pulse {
+  animation: titlePulse 2s infinite ease-in-out;
+}
+
+@keyframes titlePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.96); }
+}

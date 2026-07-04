@@ -1,0 +1,125 @@
+.food-item {
+  width: 100%;
+  margin: auto;
+  border-radius: 28px;
+  overflow: hidden;
+  background: rgba(18, 12, 40, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 26px 72px rgba(10, 7, 33, 0.24);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.food-item:hover {
+  transform: translateY(-4px);
+}
+
+.food-item-img-container {
+  position: relative;
+  overflow: hidden;
+  height: 240px;
+  background: linear-gradient(180deg, rgba(146, 90, 255, 0.14), transparent 45%);
+}
+
+.food-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.food-item:hover .food-item-image {
+  transform: scale(1.08);
+}
+
+.food-item-info {
+  padding: 24px;
+}
+
+.food-item-name-rating {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.food-item-name-rating p {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f8f7ff;
+  margin: 0;
+}
+
+.food-item-name-rating img {
+  width: 78px;
+}
+
+.food-item-desc {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0 0 16px;
+  min-height: 54px;
+}
+
+.food-item-price {
+  color: #ffad5b;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 18px;
+}
+
+.food-item-qty-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(206, 116, 255, 0.92);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 999px;
+  box-shadow: 0 16px 30px rgba(129, 78, 255, 0.16);
+}
+
+.food-item-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.food-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.food-btn:hover {
+  transform: translateY(-2px);
+}
+
+.food-btn-cart {
+  background: linear-gradient(135deg, rgba(120, 73, 255, 0.92), rgba(255, 113, 170, 0.92));
+  color: #fff;
+  box-shadow: 0 18px 36px rgba(206, 97, 255, 0.2);
+}
+
+.food-btn-order {
+  background: linear-gradient(135deg, rgba(255, 141, 72, 0.95), rgba(255, 92, 129, 0.95));
+  color: #fff;
+  box-shadow: 0 18px 36px rgba(255, 106, 98, 0.22);
+}
+
+@media (max-width: 760px) {
+  .food-item-actions {
+    grid-template-columns: 1fr;
+  }
+}

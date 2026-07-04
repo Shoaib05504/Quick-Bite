@@ -1,0 +1,152 @@
+/* ══════════════════════════════════════════════════════════════════
+   AppToast.css — compact premium toast, QuickBite green
+   Rendered via portal into document.body — no stacking context issues
+══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Wrapper ── fixed top-right, compact width ─────────────── */
+.qbt-wrapper {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999999;
+  width: 340px;
+  max-width: calc(100vw - 40px);
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  cursor: default;
+  /* isolate so internal stacking works correctly */
+  isolation: isolate;
+}
+
+/* ── 2. Ambient glow ──────────────────────────────────────────── */
+.qbt-glow {
+  position: absolute;
+  inset: -10px;
+  border-radius: 26px;
+  background: radial-gradient(
+    ellipse at 50% 60%,
+    rgba(34, 197, 94, 0.55) 0%,
+    transparent 68%
+  );
+  filter: blur(18px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ── 3. Card — green gradient glass ──────────────────────────── */
+.qbt-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 12px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 16px 16px 0 0;
+  box-shadow:
+    0 20px 50px rgba(22, 163, 74, 0.38),
+    0 6px 18px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.40);
+  backdrop-filter: blur(20px) saturate(1.7);
+  -webkit-backdrop-filter: blur(20px) saturate(1.7);
+}
+
+/* ── 4. Icon — bounce keyframe ───────────────────────────────── */
+.qbt-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+  display: block;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+  animation: qbtBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes qbtBounce {
+  0%   { transform: scale(0.25) rotate(-20deg); opacity: 0; }
+  60%  { transform: scale(1.3)  rotate(8deg);  opacity: 1; }
+  100% { transform: scale(1)    rotate(0deg);  opacity: 1; }
+}
+
+/* ── 5. Text ─────────────────────────────────────────────────── */
+.qbt-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.qbt-title {
+  margin: 0 0 3px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qbt-desc {
+  margin: 0;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.5;
+}
+
+/* ── 6. Close button ─────────────────────────────────────────── */
+.qbt-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  color: #ffffff;
+  font-size: 1.1rem;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-start;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.qbt-close:hover {
+  background: rgba(255, 255, 255, 0.34);
+  transform: scale(1.15);
+}
+
+/* ── 7. Progress track + bar ──────────────────────────────────── */
+.qbt-track {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+}
+
+.qbt-bar {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.5));
+  border-radius: 0 0 16px 0;
+  transition: width 0.04s linear;
+}
+
+/* ── 8. Hover → enhanced glow ────────────────────────────────── */
+.qbt-wrapper:hover .qbt-card {
+  box-shadow:
+    0 28px 64px rgba(22, 163, 74, 0.48),
+    0 8px 22px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
+}
+
+/* ── 9. Mobile — slightly narrower, same top-right ───────────── */
+@media (max-width: 480px) {
+  .qbt-wrapper {
+    width: 300px;
+    top: 14px;
+    right: 14px;
+  }
+
+  .qbt-title {
+    font-size: 0.82rem;
+    white-space: normal;
+  }
+}
