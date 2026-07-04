@@ -82,7 +82,20 @@ export const assets = {
     bag_icon,
     parcel_icon
 }
-export const url = import.meta.env.VITE_API_URL || "http://localhost:8000"
+const resolveApiUrl = () => {
+    const envUrl = import.meta.env.VITE_API_URL;
+    if (import.meta.env.MODE === 'development') {
+        return envUrl || 'http://localhost:8000';
+    }
+    if (typeof window !== 'undefined') {
+        if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+            return window.location.origin;
+        }
+        return envUrl || window.location.origin;
+    }
+    return envUrl || '';
+};
+export const url = resolveApiUrl();
 export const menu_list = [
     {
         menu_name: "Salad",

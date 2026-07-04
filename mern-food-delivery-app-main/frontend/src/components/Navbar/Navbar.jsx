@@ -79,7 +79,7 @@ const Navbar = ({ setShowLogin, search, setSearch }) => {
   const [menu, setMenu] = useState('home');
   const [profileOpen, setProfileOpen] = useState(false);
   const { getTotalCartItems, token, setToken, userProfile, setUserProfile, logout: contextLogout, url } = useContext(StoreContext);
-  const API_URL = url || import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_URL = url;
   const navigate = useNavigate();
   const cartCount = getTotalCartItems();
 

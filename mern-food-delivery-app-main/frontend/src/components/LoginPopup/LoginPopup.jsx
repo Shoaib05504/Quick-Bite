@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
 import './LoginPopup.css';
-import { assets } from '../../assets/assets';
+import { assets, url } from '../../assets/assets';
 import { StoreContext } from '../context/StoreContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = url;
 
 const LoginPopup = ({ setShowLogin }) => {
   const { setToken, loadCartData, loadUserProfile } = useContext(StoreContext);

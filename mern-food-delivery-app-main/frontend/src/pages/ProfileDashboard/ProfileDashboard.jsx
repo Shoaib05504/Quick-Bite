@@ -311,8 +311,8 @@ const ProfileDashboard = () => {
     if (!image) return fallbackProfileImage;
     const normalized = String(image).trim();
     if (/^data:/i.test(normalized) || /^https?:\/\//i.test(normalized)) return normalized;
-    if (normalized.startsWith('/')) return `${url || import.meta.env.VITE_API_URL || 'http://localhost:8000'}${normalized}`;
-    return `${url || import.meta.env.VITE_API_URL || 'http://localhost:8000'}/images/${normalized}`;
+    if (normalized.startsWith('/')) return `${url}${normalized}`;
+    return `${url}/images/${normalized}`;
   };
 
   const handleImageError = (event) => {

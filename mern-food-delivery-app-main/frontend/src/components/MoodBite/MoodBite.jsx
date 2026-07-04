@@ -5,7 +5,7 @@ import { toast as toastify } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaHeart, FaRobot, FaShoppingCart, FaArrowRight } from "react-icons/fa";
 import { StoreContext } from "../context/StoreContext";
-import { assets } from "../../assets/assets";
+import { assets, url } from "../../assets/assets";
 import "./MoodBite.css";
 
 const MOODS = [
@@ -95,7 +95,7 @@ const TEXT_MESSAGES = {
 };
 
 const MoodFoodCard = ({ item, onAddToCart, onOrderNow, cartCount }) => {
-  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
+  const API_URL = url;
   const imageSrc =
     item.image && item.image.startsWith("http")
       ? item.image

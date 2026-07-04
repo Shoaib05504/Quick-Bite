@@ -1,11 +1,12 @@
 import React from 'react';
 import { FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
 import './SharedCart.css';
+import { url } from '../../assets/assets';
 
 const SharedCart = ({ items, foodList, onAdd, onRemove, onDelete, disabled }) => {
   const lines = items.map((item) => {
     const food = foodList.find((product) => product._id === item.itemId) || {};
-    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
+    const API_URL = url;
     const imageUrl = food.image && food.image.startsWith('http') ? food.image : `${API_URL}/images/${food.image}`;
     return {
       ...item,

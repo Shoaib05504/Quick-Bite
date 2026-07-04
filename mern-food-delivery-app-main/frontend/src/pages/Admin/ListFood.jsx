@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { url as apiUrl } from '../../assets/assets';
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
+const API_URL = apiUrl;
 
 const ListFood = () => {
   const [list, setList] = useState([]);

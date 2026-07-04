@@ -342,7 +342,7 @@ Guidelines:
 
       const chatToken = localStorage.getItem('token');
       const response = await fetch(
-        `${url || import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/chatbot/ask`,
+        `${url}/api/chatbot/ask`,
         {
           method: 'POST',
           headers: {
