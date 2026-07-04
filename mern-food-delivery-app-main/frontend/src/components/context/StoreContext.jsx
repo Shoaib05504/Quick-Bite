@@ -4,7 +4,7 @@ import { profileAPI } from '../../services/apiService';
 
 export const StoreContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
 
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});

@@ -9,7 +9,7 @@ import './GroupOrder.css';
 import { FiChevronLeft, FiShare2, FiUsers, FiClock, FiShoppingCart, FiLock, FiUnlock, FiSearch, FiLayers, FiList, FiActivity } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
-const socketServerUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const socketServerUrl = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
 
 const formatTimer = (milliseconds) => {
   if (milliseconds <= 0) return '00:00';

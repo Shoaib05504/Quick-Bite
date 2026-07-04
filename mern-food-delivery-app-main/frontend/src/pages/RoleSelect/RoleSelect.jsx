@@ -45,7 +45,7 @@ const RoleSelect = () => {
     if (name === "admin" && password === "1234") {
       localStorage.setItem("role", "admin");
       localStorage.setItem("adminName", name);
-      window.location.href = "http://localhost:5175/";
+      window.location.href = window.location.port === "5173" ? "http://localhost:5175/" : "/admin/";
     } else {
       setError("Invalid name or password ❌");
     }

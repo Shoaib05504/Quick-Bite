@@ -95,7 +95,7 @@ const TEXT_MESSAGES = {
 };
 
 const MoodFoodCard = ({ item, onAddToCart, onOrderNow, cartCount }) => {
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
   const imageSrc =
     item.image && item.image.startsWith("http")
       ? item.image
