@@ -9,7 +9,20 @@ import './GroupOrder.css';
 import { FiChevronLeft, FiShare2, FiUsers, FiClock, FiShoppingCart, FiLock, FiUnlock, FiSearch, FiLayers, FiList, FiActivity } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
-const socketServerUrl = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
+const getSocketServerUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (import.meta.env.MODE === 'development') {
+    return envUrl || 'http://localhost:8000';
+  }
+  if (typeof window !== 'undefined') {
+    if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return window.location.origin;
+    }
+    return envUrl || window.location.origin;
+  }
+  return envUrl || '';
+};
+const socketServerUrl = getSocketServerUrl();
 
 const formatTimer = (milliseconds) => {
   if (milliseconds <= 0) return '00:00';

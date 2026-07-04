@@ -1,8 +1,19 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : (import.meta.env.MODE === 'development' ? 'http://localhost:8000/api' : '/api');
+const getApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (import.meta.env.MODE === 'development') {
+    return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
+  }
+  if (typeof window !== 'undefined') {
+    if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return `${window.location.origin}/api`;
+    }
+    return envUrl ? `${envUrl}/api` : '/api';
+  }
+  return envUrl ? `${envUrl}/api` : '/api';
+};
+const API_BASE_URL = getApiBaseUrl();
 
 // Axios instance
 const api = axios.create({

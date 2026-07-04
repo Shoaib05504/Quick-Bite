@@ -4,7 +4,20 @@ import { profileAPI } from '../../services/apiService';
 
 export const StoreContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'development' ? 'http://localhost:8000' : '');
+const getApiUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (import.meta.env.MODE === 'development') {
+    return envUrl || 'http://localhost:8000';
+  }
+  if (typeof window !== 'undefined') {
+    if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return window.location.origin;
+    }
+    return envUrl || window.location.origin;
+  }
+  return envUrl || '';
+};
+const API_URL = getApiUrl();
 
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
