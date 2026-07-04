@@ -45,11 +45,23 @@ initSocket(httpServer);
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   process.env.ADMIN_URL || 'http://localhost:5174',
-];
+].map(url => url.replace(/\/$/, ''));
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (curl, Postman, same-origin)
-    if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    
+    if (
+      allowedOrigins.includes(normalizedOrigin) || 
+      normalizedOrigin.startsWith('http://localhost:') || 
+      normalizedOrigin.startsWith('http://127.0.0.1:') ||
+      (process.env.RENDER_EXTERNAL_URL && normalizedOrigin === process.env.RENDER_EXTERNAL_URL.replace(/\/$/, ''))
+    ) {
       callback(null, true);
     } else {
       callback(new Error(`CORS: Origin ${origin} not allowed`));
