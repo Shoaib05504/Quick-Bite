@@ -386,7 +386,7 @@ ${window.location.href}`;
         // Members list loop
         if (equalSplit) {
           members.forEach((member) => {
-            const cardHeight = 22;
+            const cardHeight = 48; // Increased height
             if (currentY + cardHeight > 275) {
               doc.addPage();
               currentY = 15;
@@ -404,35 +404,56 @@ ${window.location.href}`;
             doc.setFont('Helvetica', 'bold');
             doc.setFontSize(10.5);
             doc.setTextColor(17, 24, 39);
-            doc.text(member.name, 22, currentY + 7);
+            doc.text(member.name, 22, currentY + 8);
             
+            // Role
             doc.setFont('Helvetica', 'normal');
             doc.setFontSize(8.5);
             doc.setTextColor(107, 114, 128);
-            doc.text('Split Type: Equal Split', 22, currentY + 14);
+            doc.text('Role:', 22, currentY + 15);
+            doc.setFont('Helvetica', 'bold');
+            doc.setTextColor(30, 64, 175);
+            doc.text('Member', 32, currentY + 15);
             
-            // Amount
+            // Split Type
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Split Type:', 22, currentY + 22);
+            doc.setFont('Helvetica', 'bold');
+            doc.setTextColor(55, 65, 81);
+            doc.text('Equal Split', 38, currentY + 22);
+            
+            // Amount to Pay
             doc.setFont('Helvetica', 'bold');
             doc.setFontSize(9.5);
+            doc.setTextColor(17, 24, 39);
+            doc.text('Amount To Pay:', 22, currentY + 32);
             doc.setTextColor(22, 163, 74);
-            doc.text('Amount To Pay:', 110, currentY + 14);
-            drawRupeeText(doc, equalShare, 190, currentY + 14, 'right');
+            drawRupeeText(doc, equalShare, 190, currentY + 32, 'right');
+            
+            // Payment Status
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Payment Status:', 22, currentY + 40);
             
             // Status Badge
             const isPaid = member.paymentStatus === 'Paid';
             doc.setFillColor(isPaid ? 220 : 254, isPaid ? 252 : 243, isPaid ? 231 : 199);
-            doc.roundedRect(145, currentY + 3, 20, 6, 2, 2, 'F');
+            doc.roundedRect(165, currentY + 36, 25, 6, 2, 2, 'F');
             doc.setFontSize(7.5);
+            doc.setFont('Helvetica', 'bold');
             doc.setTextColor(isPaid ? 22 : 217, isPaid ? 163 : 119, isPaid ? 74 : 6);
-            doc.text(isPaid ? 'PAID' : 'PENDING', 155, currentY + 7, { align: 'center' });
+            doc.text(isPaid ? 'PAID' : 'PENDING', 177.5, currentY + 40, { align: 'center' });
             
-            currentY += cardHeight + 6;
+            currentY += cardHeight + 8;
           });
         } else {
           memberDetails.forEach((member) => {
             const itemsCount = member.items.length;
             const itemsHeight = itemsCount * 6;
-            const cardHeight = 32 + itemsHeight; // Dynamic card height with proper padding
+            const cardHeight = 74 + itemsHeight; // Increased dynamic card height
             
             if (currentY + cardHeight > 275) {
               doc.addPage();
@@ -449,64 +470,90 @@ ${window.location.href}`;
             
             // Member Name
             doc.setFont('Helvetica', 'bold');
-            doc.setFontSize(10);
+            doc.setFontSize(10.5);
             doc.setTextColor(17, 24, 39);
-            doc.text(member.name, 22, currentY + 7);
+            doc.text(member.name, 22, currentY + 8);
             
-            // Role: Spender
+            // Role
+            const isSpender = itemsCount > 0;
             doc.setFont('Helvetica', 'normal');
             doc.setFontSize(8.5);
             doc.setTextColor(107, 114, 128);
-            doc.text('Role:', 22, currentY + 13);
+            doc.text('Role:', 22, currentY + 15);
             doc.setFont('Helvetica', 'bold');
-            doc.setTextColor(30, 64, 175);
-            doc.text('Spender', 32, currentY + 13);
+            doc.setTextColor(isSpender ? 30 : 55, isSpender ? 64 : 65, isSpender ? 175 : 81);
+            doc.text(isSpender ? 'Spender' : 'Member', 32, currentY + 15);
             
-            // Items header
+            // Split Type
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Split Type:', 22, currentY + 22);
+            doc.setFont('Helvetica', 'bold');
+            doc.setTextColor(55, 65, 81);
+            doc.text('Custom Split', 38, currentY + 22);
+            
+            // Items Ordered Header
             doc.setFont('Helvetica', 'bold');
             doc.setFontSize(8.5);
             doc.setTextColor(55, 65, 81);
-            doc.text('Items:', 22, currentY + 20);
+            doc.text('Items Ordered:', 22, currentY + 30);
             
             // Items List
             doc.setFont('Helvetica', 'normal');
             doc.setFontSize(8.5);
             doc.setTextColor(55, 65, 81);
-            let itemY = currentY + 25;
+            let itemY = currentY + 35;
             member.items.forEach((item) => {
-              doc.text(`${item.food.name || item.name} x${item.quantity}`, 22, itemY);
+              doc.text(`${item.food.name || item.name} x${item.quantity}`, 26, itemY);
               drawRupeeText(doc, item.lineTotal, 190, itemY, 'right');
               itemY += 6;
             });
             
-            // Extra Charges (Delivery Share, Taxes Share, Discount Share)
-            doc.setFontSize(8);
+            // Calculations
+            const itemTotalAmount = member.items.reduce((sum, i) => sum + i.lineTotal, 0);
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
             doc.setTextColor(107, 114, 128);
-            doc.text('Delivery Share:', 22, itemY);
-            drawRupeeText(doc, member.deliveryFeeShare, 45, itemY, 'left');
-            
-            doc.text('Taxes Share:', 75, itemY);
-            drawRupeeText(doc, member.taxShare + member.platformFeeShare, 95, itemY, 'left');
-            
-            doc.text('Discount:', 135, itemY);
-            drawRupeeText(doc, -member.discountShare, 150, itemY, 'left');
+            doc.text('Item Total:', 22, itemY);
+            drawRupeeText(doc, itemTotalAmount, 190, itemY, 'right');
             
             itemY += 6;
+            doc.text('Delivery Share:', 22, itemY);
+            drawRupeeText(doc, member.deliveryFeeShare, 190, itemY, 'right');
             
-            // Final Payable & Status
+            itemY += 6;
+            doc.text('Taxes Share:', 22, itemY);
+            drawRupeeText(doc, member.taxShare + member.platformFeeShare, 190, itemY, 'right');
+            
+            itemY += 6;
+            doc.text('Discount Applied:', 22, itemY);
+            drawRupeeText(doc, -member.discountShare, 190, itemY, 'right');
+            
+            // Final Amount to Pay
+            itemY += 8;
             doc.setFont('Helvetica', 'bold');
             doc.setFontSize(9.5);
+            doc.setTextColor(17, 24, 39);
+            doc.text('Final Amount To Pay:', 22, itemY);
             doc.setTextColor(22, 163, 74);
-            doc.text('Final Payable:', 22, itemY + 4);
-            drawRupeeText(doc, member.finalAmount, 190, itemY + 4, 'right');
+            drawRupeeText(doc, member.finalAmount, 190, itemY, 'right');
+            
+            // Payment Status Section
+            itemY += 8;
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Payment Status:', 22, itemY);
             
             // Status Badge
             const isPaid = member.paymentStatus === 'Paid';
             doc.setFillColor(isPaid ? 220 : 254, isPaid ? 252 : 243, isPaid ? 231 : 199);
-            doc.roundedRect(145, currentY + 3, 20, 6, 2, 2, 'F');
+            doc.roundedRect(165, itemY - 4, 25, 6, 2, 2, 'F');
             doc.setFontSize(7.5);
+            doc.setFont('Helvetica', 'bold');
             doc.setTextColor(isPaid ? 22 : 217, isPaid ? 163 : 119, isPaid ? 74 : 6);
-            doc.text(isPaid ? 'PAID' : 'PENDING', 155, currentY + 7, { align: 'center' });
+            doc.text(isPaid ? 'PAID' : 'PENDING', 177.5, itemY, { align: 'center' });
             
             currentY += cardHeight + 8;
           });
