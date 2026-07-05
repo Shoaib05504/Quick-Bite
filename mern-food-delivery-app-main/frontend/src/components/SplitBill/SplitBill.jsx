@@ -204,111 +204,6 @@ ${window.location.href}`;
     const img = new Image();
     img.src = logo;
 
-    const drawHeaderGradient = (doc, x, y, width, height) => {
-      // #000000 -> #39B54A -> #9DFF00
-      const steps = 100;
-      const stepWidth = width / steps;
-      for (let i = 0; i < steps; i++) {
-        const t = i / steps;
-        let r, g, b;
-        if (t < 0.5) {
-          const factor = t * 2;
-          r = Math.round(0 + (57 - 0) * factor);
-          g = Math.round(0 + (181 - 0) * factor);
-          b = Math.round(74 - 74 * factor);
-        } else {
-          const factor = (t - 0.5) * 2;
-          r = Math.round(57 + (157 - 57) * factor);
-          g = Math.round(181 + (255 - 181) * factor);
-          b = Math.round(74 - 74 * factor);
-        }
-        doc.setFillColor(r, g, b);
-        doc.rect(x + i * stepWidth, y, stepWidth + 0.1, height, 'F');
-      }
-    };
-
-    const drawProgressBarGradient = (doc, x, y, width, height) => {
-      // #16A34A -> #39B54A -> #9DFF00
-      const steps = 50;
-      const stepWidth = width / steps;
-      for (let i = 0; i < steps; i++) {
-        const t = i / steps;
-        let r, g, b;
-        if (t < 0.5) {
-          const factor = t * 2;
-          r = Math.round(22 + (57 - 22) * factor);
-          g = Math.round(163 + (181 - 163) * factor);
-          b = Math.round(74 - 74 * factor);
-        } else {
-          const factor = (t - 0.5) * 2;
-          r = Math.round(57 + (157 - 57) * factor);
-          g = Math.round(181 + (255 - 181) * factor);
-          b = Math.round(74 - 74 * factor);
-        }
-        doc.setFillColor(r, g, b);
-        doc.rect(x + i * stepWidth, y, stepWidth + 0.1, height, 'F');
-      }
-    };
-
-    const drawFooterGradient = (doc, x, y, width, height) => {
-      // #064E3B -> #16A34A -> #84CC16
-      const steps = 100;
-      const stepWidth = width / steps;
-      for (let i = 0; i < steps; i++) {
-        const t = i / steps;
-        let r, g, b;
-        if (t < 0.5) {
-          const factor = t * 2;
-          r = Math.round(6 + (22 - 6) * factor);
-          g = Math.round(78 + (163 - 78) * factor);
-          b = Math.round(59 + (74 - 59) * factor);
-        } else {
-          const factor = (t - 0.5) * 2;
-          r = Math.round(22 + (132 - 22) * factor);
-          g = Math.round(163 + (204 - 163) * factor);
-          b = Math.round(74 + (22 - 74) * factor);
-        }
-        doc.setFillColor(r, g, b);
-        doc.rect(x + i * stepWidth, y, stepWidth + 0.1, height, 'F');
-      }
-    };
-
-    const roundCardCorners = (doc, x, y, w, h, r = 4) => {
-      doc.setFillColor(255, 255, 255);
-      
-      // Top-left
-      doc.beginPath();
-      doc.moveTo(x, y);
-      doc.lineTo(x + r, y);
-      doc.arc(x + r, y + r, r, 3 * Math.PI / 2, Math.PI, true);
-      doc.lineTo(x, y);
-      doc.fill();
-      
-      // Top-right
-      doc.beginPath();
-      doc.moveTo(x + w, y);
-      doc.lineTo(x + w - r, y);
-      doc.arc(x + w - r, y + r, r, 3 * Math.PI / 2, 0, false);
-      doc.lineTo(x + w, y);
-      doc.fill();
-      
-      // Bottom-left
-      doc.beginPath();
-      doc.moveTo(x, y + h);
-      doc.lineTo(x + r, y + h);
-      doc.arc(x + r, y + h - r, r, Math.PI / 2, Math.PI, false);
-      doc.lineTo(x, y + h);
-      doc.fill();
-      
-      // Bottom-right
-      doc.beginPath();
-      doc.moveTo(x + w, y + h);
-      doc.lineTo(x + w - r, y + h);
-      doc.arc(x + w - r, y + h - r, r, Math.PI / 2, 0, true);
-      doc.lineTo(x + w, y + h);
-      doc.fill();
-    };
-
     const drawRupee = (doc, x, y) => {
       const currentDrawColor = doc.getDrawColor();
       doc.setDrawColor(80, 80, 80);
@@ -359,8 +254,19 @@ ${window.location.href}`;
       try {
         const doc = new jsPDF();
 
-        // QuickBite Branding Header - Linear gradient matching official logo
-        drawHeaderGradient(doc, 0, 0, 210, 40);
+        // 1. Draw Header Gradient using Canvas
+        const headerCanvas = document.createElement('canvas');
+        headerCanvas.width = 2100;
+        headerCanvas.height = 400;
+        const headerCtx = headerCanvas.getContext('2d');
+        const headerGrad = headerCtx.createLinearGradient(0, 0, 2100, 400);
+        headerGrad.addColorStop(0, '#000000');
+        headerGrad.addColorStop(0.5, '#39B54A');
+        headerGrad.addColorStop(1, '#9DFF00');
+        headerCtx.fillStyle = headerGrad;
+        headerCtx.fillRect(0, 0, 2100, 400);
+        const headerImgData = headerCanvas.toDataURL('image/png');
+        doc.addImage(headerImgData, 'PNG', 0, 0, 210, 40);
         
         // Draw QuickBite Logo
         if (logoImg) {
@@ -476,8 +382,24 @@ ${window.location.href}`;
         currentY += 3;
         doc.setFillColor(241, 245, 249);
         doc.roundedRect(14, currentY, 182, 4, 2, 2, 'F');
-        // Progress Bar Gradient Fill
-        drawProgressBarGradient(doc, 14, currentY, 182 * (paidCount / memberCount), 4);
+        
+        // Progress Bar Gradient Fill using Canvas
+        const ratio = paidCount / memberCount;
+        if (ratio > 0) {
+          const progressCanvas = document.createElement('canvas');
+          const pWidth = Math.max(1, Math.round(1820 * ratio));
+          progressCanvas.width = pWidth;
+          progressCanvas.height = 40;
+          const pCtx = progressCanvas.getContext('2d');
+          const pGrad = pCtx.createLinearGradient(0, 0, pWidth, 0);
+          pGrad.addColorStop(0, '#16A34A');
+          pGrad.addColorStop(0.5, '#39B54A');
+          pGrad.addColorStop(1, '#9DFF00');
+          pCtx.fillStyle = pGrad;
+          pCtx.fillRect(0, 0, pWidth, 40);
+          const pImgData = progressCanvas.toDataURL('image/png');
+          doc.addImage(pImgData, 'PNG', 14, currentY, 182 * ratio, 4);
+        }
         
         currentY += 12;
         doc.setTextColor(17, 24, 39);
@@ -544,7 +466,6 @@ ${window.location.href}`;
             
             // Status Badge
             const isPaid = member.paymentStatus === 'Paid';
-            // Paid color text #22C55E (34, 197, 94) or Pending #F59E0B (245, 158, 11)
             doc.setFillColor(isPaid ? 240 : 254, isPaid ? 253 : 243, isPaid ? 244 : 199);
             doc.roundedRect(165, currentY + 36, 25, 6, 2, 2, 'F');
             doc.setFontSize(7.5);
@@ -686,7 +607,7 @@ ${window.location.href}`;
         doc.setLineWidth(0.15);
         doc.line(52, currentY + 0.8, 52 + linkWidth, currentY + 0.8);
 
-        // Draw Footer at the end of the PDF
+        // Draw Footer Card using Canvas
         const footerHeight = 42;
         if (currentY + footerHeight > 275) {
           doc.addPage();
@@ -695,9 +616,31 @@ ${window.location.href}`;
           currentY += 12;
         }
         
-        // Draw footer gradient card
-        drawFooterGradient(doc, 14, currentY, 182, footerHeight);
-        roundCardCorners(doc, 14, currentY, 182, footerHeight, 4);
+        // Render Footer Gradient Card via memory canvas
+        const footerCanvas = document.createElement('canvas');
+        footerCanvas.width = 1820;
+        footerCanvas.height = 420;
+        const fCtx = footerCanvas.getContext('2d');
+        
+        // Draw rounded rectangle path on canvas
+        fCtx.beginPath();
+        fCtx.moveTo(40, 0);
+        fCtx.arcTo(1820, 0, 1820, 420, 40);
+        fCtx.arcTo(1820, 420, 0, 420, 40);
+        fCtx.arcTo(0, 420, 0, 0, 40);
+        fCtx.arcTo(0, 0, 1820, 0, 40);
+        fCtx.closePath();
+        fCtx.clip();
+        
+        const fGrad = fCtx.createLinearGradient(0, 0, 1820, 420);
+        fGrad.addColorStop(0, '#064E3B');
+        fGrad.addColorStop(0.5, '#16A34A');
+        fGrad.addColorStop(1, '#84CC16');
+        fCtx.fillStyle = fGrad;
+        fCtx.fillRect(0, 0, 1820, 420);
+        
+        const footerImgData = footerCanvas.toDataURL('image/png');
+        doc.addImage(footerImgData, 'PNG', 14, currentY, 182, footerHeight);
         
         // White text content on green footer card
         doc.setTextColor(255, 255, 255);
