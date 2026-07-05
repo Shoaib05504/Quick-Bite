@@ -6,12 +6,15 @@ const getApiBaseUrl = () => {
     return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
   }
   if (typeof window !== 'undefined') {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
+    }
     if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
       return `${window.location.origin}/api`;
     }
-    return envUrl ? `${envUrl}/api` : '/api';
+    return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
   }
-  return envUrl ? `${envUrl}/api` : '/api';
+  return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
 };
 const API_BASE_URL = getApiBaseUrl();
 

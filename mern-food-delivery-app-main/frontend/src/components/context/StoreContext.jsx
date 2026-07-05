@@ -10,12 +10,15 @@ const getApiUrl = () => {
     return envUrl || 'http://localhost:8000';
   }
   if (typeof window !== 'undefined') {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return envUrl || 'http://localhost:8000';
+    }
     if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
       return window.location.origin;
     }
     return envUrl || window.location.origin;
   }
-  return envUrl || '';
+  return envUrl || 'http://localhost:8000';
 };
 const API_URL = getApiUrl();
 
