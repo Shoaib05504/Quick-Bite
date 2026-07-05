@@ -204,6 +204,111 @@ ${window.location.href}`;
     const img = new Image();
     img.src = logo;
 
+    const drawHeaderGradient = (doc, x, y, width, height) => {
+      // #000000 -> #39B54A -> #9DFF00
+      const steps = 100;
+      const stepWidth = width / steps;
+      for (let i = 0; i < steps; i++) {
+        const t = i / steps;
+        let r, g, b;
+        if (t < 0.5) {
+          const factor = t * 2;
+          r = Math.round(0 + (57 - 0) * factor);
+          g = Math.round(0 + (181 - 0) * factor);
+          b = Math.round(74 - 74 * factor);
+        } else {
+          const factor = (t - 0.5) * 2;
+          r = Math.round(57 + (157 - 57) * factor);
+          g = Math.round(181 + (255 - 181) * factor);
+          b = Math.round(74 - 74 * factor);
+        }
+        doc.setFillColor(r, g, b);
+        doc.rect(x + i * stepWidth, y, stepWidth + 0.1, height, 'F');
+      }
+    };
+
+    const drawProgressBarGradient = (doc, x, y, width, height) => {
+      // #16A34A -> #39B54A -> #9DFF00
+      const steps = 50;
+      const stepWidth = width / steps;
+      for (let i = 0; i < steps; i++) {
+        const t = i / steps;
+        let r, g, b;
+        if (t < 0.5) {
+          const factor = t * 2;
+          r = Math.round(22 + (57 - 22) * factor);
+          g = Math.round(163 + (181 - 163) * factor);
+          b = Math.round(74 - 74 * factor);
+        } else {
+          const factor = (t - 0.5) * 2;
+          r = Math.round(57 + (157 - 57) * factor);
+          g = Math.round(181 + (255 - 181) * factor);
+          b = Math.round(74 - 74 * factor);
+        }
+        doc.setFillColor(r, g, b);
+        doc.rect(x + i * stepWidth, y, stepWidth + 0.1, height, 'F');
+      }
+    };
+
+    const drawFooterGradient = (doc, x, y, width, height) => {
+      // #064E3B -> #16A34A -> #84CC16
+      const steps = 100;
+      const stepWidth = width / steps;
+      for (let i = 0; i < steps; i++) {
+        const t = i / steps;
+        let r, g, b;
+        if (t < 0.5) {
+          const factor = t * 2;
+          r = Math.round(6 + (22 - 6) * factor);
+          g = Math.round(78 + (163 - 78) * factor);
+          b = Math.round(59 + (74 - 59) * factor);
+        } else {
+          const factor = (t - 0.5) * 2;
+          r = Math.round(22 + (132 - 22) * factor);
+          g = Math.round(163 + (204 - 163) * factor);
+          b = Math.round(74 + (22 - 74) * factor);
+        }
+        doc.setFillColor(r, g, b);
+        doc.rect(x + i * stepWidth, y, stepWidth + 0.1, height, 'F');
+      }
+    };
+
+    const roundCardCorners = (doc, x, y, w, h, r = 4) => {
+      doc.setFillColor(255, 255, 255);
+      
+      // Top-left
+      doc.beginPath();
+      doc.moveTo(x, y);
+      doc.lineTo(x + r, y);
+      doc.arc(x + r, y + r, r, 3 * Math.PI / 2, Math.PI, true);
+      doc.lineTo(x, y);
+      doc.fill();
+      
+      // Top-right
+      doc.beginPath();
+      doc.moveTo(x + w, y);
+      doc.lineTo(x + w - r, y);
+      doc.arc(x + w - r, y + r, r, 3 * Math.PI / 2, 0, false);
+      doc.lineTo(x + w, y);
+      doc.fill();
+      
+      // Bottom-left
+      doc.beginPath();
+      doc.moveTo(x, y + h);
+      doc.lineTo(x + r, y + h);
+      doc.arc(x + r, y + h - r, r, Math.PI / 2, Math.PI, false);
+      doc.lineTo(x, y + h);
+      doc.fill();
+      
+      // Bottom-right
+      doc.beginPath();
+      doc.moveTo(x + w, y + h);
+      doc.lineTo(x + w - r, y + h);
+      doc.arc(x + w - r, y + h - r, r, Math.PI / 2, 0, true);
+      doc.lineTo(x + w, y + h);
+      doc.fill();
+    };
+
     const drawRupee = (doc, x, y) => {
       const currentDrawColor = doc.getDrawColor();
       doc.setDrawColor(80, 80, 80);
@@ -254,9 +359,8 @@ ${window.location.href}`;
       try {
         const doc = new jsPDF();
 
-        // QuickBite Branding Header - Green theme (22, 163, 74)
-        doc.setFillColor(22, 163, 74);
-        doc.rect(0, 0, 210, 40, 'F');
+        // QuickBite Branding Header - Linear gradient matching official logo
+        drawHeaderGradient(doc, 0, 0, 210, 40);
         
         // Draw QuickBite Logo
         if (logoImg) {
@@ -339,7 +443,7 @@ ${window.location.href}`;
 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(10);
-        doc.setTextColor(22, 163, 74); // Green accent
+        doc.setTextColor(22, 163, 74); // QuickBite Green
         doc.text('Grand Total:', 130, currentY);
         drawRupeeText(doc, grandTotal, 196, currentY, 'right');
         
@@ -368,12 +472,12 @@ ${window.location.href}`;
           drawRupeeText(doc, discountApplied, 196, currentY, 'right');
         }
         
-        // Progress Bar
+        // Progress Bar Background
         currentY += 3;
         doc.setFillColor(241, 245, 249);
         doc.roundedRect(14, currentY, 182, 4, 2, 2, 'F');
-        doc.setFillColor(22, 163, 74);
-        doc.roundedRect(14, currentY, 182 * (paidCount / memberCount), 4, 2, 2, 'F');
+        // Progress Bar Gradient Fill
+        drawProgressBarGradient(doc, 14, currentY, 182 * (paidCount / memberCount), 4);
         
         currentY += 12;
         doc.setTextColor(17, 24, 39);
@@ -386,7 +490,7 @@ ${window.location.href}`;
         // Members list loop
         if (equalSplit) {
           members.forEach((member) => {
-            const cardHeight = 48; // Increased height
+            const cardHeight = 48; // Spaced height
             if (currentY + cardHeight > 275) {
               doc.addPage();
               currentY = 15;
@@ -396,8 +500,8 @@ ${window.location.href}`;
             doc.setFillColor(248, 250, 252);
             doc.roundedRect(14, currentY, 182, cardHeight, 4, 4, 'F');
             
-            // Left green accent bar
-            doc.setFillColor(22, 163, 74);
+            // Left accent bar (#39B54A)
+            doc.setFillColor(57, 181, 74);
             doc.rect(14, currentY, 3, cardHeight, 'F');
             
             // Member Name
@@ -440,11 +544,12 @@ ${window.location.href}`;
             
             // Status Badge
             const isPaid = member.paymentStatus === 'Paid';
-            doc.setFillColor(isPaid ? 220 : 254, isPaid ? 252 : 243, isPaid ? 231 : 199);
+            // Paid color text #22C55E (34, 197, 94) or Pending #F59E0B (245, 158, 11)
+            doc.setFillColor(isPaid ? 240 : 254, isPaid ? 253 : 243, isPaid ? 244 : 199);
             doc.roundedRect(165, currentY + 36, 25, 6, 2, 2, 'F');
             doc.setFontSize(7.5);
             doc.setFont('Helvetica', 'bold');
-            doc.setTextColor(isPaid ? 22 : 217, isPaid ? 163 : 119, isPaid ? 74 : 6);
+            doc.setTextColor(isPaid ? 34 : 245, isPaid ? 197 : 158, isPaid ? 94 : 11);
             doc.text(isPaid ? 'PAID' : 'PENDING', 177.5, currentY + 40, { align: 'center' });
             
             currentY += cardHeight + 8;
@@ -453,7 +558,7 @@ ${window.location.href}`;
           memberDetails.forEach((member) => {
             const itemsCount = member.items.length;
             const itemsHeight = itemsCount * 6;
-            const cardHeight = 74 + itemsHeight; // Increased dynamic card height
+            const cardHeight = 74 + itemsHeight; // Spaced dynamic height
             
             if (currentY + cardHeight > 275) {
               doc.addPage();
@@ -464,8 +569,8 @@ ${window.location.href}`;
             doc.setFillColor(248, 250, 252);
             doc.roundedRect(14, currentY, 182, cardHeight, 4, 4, 'F');
             
-            // Left green accent bar
-            doc.setFillColor(22, 163, 74);
+            // Left accent bar (#39B54A)
+            doc.setFillColor(57, 181, 74);
             doc.rect(14, currentY, 3, cardHeight, 'F');
             
             // Member Name
@@ -548,11 +653,11 @@ ${window.location.href}`;
             
             // Status Badge
             const isPaid = member.paymentStatus === 'Paid';
-            doc.setFillColor(isPaid ? 220 : 254, isPaid ? 252 : 243, isPaid ? 231 : 199);
+            doc.setFillColor(isPaid ? 240 : 254, isPaid ? 253 : 243, isPaid ? 244 : 199);
             doc.roundedRect(165, itemY - 4, 25, 6, 2, 2, 'F');
             doc.setFontSize(7.5);
             doc.setFont('Helvetica', 'bold');
-            doc.setTextColor(isPaid ? 22 : 217, isPaid ? 163 : 119, isPaid ? 74 : 6);
+            doc.setTextColor(isPaid ? 34 : 245, isPaid ? 197 : 158, isPaid ? 94 : 11);
             doc.text(isPaid ? 'PAID' : 'PENDING', 177.5, itemY, { align: 'center' });
             
             currentY += cardHeight + 8;
@@ -567,49 +672,47 @@ ${window.location.href}`;
         }
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(9);
-        doc.setTextColor(17, 24, 39);
+        doc.setTextColor(22, 163, 74); // Green label #16A34A
         doc.text('Join QuickBite Feast:', 14, currentY);
+        
         doc.setFont('Helvetica', 'normal');
-        doc.setTextColor(22, 163, 74);
-        doc.text(window.location.href, 50, currentY);
+        doc.setTextColor(37, 99, 235); // Blue link #2563EB
+        const linkText = window.location.href;
+        doc.text(linkText, 52, currentY);
+        
+        // Link underline
+        const linkWidth = doc.getTextWidth(linkText);
+        doc.setDrawColor(37, 99, 235);
+        doc.setLineWidth(0.15);
+        doc.line(52, currentY + 0.8, 52 + linkWidth, currentY + 0.8);
 
         // Draw Footer at the end of the PDF
-        const footerHeight = 40;
+        const footerHeight = 42;
         if (currentY + footerHeight > 275) {
           doc.addPage();
           currentY = 20;
         } else {
-          currentY += 10;
+          currentY += 12;
         }
         
-        doc.setDrawColor(22, 163, 74); // Green accent
-        doc.setLineWidth(0.3);
-        doc.line(40, currentY, 170, currentY);
+        // Draw footer gradient card
+        drawFooterGradient(doc, 14, currentY, 182, footerHeight);
+        roundCardCorners(doc, 14, currentY, 182, footerHeight, 4);
         
-        currentY += 6;
+        // White text content on green footer card
+        doc.setTextColor(255, 255, 255);
         doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(9.5);
-        doc.setTextColor(22, 163, 74);
-        doc.text('Thank you for ordering with QuickBite!', 105, currentY, { align: 'center' });
+        doc.setFontSize(10);
+        doc.text('Thank you for ordering with QuickBite!', 105, currentY + 10, { align: 'center' });
         
-        currentY += 5;
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(8.5);
-        doc.setTextColor(107, 114, 128);
-        doc.text('We hope you enjoyed your Group Feast.', 105, currentY, { align: 'center' });
+        doc.text('We hope you enjoyed your Group Feast.', 105, currentY + 18, { align: 'center' });
+        doc.text('Share more meals, split smarter, and eat happier.', 105, currentY + 24, { align: 'center' });
         
-        currentY += 4;
-        doc.text('Share more meals, split smarter, and eat happier.', 105, currentY, { align: 'center' });
-        
-        currentY += 5;
         doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(9);
-        doc.setTextColor(22, 163, 74);
-        doc.text('FAST \u2022 FRESH \u2022 DELICIOUS', 105, currentY, { align: 'center' });
-        
-        currentY += 4;
-        doc.setDrawColor(22, 163, 74);
-        doc.line(40, currentY, 170, currentY);
+        doc.setFontSize(9.5);
+        doc.text('FAST \u2022 FRESH \u2022 DELICIOUS', 105, currentY + 34, { align: 'center' });
 
         doc.save(equalSplit ? 'QuickBite_Equal_Split_Receipt.pdf' : 'QuickBite_Custom_Split_Receipt.pdf');
         toast.success('Invoice downloaded!');
