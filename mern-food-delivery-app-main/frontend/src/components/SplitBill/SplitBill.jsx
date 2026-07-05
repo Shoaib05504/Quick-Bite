@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
 
 const SplitBill = ({ items, members, foodList, equalSplit, onToggleEqual, groupCode, currentUser, isHost, socket }) => {
+  const [showShareModal, setShowShareModal] = useState(false);
   // calculate base amounts
   const itemSummary = useMemo(() => {
     return items.map((item) => {
@@ -104,29 +105,74 @@ const SplitBill = ({ items, members, foodList, equalSplit, onToggleEqual, groupC
     });
   };
 
-  // Copy shareable details
+  // Open premium sharing modal
   const handleShareInvoice = () => {
-    const textLines = [
-      `🍔 QuickBite Smart Bill Split (Group: ${groupCode})`,
-      `Total Amount: ₹${grandTotal}`,
-      `Split Type: ${equalSplit ? 'Equal Split' : 'Order-based Split'}`,
-      '--------------------------------',
-    ];
+    setShowShareModal(true);
+  };
 
-    if (equalSplit) {
-      textLines.push(`Each person pays: ₹${equalShare} (${memberCount} members)`);
-    } else {
-      memberDetails.forEach((member) => {
-        textLines.push(`${member.name}: ₹${member.finalAmount} (${member.paymentStatus})`);
-      });
-    }
+  const getShareText = () => {
+    const orderSummaryText = itemSummary.map((item, idx) => {
+      return `${idx + 1}. ${item.food?.name || item.name || 'Food Item'}\nQuantity: x${item.quantity}\nAdded By: ${item.addedBy}\nAmount: ₹${item.lineTotal}`;
+    }).join('\n\n');
 
-    textLines.push('--------------------------------');
-    textLines.push(`Link: ${window.location.href}`);
+    const membersText = memberDetails.map((m) => {
+      const memberAmount = equalSplit ? equalShare : m.finalAmount;
+      const itemsList = m.items.map(item => item.food?.name || item.name).join(', ') || 'No items';
+      return `👤 ${m.name}\nItems Ordered: ${itemsList}\nAmount to Pay: ₹${memberAmount}\nPayment Status: ${m.paymentStatus}`;
+    }).join('\n\n');
 
-    navigator.clipboard.writeText(textLines.join('\n')).then(() => {
-      toast.success('Invoice details copied to clipboard!');
-    });
+    return `🍔 QuickBite Group Feast Receipt
+
+Group Code: ${groupCode}
+Date: ${new Date().toLocaleDateString()}
+
+--------------------------------
+
+🧾 Order Summary:
+
+${orderSummaryText}
+
+--------------------------------
+
+💰 Bill Details:
+
+Subtotal: ₹${subtotal}
+Delivery Charges: ₹${deliveryFee}
+Taxes & Fees: ₹${(taxes + platformFee).toFixed(2)}
+Group Discount: -₹${discountApplied}
+
+Grand Total: ₹${grandTotal}
+
+--------------------------------
+
+💳 Split Details:
+
+Split Type:
+${equalSplit ? 'Equal Split' : 'Order Based Split'}
+
+Members:
+
+${membersText}
+
+--------------------------------
+
+🔗 Join QuickBite Feast:
+${window.location.href}
+
+FAST • FRESH • DELICIOUS 🚀`;
+  };
+
+  const getShortShareText = () => {
+    const currentUserDetail = memberDetails.find(m => m.name === currentUser) || {};
+    const currentUserShare = equalSplit ? equalShare : (currentUserDetail.finalAmount || 0);
+    const currentUserStatus = currentUserDetail.paymentStatus || 'Pending';
+
+    return `🍔 QuickBite Bill
+Group: ${groupCode}
+Total: ₹${grandTotal}
+Your Share: ₹${currentUserShare}
+Status: ${currentUserStatus}
+Join: ${window.location.href}`;
   };
 
   // PDF Generation via jsPDF
@@ -455,6 +501,100 @@ const SplitBill = ({ items, members, foodList, equalSplit, onToggleEqual, groupC
           </div>
         </div>
       </div>
+
+      {/* Premium Sharing Modal */}
+      <AnimatePresence>
+        {showShareModal && (
+          <div className="share-modal-overlay" onClick={() => setShowShareModal(false)}>
+            <motion.div
+              className="share-modal-content"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <div className="share-modal-header">
+                <h3>📤 Share QuickBite Bill</h3>
+                <p>🍔 QuickBite Group Feast</p>
+                <span>Share your split bill with friends</span>
+              </div>
+              
+              <div className="share-modal-divider" />
+              
+              <div className="share-options-list">
+                <button
+                  type="button"
+                  className="share-option-btn whatsapp-opt"
+                  onClick={() => {
+                    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareText())}`, '_blank');
+                  }}
+                >
+                  <span className="option-icon">🟢</span>
+                  <div className="option-text">
+                    <strong>WhatsApp</strong>
+                    <span>Send bill directly to group</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className="share-option-btn gmail-opt"
+                  onClick={() => {
+                    window.open(`mailto:?subject=${encodeURIComponent("QuickBite Group Feast Bill - " + groupCode)}&body=${encodeURIComponent(getShareText())}`, '_blank');
+                  }}
+                >
+                  <span className="option-icon">📧</span>
+                  <div className="option-text">
+                    <strong>Gmail</strong>
+                    <span>Share receipt by email</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className="share-option-btn messages-opt"
+                  onClick={() => {
+                    window.open(`sms:?&body=${encodeURIComponent(getShortShareText())}`, '_blank');
+                  }}
+                >
+                  <span className="option-icon">💬</span>
+                  <div className="option-text">
+                    <strong>Messages</strong>
+                    <span>Send as text message</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  className="share-option-btn copy-opt"
+                  onClick={() => {
+                    navigator.clipboard.writeText(getShareText()).then(() => {
+                      toast.success("✅ QuickBite bill copied successfully");
+                    });
+                  }}
+                >
+                  <span className="option-icon">🔗</span>
+                  <div className="option-text">
+                    <strong>Copy Link</strong>
+                    <span>Copy invite + bill details</span>
+                  </div>
+                </button>
+              </div>
+
+              <div className="share-modal-divider" />
+
+              <button
+                type="button"
+                className="share-modal-cancel"
+                onClick={() => setShowShareModal(false)}
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
