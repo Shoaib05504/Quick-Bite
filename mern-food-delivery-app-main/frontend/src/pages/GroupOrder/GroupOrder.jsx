@@ -186,11 +186,24 @@ const GroupOrder = () => {
 
   const connectSocket = useCallback(() => {
     const socket = io(socketServerUrl, {
-      transports: ['websocket'],
+      transports: ['polling', 'websocket'],
       autoConnect: false,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
     });
 
     socket.connect();
+
+    socket.on('connect', () => {
+      console.log('Real-time socket connected');
+    });
+
+    socket.on('reconnect', () => {
+      toast.success('Real-time connection restored! \uD83D\uDFE2');
+    });
 
     socket.on('group:joined', (payload) => {
       setGroup(payload.groupOrder);
@@ -211,8 +224,8 @@ const GroupOrder = () => {
     });
 
     socket.on('group:remind', ({ senderName }) => {
-      toast(`🔔 ${senderName} sent you a payment reminder!`, {
-        icon: '💰',
+      toast(`\uD83D\uDD14 ${senderName} sent you a payment reminder!`, {
+        icon: '\uD83D\uDCB0',
         duration: 5000,
         style: {
           border: '1px solid #eab308',
@@ -280,9 +293,9 @@ const GroupOrder = () => {
 
       if (socketRef.current.connected) {
         emitJoin();
-      } else {
-        socketRef.current.on('connect', emitJoin);
       }
+
+      socketRef.current.on('connect', emitJoin);
 
       return () => {
         socketRef.current?.off('connect', emitJoin);
