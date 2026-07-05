@@ -186,7 +186,7 @@ const GroupOrder = () => {
 
   const connectSocket = useCallback(() => {
     const socket = io(socketServerUrl, {
-      transports: ['polling', 'websocket'],
+      transports: ['websocket'],
       autoConnect: false,
       reconnection: true,
       reconnectionAttempts: Infinity,
