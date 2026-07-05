@@ -265,6 +265,31 @@ const GroupOrder = () => {
     fetchGroupOrder();
   }, [fetchGroupOrder]);
 
+  // Auto-join socket room if already joined via REST API
+  useEffect(() => {
+    if (joined && socketRef.current && currentName) {
+      const emitJoin = () => {
+        socketRef.current.emit('group:join', { groupCode, name: currentName }, (response) => {
+          if (response?.success) {
+            setGroup(response.groupOrder);
+            setActivities(response.groupOrder.activities || []);
+            setExpired(response.groupOrder.isExpired || new Date() > new Date(response.groupOrder.expiresAt));
+          }
+        });
+      };
+
+      if (socketRef.current.connected) {
+        emitJoin();
+      } else {
+        socketRef.current.on('connect', emitJoin);
+      }
+
+      return () => {
+        socketRef.current?.off('connect', emitJoin);
+      };
+    }
+  }, [joined, groupCode, currentName]);
+
   useEffect(() => {
     if (!group?.expiresAt) return;
     const interval = setInterval(() => {
@@ -303,14 +328,26 @@ const GroupOrder = () => {
 
   const handleUpdateCart = (action, itemId, quantity = 1) => {
     if (expired) return;
+    
+    // Use one single source of truth for cart lock state
     if (group?.isLocked) {
-      toast.error('Shared cart is locked by the host.');
+      toast('🔒 Group cart is locked by host', {
+        icon: '🔒',
+        style: {
+          background: 'rgba(239, 68, 68, 0.95)',
+          color: '#ffffff',
+          borderRadius: '10px',
+          fontWeight: '600',
+        }
+      });
       return;
     }
+
     if (!socketRef.current?.connected) {
       toast.error('Real-time session disconnected');
       return;
     }
+
     const item = food_list.find((food) => food._id === itemId) || {};
     const price = Number(item.price || 0);
     socketRef.current.emit(
@@ -321,8 +358,16 @@ const GroupOrder = () => {
           setGroup(response.groupOrder);
           setActivities(response.groupOrder.activities || []);
           setExpired(response.groupOrder.isExpired || new Date() > new Date(response.groupOrder.expiresAt));
+          
+          if (action === 'add') {
+            toast.success('🍽️ Item added to Group Feast');
+          }
         } else {
-          toast.error(response?.message || 'Unable to update cart');
+          if (response?.message?.includes('locked')) {
+            toast('🔒 Group cart is locked by host', { icon: '🔒' });
+          } else {
+            toast.error(response?.message || 'Unable to update cart');
+          }
         }
       }
     );
@@ -334,10 +379,17 @@ const GroupOrder = () => {
       return;
     }
     const nextLocked = !group?.isLocked;
+    
+    // Optimistically update the single source of truth immediately for instant UI responsiveness
+    setGroup((prev) => prev ? { ...prev, isLocked: nextLocked } : prev);
+
     socketRef.current.emit('group:toggleLock', { groupCode, isLocked: nextLocked }, (response) => {
       if (response?.success) {
+        setGroup(response.groupOrder);
         toast.success(nextLocked ? 'Shared cart is now LOCKED 🔒' : 'Shared cart is now UNLOCKED 🔓');
       } else {
+        // Rollback state if server request fails
+        setGroup((prev) => prev ? { ...prev, isLocked: !nextLocked } : prev);
         toast.error('Failed to toggle lock status');
       }
     });
