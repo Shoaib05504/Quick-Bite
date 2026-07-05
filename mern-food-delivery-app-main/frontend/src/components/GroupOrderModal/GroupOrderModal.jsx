@@ -76,8 +76,8 @@ const GroupOrderModal = ({ cartLines, onClose }) => {
   const [generating, setGenerating] = useState(false);
 
   // Setup form states
-  const [groupName, setGroupName] = useState('Friday Night Feast');
-  const [noteToGroup, setNoteToGroup] = useState('No peanuts please! 🥜');
+  const [groupName, setGroupName] = useState('');
+  const [noteToGroup, setNoteToGroup] = useState('');
   const [maxParticipants, setMaxParticipants] = useState(5);
   const [groupExpiry, setGroupExpiry] = useState('30 Minutes');
   const [isExpiryDropdownOpen, setIsExpiryDropdownOpen] = useState(false);
@@ -114,13 +114,28 @@ const GroupOrderModal = ({ cartLines, onClose }) => {
   );
 
   const handleCreateGroup = async () => {
-    if (!cartItemsPayload.length) {
-      toast.error('Add items to cart before creating a group order');
+    if (!groupName.trim()) {
+      toast('⚠️ Please enter a group name to start your feast', {
+        position: 'top-right',
+        duration: 3000,
+        style: {
+          background: 'rgba(6, 95, 70, 0.85)',
+          color: '#ffffff',
+          border: '1px solid rgba(209, 250, 229, 0.25)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderRadius: '14px',
+          padding: '12px 18px',
+          fontSize: '14px',
+          fontWeight: '600',
+          boxShadow: '0 10px 30px rgba(16, 185, 129, 0.2)',
+        }
+      });
       return;
     }
     setGenerating(true);
     const response = await groupOrderAPI.createGroupOrder({ 
-      cartItems: cartItemsPayload,
+      cartItems: [],
       groupName: groupName,
       note: noteToGroup,
       maxParticipants: maxParticipants,
@@ -184,7 +199,7 @@ const GroupOrderModal = ({ cartLines, onClose }) => {
                 className="field-input" 
                 value={groupName} 
                 onChange={(e) => setGroupName(e.target.value)}
-                placeholder="Friday Night Feast"
+                placeholder="Enter group name"
               />
             </motion.div>
 
@@ -196,7 +211,7 @@ const GroupOrderModal = ({ cartLines, onClose }) => {
                   className="field-textarea" 
                   value={noteToGroup} 
                   onChange={(e) => setNoteToGroup(e.target.value.slice(0, 100))}
-                  placeholder="No peanuts please! 🥜"
+                  placeholder="Add instructions for your group (optional)"
                   maxLength={100}
                 />
                 <span className="char-counter">{noteToGroup.length}/100</span>
@@ -346,7 +361,7 @@ const GroupOrderModal = ({ cartLines, onClose }) => {
             className="pinned-note-card"
             variants={pinnedCardVariants}
           >
-            <span>📌 "{noteToGroup || 'No peanuts please! 🥜'} — Host"</span>
+            <span>📌 "{noteToGroup || 'No instructions added'} — Host"</span>
           </motion.div>
         </div>
       </motion.div>

@@ -146,6 +146,44 @@ const GroupOrder = () => {
 
   const currentName = userProfile?.name || joinName || 'Guest';
 
+  const formatActivityMessage = (msg, members = []) => {
+    if (!msg) return "";
+    let cleanMsg = msg;
+    let prefix = "";
+    if (msg.startsWith('🟢')) {
+      prefix = '🟢 ';
+      cleanMsg = msg.slice(2).trim();
+    } else if (msg.startsWith('🔴')) {
+      prefix = '🔴 ';
+      cleanMsg = msg.slice(2).trim();
+    }
+    
+    const matchingMember = members.find(m => cleanMsg.startsWith(m.name));
+    if (matchingMember) {
+      const nameLen = matchingMember.name.length;
+      return (
+        <>
+          {prefix && <span>{prefix}</span>}
+          <span className="activity-user-highlight">{matchingMember.name}</span>
+          {cleanMsg.slice(nameLen)}
+        </>
+      );
+    }
+    
+    const words = cleanMsg.split(' ');
+    if (words.length > 1 && /^[A-Z]/.test(words[0])) {
+      return (
+        <>
+          {prefix && <span>{prefix}</span>}
+          <span className="activity-user-highlight">{words[0]} {words[1]}</span>
+          {" " + words.slice(2).join(' ')}
+        </>
+      );
+    }
+    
+    return msg;
+  };
+
   const connectSocket = useCallback(() => {
     const socket = io(socketServerUrl, {
       transports: ['websocket'],
@@ -310,8 +348,8 @@ const GroupOrder = () => {
       toast.error('The shared cart is empty');
       return;
     }
-    const itemsToAdd = group.cartItems.map((item) => ({ itemId: item.itemId, quantity: item.quantity }));
-    await addItemsToCart(itemsToAdd);
+    localStorage.setItem('groupOrderCheckout', JSON.stringify(group.cartItems));
+    localStorage.setItem('groupOrderCode', group.groupCode);
     navigate('/order');
   };
 
@@ -847,8 +885,8 @@ const GroupOrder = () => {
                   <div className="activity-list">
                     {activities.slice(0, 6).map((activity, index) => (
                       <div key={index} className="activity-item">
-                        <FiActivity className="activity-bullet" />
-                        <p>{activity.message}</p>
+                        <span className="activity-bullet">🟢</span>
+                        <p>{formatActivityMessage(activity.message, group?.members)}</p>
                       </div>
                     ))}
                   </div>

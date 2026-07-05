@@ -35,6 +35,11 @@ const PlaceOrder = () => {
 
   const { getTotalCartAmount, token, food_list, cartItems, url, userProfile, setUserProfile } = useContext(StoreContext);
 
+  const groupOrderItems = useMemo(() => {
+    const stored = localStorage.getItem('groupOrderCheckout');
+    return stored ? JSON.parse(stored) : null;
+  }, []);
+
   const [data, setData] = useState({
     firstName: '',
     lastName: '',
@@ -68,17 +73,33 @@ const PlaceOrder = () => {
   });
 
   const cartLines = useMemo(
-    () =>
-      food_list
+    () => {
+      if (groupOrderItems) {
+        return groupOrderItems.map((item) => {
+          const food = food_list.find((f) => f._id === item.itemId) || {};
+          return {
+            _id: item.itemId,
+            name: food.name || item.itemId,
+            price: Number(food.price || item.price || 0),
+            quantity: item.quantity,
+          };
+        });
+      }
+      return food_list
         .filter((item) => cartItems[item._id] > 0)
         .map((item) => ({
           _id: item._id,
           name: item.name,
           price: item.price,
           quantity: cartItems[item._id],
-        })),
-    [food_list, cartItems]
+        }));
+    },
+    [food_list, cartItems, groupOrderItems]
   );
+
+  const subtotal = useMemo(() => {
+    return cartLines.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+  }, [cartLines]);
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
@@ -376,9 +397,20 @@ const PlaceOrder = () => {
       return;
     }
 
-    const orderItems = food_list
-      .filter((item) => cartItems[item._id] > 0)
-      .map((item) => ({ ...item, quantity: cartItems[item._id] }));
+    const orderItems = groupOrderItems
+      ? groupOrderItems.map((item) => {
+          const food = food_list.find((f) => f._id === item.itemId) || {};
+          return {
+            _id: item.itemId,
+            name: food.name || item.itemId,
+            price: Number(food.price || item.price || 0),
+            image: food.image,
+            quantity: item.quantity,
+          };
+        })
+      : food_list
+          .filter((item) => cartItems[item._id] > 0)
+          .map((item) => ({ ...item, quantity: cartItems[item._id] }));
 
     if (orderItems.length === 0) {
       toast.error('Your cart is empty');
@@ -406,6 +438,7 @@ const PlaceOrder = () => {
       address: addressPayload,
       items: orderItems,
       paymentMethod: 'UPI',
+      isGroupOrder: Boolean(groupOrderItems),
     };
 
     try {
@@ -446,6 +479,10 @@ const PlaceOrder = () => {
               );
 
               if (verifyRes.data.success) {
+                if (groupOrderItems) {
+                  localStorage.removeItem('groupOrderCheckout');
+                  localStorage.removeItem('groupOrderCode');
+                }
                 toast.success('✅ Order placed successfully! Preparing your delicious meal 🍽️', {
                   position: 'top-right',
                   duration: 3000,
@@ -758,17 +795,17 @@ const PlaceOrder = () => {
           <div className="cart-total-details">
             <div className="cart-total-detail">
               <p>Subtotal</p>
-              <p>₹{getTotalCartAmount()}</p>
+              <p>₹{subtotal}</p>
             </div>
             <hr />
             <div className="cart-total-detail">
               <p>Delivery Fee</p>
-              <p>₹{getTotalCartAmount() === 0 ? 0 : 2}</p>
+              <p>₹{subtotal === 0 ? 0 : 2}</p>
             </div>
             <hr />
             <div className="cart-total-detail total-row">
               <b>Total</b>
-              <b>₹{getTotalCartAmount() === 0 ? 0 : getTotalCartAmount() + 2}</b>
+              <b>₹{subtotal === 0 ? 0 : subtotal + 2}</b>
             </div>
           </div>
           <motion.button

@@ -265,7 +265,7 @@ const SplitBill = ({ items, members, foodList, equalSplit, onToggleEqual, groupC
             className={`tab-btn ${!equalSplit ? 'active' : ''}`}
             onClick={() => { if (equalSplit) onToggleEqual(); }}
           >
-            Order-based
+            Custom Split
           </button>
           <button
             type="button"
@@ -281,7 +281,7 @@ const SplitBill = ({ items, members, foodList, equalSplit, onToggleEqual, groupC
       <div className="payment-progress-container">
         <div className="progress-labels">
           <span>Payment Completion</span>
-          <span>{paidCount} of {memberCount} Paid ({paymentProgress}%)</span>
+          <span>{paidCount} of {memberCount} Paid (<span className="progress-green-text">{paymentProgress}%</span>)</span>
         </div>
         <div className="progress-bar-track">
           <motion.div

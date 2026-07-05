@@ -71,7 +71,9 @@ const placeOrder = async (req, res) => {
     });
 
     await newOrder.save();
-    await userModel.findByIdAndUpdate(userId, { cartData: {} });
+    if (!req.body.isGroupOrder) {
+      await userModel.findByIdAndUpdate(userId, { cartData: {} });
+    }
 
     const razorpayOrder = await razorpay.orders.create({
       amount: Math.round(serverAmount * 100), // paise

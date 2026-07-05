@@ -715,13 +715,15 @@ body,
 }
 
 .payment-badge.paid {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
+  background: rgba(34, 197, 94, 0.14);
+  color: #15803d;
+  font-weight: 800;
 }
 
 .payment-badge.pending {
-  background: rgba(234, 179, 8, 0.1);
-  color: #ca8a04;
+  background: rgba(234, 179, 8, 0.14);
+  color: #a16207;
+  font-weight: 800;
 }
 
 .member-count {
@@ -756,17 +758,19 @@ body,
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  color: #4b5563;
+  color: #374151; /* Message text: #374151 */
   padding: 10px 14px;
   border-radius: 12px;
-  background: #fff;
-  border: 1px solid #f1f5f9;
+  background: rgba(255, 255, 255, 0.9); /* light green/white card */
+  border: 1px solid #D1FAE5; /* light green border */
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.10); /* soft green shadow */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .activity-bullet {
-  color: #2563eb;
-  font-size: 13px;
-  margin-top: 2px;
+  font-size: 12px;
+  margin-top: 1px;
   flex-shrink: 0;
 }
 
@@ -775,6 +779,13 @@ body,
   font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
+  color: #374151; /* Message text */
+}
+
+.activity-user-highlight {
+  color: #16A34A !important;
+  font-weight: 800 !important;
+  display: inline !important;
 }
 
 /* ==================== ACTION PANEL (RIGHT PANEL — TIMER, LOCK, CHECKOUT) ==================== */
