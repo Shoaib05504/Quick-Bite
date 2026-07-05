@@ -109,9 +109,26 @@ const Navbar = ({ setShowLogin, search, setSearch }) => {
     navigate('/home');
   };
 
+  const handleNavClick = (e, item) => {
+    if (item.href) {
+      const hashIndex = item.href.indexOf('#');
+      if (hashIndex !== -1) {
+        const targetId = item.href.slice(hashIndex + 1);
+        if (window.location.pathname === '/home') {
+          e.preventDefault();
+          setMenu(item.key);
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      }
+    }
+  };
+
   return (
     <div className='navbar'>
-      <Link to='/home'>
+      <Link to='/'>
         <h2 className="logo-text">
           <span className="logo-q">
             <span className="fork">🍴</span>
@@ -157,7 +174,7 @@ const Navbar = ({ setShowLogin, search, setSearch }) => {
               ) : (
                 <a
                   href={item.href}
-                  onClick={() => setMenu(item.key)}
+                  onClick={(e) => handleNavClick(e, item)}
                   className={`menu-link-front ${menu === item.key ? 'active' : ''}`}
                   variants={itemVariants}
                   transition={sharedTransition}
@@ -194,7 +211,7 @@ const Navbar = ({ setShowLogin, search, setSearch }) => {
               ) : (
                 <a
                   href={item.href}
-                  onClick={() => setMenu(item.key)}
+                  onClick={(e) => handleNavClick(e, item)}
                   className={`menu-link-back ${menu === item.key ? 'active' : ''}`}
                   variants={backVariants}
                   transition={sharedTransition}

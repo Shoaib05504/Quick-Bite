@@ -1,26 +1,60 @@
 /* ══════════════════════════════════════════════════════════════════
    AppDownlaod.css  –  download section + store button enhancements
-══════════════════════════════════════════════════════════════════ */
+   Dark Premium Green, Repeating Food Pattern & Premium Shadows
+   ══════════════════════════════════════════════════════════════════ */
 
 /* ── Section container ───────────────────────────────────────────── */
 .app-download {
   margin: 60px auto 120px;
-  padding: 40px 24px;
+  padding: 32px 24px;
   max-width: 1120px;
   border-radius: 28px;
-  background: rgba(15, 10, 36, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Dark Premium Green gradient */
+  background: linear-gradient(
+    135deg,
+    #022C22 0%,
+    #065F46 50%,
+    #10B981 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(18px);
-  box-shadow: 0 28px 72px rgba(7, 5, 23, 0.26);
+  /* Premium Shadow & Soft Green Glow */
+  box-shadow: 0 20px 45px rgba(16, 185, 129, 0.35);
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+  animation: floatCard 5s ease-in-out infinite, fadeIn 0.8s ease-out;
+}
+
+.app-download:hover {
+  transform: scale(1.03) translateY(-4px); /* Hover scale 1.03 */
+  box-shadow: 0 28px 60px rgba(16, 185, 129, 0.50), 0 0 35px rgba(16, 185, 129, 0.25);
+}
+
+/* Subtle food pattern background (leaf, pizza, burger icons) at 5% opacity */
+.app-download::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M15 35h30a8 8 0 0 0 8-8v-2H7v2a8 8 0 0 0 8 8zm-8 4h46v2H7zm3 6h40a4 4 0 0 0-4-4H14a4 4 0 0 0-4 4z' fill='%23ffffff' fill-opacity='0.8'%3E%3C/path%3E%3Cpath d='M65 15l10 25a12 12 0 0 1-20 0z' fill='%23ffffff' fill-opacity='0.8'%3E%3C/path%3E%3Ccircle cx='65' cy='25' r='2' fill='%23ffffff' fill-opacity='0.8'%3E%3C/circle%3E%3Cpath d='M25 65c0-8 12-8 12 0s-12 8-12 0z' fill='%23ffffff' fill-opacity='0.8'%3E%3C/path%3E%3C/svg%3E");
+  background-size: 80px 80px;
+  opacity: 0.05; /* Pattern opacity 5% */
+  pointer-events: none;
+  z-index: 1;
 }
 
 .app-download p {
   margin: 0;
-  color: #f7f5ff;
+  color: #ffffff; /* White bold text */
   font-size: clamp(1.8rem, 2.7vw, 2.6rem);
-  font-weight: 700;
-  line-height: 1.1;
+  font-weight: 800; /* Smooth font weight */
+  line-height: 1.15;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 2; /* Put above pattern */
+  letter-spacing: -0.5px;
 }
 
 /* ── Platforms row ───────────────────────────────────────────────── */
@@ -28,37 +62,35 @@
   display: flex;
   justify-content: center;
   gap: 24px;
-  margin-top: 32px;
+  margin-top: 28px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 2; /* Put above pattern */
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   Store button wrapper
-   • overflow:hidden clips the ripple inside the rounded rect
-   • hover: scale 1.05 + green outer glow
-   • active: quick press-down
-───────────────────────────────────────────────────────────────── */
+/* ── Store button wrapper ── */
 .store-btn {
   position: relative;
   overflow: hidden;
   border-radius: 22px;
   display: inline-block;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition:
-    transform  0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.28s ease;
+    transform  0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s ease;
 }
 
 .store-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.05) translateY(-5px); /* scale(1.05) and translateY(-5px) */
   box-shadow:
-    0 0 0 2px  rgba(34, 197, 94, 0.50),
-    0 16px 42px rgba(34, 197, 94, 0.30),
-    0 6px  18px rgba(0, 0, 0, 0.22);
+    0 0 0 2px rgba(255, 255, 255, 0.3),
+    0 12px 28px rgba(16, 185, 129, 0.4),
+    0 0 20px rgba(16, 185, 129, 0.25); /* Soft glow */
 }
 
 .store-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.97) translateY(-2px);
   transition-duration: 0.08s;
 }
 
@@ -68,7 +100,6 @@
   width: min(180px, 28vw);
   max-width: 180px;
   border-radius: 22px;
-  box-shadow: 0 18px 38px rgba(147, 84, 255, 0.18);
   transition: filter 0.28s ease;
   user-select: none;
   pointer-events: none;
@@ -76,7 +107,7 @@
 }
 
 .store-btn:hover img {
-  filter: brightness(1.07) saturate(1.12);
+  filter: brightness(1.05) saturate(1.08);
 }
 
 /* ── CSS Ripple ──────────────────────────────────────────────────── */
@@ -85,7 +116,7 @@
   border-radius: 50%;
   pointer-events: none;
   transform: scale(0);
-  background: rgba(34, 197, 94, 0.45);
+  background: rgba(255, 255, 255, 0.4);
   animation: storeRipple 0.6s ease-out forwards;
 }
 
@@ -96,11 +127,23 @@
   }
 }
 
+/* ── Keyframes ── */
+@keyframes floatCard {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 700px) {
   .app-download {
     margin: 40px auto 80px;
-    padding: 32px 18px;
+    padding: 26px 18px;
   }
 
   .app-download p {

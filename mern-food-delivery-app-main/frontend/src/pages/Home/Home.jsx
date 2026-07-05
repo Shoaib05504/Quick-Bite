@@ -11,9 +11,11 @@ const Home = ({search,setSearch}) => {
   const [category, setCategory] = useState('All')
 
   useEffect(() => {
-    if (window.location.hash === '#moodbite') {
+    const hash = window.location.hash;
+    if (hash) {
+      const targetId = hash.replace('#', '');
       setTimeout(() => {
-        const el = document.getElementById('moodbite');
+        const el = document.getElementById(targetId);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
