@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiDownload, FiShare2, FiBell, FiDollarSign, FiCheckCircle, FiClock, FiStar, FiUser, FiActivity } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
+import logo from '../../assets/logo.png';
 
 const SplitBill = ({ items, members, foodList, equalSplit, onToggleEqual, groupCode, currentUser, isHost, socket }) => {
   const [showShareModal, setShowShareModal] = useState(false);
@@ -111,190 +112,257 @@ const SplitBill = ({ items, members, foodList, equalSplit, onToggleEqual, groupC
   };
 
   const getShareText = () => {
-    const orderSummaryText = itemSummary.map((item, idx) => {
-      return `${idx + 1}. ${item.food?.name || item.name || 'Food Item'}\nQuantity: x${item.quantity}\nAdded By: ${item.addedBy}\nAmount: ₹${item.lineTotal}`;
+    const orderSummaryText = itemSummary.map((item) => {
+      return `🍽 Item Name: ${item.food?.name || item.name || 'Food Item'}
+Quantity: x${item.quantity}
+Added By: ${item.addedBy}
+Price: ₹${item.price}`;
     }).join('\n\n');
 
     const membersText = memberDetails.map((m) => {
       const memberAmount = equalSplit ? equalShare : m.finalAmount;
-      const itemsList = m.items.map(item => item.food?.name || item.name).join(', ') || 'No items';
-      return `👤 ${m.name}\nItems Ordered: ${itemsList}\nAmount to Pay: ₹${memberAmount}\nPayment Status: ${m.paymentStatus}`;
-    }).join('\n\n');
+      const itemsList = m.items.map(item => `🍽 ${item.food?.name || item.name}`).join('\n') || 'No items';
+      const statusEmoji = m.paymentStatus === 'Paid' ? '🟢 Paid' : '🟡 Pending';
+      return `👤 ${m.name}
 
-    return `🍔 QuickBite Group Feast Receipt
+Items Ordered:
+${itemsList}
 
-Group Code: ${groupCode}
-Date: ${new Date().toLocaleDateString()}
+Amount to Pay:
+₹${memberAmount}
 
---------------------------------
+Payment Status:
+${statusEmoji}`;
+    }).join('\n\n\n');
 
-🧾 Order Summary:
+    return `QuickBite Group Feast Receipt
+
+FAST • FRESH • DELICIOUS 🚀
+
+🆔 Group Code: ${groupCode}
+📅 Date: ${new Date().toLocaleDateString()}
+
+━━━━━━━━━━━━━━━━━━
+
+🧾 ORDER SUMMARY
 
 ${orderSummaryText}
 
---------------------------------
+━━━━━━━━━━━━━━━━━━
 
-💰 Bill Details:
+💰 BILL SUMMARY
 
 Subtotal: ₹${subtotal}
 Delivery Charges: ₹${deliveryFee}
 Taxes & Fees: ₹${(taxes + platformFee).toFixed(2)}
 Group Discount: -₹${discountApplied}
 
-Grand Total: ₹${grandTotal}
+💚 Grand Total: ₹${grandTotal}
 
---------------------------------
+━━━━━━━━━━━━━━━━━━
 
-💳 Split Details:
+💳 SMART SPLIT DETAILS
 
 Split Type:
 ${equalSplit ? 'Equal Split' : 'Order Based Split'}
 
-Members:
+👥 MEMBERS DETAILS
 
 ${membersText}
 
---------------------------------
+━━━━━━━━━━━━━━━━━━
 
 🔗 Join QuickBite Feast:
+
 ${window.location.href}
 
-FAST • FRESH • DELICIOUS 🚀`;
+Thank you for ordering with QuickBite ❤️`;
   };
 
   const getShortShareText = () => {
     const currentUserDetail = memberDetails.find(m => m.name === currentUser) || {};
     const currentUserShare = equalSplit ? equalShare : (currentUserDetail.finalAmount || 0);
-    const currentUserStatus = currentUserDetail.paymentStatus || 'Pending';
+    const currentUserStatus = currentUserDetail.paymentStatus === 'Paid' ? '🟢 Paid' : '🟡 Pending';
 
-    return `🍔 QuickBite Bill
+    return `QuickBite Bill
+
 Group: ${groupCode}
-Total: ₹${grandTotal}
+
+Total Bill: ₹${grandTotal}
+
 Your Share: ₹${currentUserShare}
-Status: ${currentUserStatus}
-Join: ${window.location.href}`;
+
+Status:
+${currentUserStatus}
+
+Join Feast:
+${window.location.href}`;
   };
 
   // PDF Generation via jsPDF
   const handleDownloadInvoice = () => {
-    try {
-      const doc = new jsPDF();
+    const img = new Image();
+    img.src = logo;
+    
+    const generatePDF = (logoImg) => {
+      try {
+        const doc = new jsPDF();
 
-      // QuickBite Branding Header
-      doc.setFillColor(37, 99, 235); // Royal Blue
-      doc.rect(0, 0, 210, 40, 'F');
-      
-      doc.setTextColor(255, 255, 255);
-      doc.setFont('Helvetica', 'bold');
-      doc.setFontSize(22);
-      doc.text('QuickBite Feast Receipt', 14, 26);
-      
-      doc.setFont('Helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text(`Group Code: ${groupCode}  |  Date: ${new Date().toLocaleDateString()}`, 14, 33);
+        // QuickBite Branding Header - Green theme (22, 163, 74)
+        doc.setFillColor(22, 163, 74);
+        doc.rect(0, 0, 210, 40, 'F');
+        
+        // Draw QuickBite Logo
+        if (logoImg) {
+          doc.addImage(logoImg, 'PNG', 14, 8, 24, 24);
+        }
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text('QuickBite Group Feast Receipt', 44, 18);
+        
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text('FAST \u2022 FRESH \u2022 DELICIOUS', 44, 24);
+        doc.text(`Group Code: ${groupCode}  |  Date: ${new Date().toLocaleDateString()}`, 44, 30);
 
-      doc.setTextColor(17, 24, 39);
-      doc.setFontSize(14);
-      doc.setFont('Helvetica', 'bold');
-      doc.text('Order Summary', 14, 52);
+        doc.setTextColor(17, 24, 39);
+        doc.setFontSize(13);
+        doc.setFont('Helvetica', 'bold');
+        doc.text('Order Summary', 14, 52);
 
-      // Render Items Table
-      doc.setFontSize(10);
-      doc.setFont('Helvetica', 'bold');
-      doc.text('Item', 14, 62);
-      doc.text('Added By', 95, 62);
-      doc.text('Qty', 145, 62);
-      doc.text('Price', 170, 62);
-      doc.text('Total', 190, 62, { align: 'right' });
+        // Render Items Table
+        doc.setFontSize(9);
+        doc.setFont('Helvetica', 'bold');
+        doc.text('Item', 14, 62);
+        doc.text('Added By', 95, 62);
+        doc.text('Qty', 145, 62);
+        doc.text('Price', 170, 62);
+        doc.text('Total', 190, 62, { align: 'right' });
 
-      doc.setDrawColor(226, 232, 240);
-      doc.line(14, 65, 196, 65);
+        doc.setDrawColor(22, 163, 74); // Green accent line
+        doc.setLineWidth(0.5);
+        doc.line(14, 65, 196, 65);
 
-      let currentY = 71;
-      doc.setFont('Helvetica', 'normal');
-      itemSummary.forEach((item) => {
+        let currentY = 72;
+        doc.setFont('Helvetica', 'normal');
+        itemSummary.forEach((item) => {
+          if (currentY > 260) {
+            doc.addPage();
+            currentY = 20;
+          }
+          doc.text(String(item.food.name || item.itemId).substring(0, 38), 14, currentY);
+          doc.text(String(item.addedBy), 95, currentY);
+          doc.text(String(item.quantity), 145, currentY);
+          doc.text(`\u20B9${item.price}`, 170, currentY);
+          doc.text(`\u20B9${item.lineTotal}`, 196, currentY, { align: 'right' });
+          currentY += 8;
+        });
+
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.2);
+        doc.line(14, currentY - 2, 196, currentY - 2);
+
+        // Financials breakdown
+        currentY += 4;
+        doc.setFontSize(9);
+        doc.text('Subtotal:', 130, currentY);
+        doc.text(`\u20B9${subtotal}`, 196, currentY, { align: 'right' });
+        currentY += 6;
+        doc.text('Delivery Charges:', 130, currentY);
+        doc.text(`\u20B9${deliveryFee}`, 196, currentY, { align: 'right' });
+        currentY += 6;
+        doc.text('Taxes & Fees:', 130, currentY);
+        doc.text(`\u20B9${(taxes + platformFee).toFixed(2)}`, 196, currentY, { align: 'right' });
+        currentY += 6;
+        doc.text('Group Discount:', 130, currentY);
+        doc.text(`-\u20B9${discountApplied}`, 196, currentY, { align: 'right' });
+        currentY += 8;
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(22, 163, 74); // Green accent
+        doc.text('Grand Total:', 130, currentY);
+        doc.text(`\u20B9${grandTotal}`, 196, currentY, { align: 'right' });
+        
+        // Individual Summary Table
+        currentY += 15;
+        doc.setTextColor(17, 24, 39);
+        doc.setFontSize(13);
+        doc.text('Smart Split Details', 14, currentY);
+        doc.setFontSize(9);
+        doc.setFont('Helvetica', 'normal');
+        doc.text(`Split Type: ${equalSplit ? 'Equal Split' : 'Order Based Split'}`, 14, currentY + 5);
+        currentY += 12;
+
+        doc.setFont('Helvetica', 'bold');
+        doc.text('Member', 14, currentY);
+        doc.text('Items Ordered', 70, currentY);
+        doc.text('Amount Owed', 150, currentY);
+        doc.text('Status', 180, currentY);
+        
+        doc.setDrawColor(22, 163, 74);
+        doc.setLineWidth(0.5);
+        doc.line(14, currentY + 3, 196, currentY + 3);
+        currentY += 9;
+
+        doc.setFont('Helvetica', 'normal');
+        if (equalSplit) {
+          members.forEach((member) => {
+            if (currentY > 260) {
+              doc.addPage();
+              currentY = 20;
+            }
+            doc.text(member.name, 14, currentY);
+            doc.text('Equal Split Share', 70, currentY);
+            doc.text(`\u20B9${equalShare}`, 150, currentY);
+            doc.text(member.paymentStatus || 'Pending', 180, currentY);
+            currentY += 8;
+          });
+        } else {
+          memberDetails.forEach((member) => {
+            if (currentY > 260) {
+              doc.addPage();
+              currentY = 20;
+            }
+            doc.text(member.name, 14, currentY);
+            const itemNames = member.items.map((i) => `${i.food.name || i.name} x${i.quantity}`).join(', ');
+            doc.text(itemNames.length > 35 ? itemNames.substring(0, 32) + '...' : itemNames, 70, currentY);
+            doc.text(`\u20B9${member.finalAmount}`, 150, currentY);
+            doc.text(member.paymentStatus, 180, currentY);
+            currentY += 8;
+          });
+        }
+
+        // Invite Link
+        currentY += 6;
         if (currentY > 260) {
           doc.addPage();
           currentY = 20;
         }
-        doc.text(String(item.food.name || item.itemId).substring(0, 38), 14, currentY);
-        doc.text(String(item.addedBy), 95, currentY);
-        doc.text(String(item.quantity), 145, currentY);
-        doc.text(`₹${item.price}`, 170, currentY);
-        doc.text(`₹${item.lineTotal}`, 196, currentY, { align: 'right' });
-        currentY += 8;
-      });
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text('Join QuickBite Feast:', 14, currentY);
+        doc.setFont('Helvetica', 'normal');
+        doc.setTextColor(22, 163, 74);
+        doc.text(window.location.href, 50, currentY);
 
-      doc.line(14, currentY - 2, 196, currentY - 2);
+        // Branding Footer
+        doc.setFontSize(9);
+        doc.setTextColor(107, 114, 128);
+        doc.text('Thank you for ordering with QuickBite \u2764\uFE0F', 105, 280, { align: 'center' });
 
-      // Financials breakdown
-      currentY += 4;
-      doc.text('Subtotal:', 140, currentY);
-      doc.text(`₹${subtotal}`, 196, currentY, { align: 'right' });
-      currentY += 6;
-      doc.text('Delivery Charges:', 140, currentY);
-      doc.text(`₹${deliveryFee}`, 196, currentY, { align: 'right' });
-      currentY += 6;
-      doc.text('Taxes (5% GST):', 140, currentY);
-      doc.text(`₹${taxes}`, 196, currentY, { align: 'right' });
-      currentY += 6;
-      doc.text('Platform Fee:', 140, currentY);
-      doc.text(`₹${platformFee}`, 196, currentY, { align: 'right' });
-      currentY += 6;
-      doc.text('Discount Applied:', 140, currentY);
-      doc.text(`-₹${discountApplied}`, 196, currentY, { align: 'right' });
-      currentY += 8;
-
-      doc.setFont('Helvetica', 'bold');
-      doc.text('Grand Total:', 140, currentY);
-      doc.text(`₹${grandTotal}`, 196, currentY, { align: 'right' });
-      
-      // Individual Summary Table
-      currentY += 15;
-      doc.setFontSize(14);
-      doc.text('Individual Share Breakdown', 14, currentY);
-      currentY += 8;
-
-      doc.setFontSize(10);
-      doc.text('Member', 14, currentY);
-      doc.text('Items Ordered', 70, currentY);
-      doc.text('Amount Owed', 150, currentY);
-      doc.text('Status', 180, currentY);
-      
-      doc.line(14, currentY + 3, 196, currentY + 3);
-      currentY += 9;
-
-      doc.setFont('Helvetica', 'normal');
-      if (equalSplit) {
-        members.forEach((member) => {
-          doc.text(member.name, 14, currentY);
-          doc.text('Equal Split Share', 70, currentY);
-          doc.text(`₹${equalShare}`, 150, currentY);
-          doc.text(member.paymentStatus || 'Pending', 180, currentY);
-          currentY += 8;
-        });
-      } else {
-        memberDetails.forEach((member) => {
-          doc.text(member.name, 14, currentY);
-          const itemNames = member.items.map((i) => `${i.food.name} x${i.quantity}`).join(', ');
-          doc.text(itemNames.length > 35 ? itemNames.substring(0, 32) + '...' : itemNames, 70, currentY);
-          doc.text(`₹${member.finalAmount}`, 150, currentY);
-          doc.text(member.paymentStatus, 180, currentY);
-          currentY += 8;
-        });
+        doc.save(`QuickBite_Feast_${groupCode}.pdf`);
+        toast.success('Invoice downloaded!');
+      } catch (error) {
+        console.error(error);
+        toast.error('Unable to generate invoice PDF.');
       }
+    };
 
-      // Branding Footer
-      doc.setFontSize(9);
-      doc.setTextColor(107, 114, 128);
-      doc.text('Thank you for ordering with QuickBite. Hope to feed you again soon!', 105, 280, { align: 'center' });
-
-      doc.save(`QuickBite_Feast_${groupCode}.pdf`);
-      toast.success('Invoice downloaded!');
-    } catch (error) {
-      console.error(error);
-      toast.error('Unable to generate invoice PDF.');
-    }
+    img.onload = () => generatePDF(img);
+    img.onerror = () => generatePDF(null);
   };
 
   return (
