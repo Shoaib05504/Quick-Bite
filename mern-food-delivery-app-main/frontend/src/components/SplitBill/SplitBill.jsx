@@ -203,6 +203,52 @@ ${window.location.href}`;
   const handleDownloadInvoice = () => {
     const img = new Image();
     img.src = logo;
+
+    const drawRupee = (doc, x, y) => {
+      const currentDrawColor = doc.getDrawColor();
+      doc.setDrawColor(80, 80, 80);
+      doc.setLineWidth(0.20);
+      
+      // Top bar
+      doc.line(x, y - 2.5, x + 1.8, y - 2.5);
+      // Middle bar
+      doc.line(x, y - 1.6, x + 1.4, y - 1.6);
+      // Downward loop (Devanagari र shape)
+      doc.line(x + 0.3, y - 2.5, x + 0.3, y - 1.2);
+      doc.line(x + 0.3, y - 2.5, x + 1.3, y - 2.5);
+      doc.line(x + 1.3, y - 2.5, x + 1.3, y - 1.8);
+      doc.line(x + 1.3, y - 1.8, x + 0.3, y - 1.2);
+      // Diagonal leg
+      doc.line(x + 0.6, y - 1.4, x + 1.5, y);
+      
+      // Restore default draw color
+      doc.setDrawColor(0);
+    };
+
+    const drawRupeeText = (doc, amount, x, y, align = 'left') => {
+      const isNegative = amount < 0;
+      const absAmountVal = Math.abs(amount);
+      const absAmountStr = absAmountVal.toFixed(2);
+      const textWidth = doc.getTextWidth(absAmountStr);
+      const symbolWidth = 2.4; // width in mm for symbol + gap
+      
+      if (align === 'right') {
+        doc.text(absAmountStr, x, y, { align: 'right' });
+        const symbolX = x - textWidth - symbolWidth;
+        drawRupee(doc, symbolX, y);
+        if (isNegative) {
+          doc.text('-', symbolX - 1.8, y);
+        }
+      } else {
+        let currentX = x;
+        if (isNegative) {
+          doc.text('-', currentX, y);
+          currentX += 1.8;
+        }
+        drawRupee(doc, currentX, y);
+        doc.text(absAmountStr, currentX + symbolWidth, y);
+      }
+    };
     
     const generatePDF = (logoImg) => {
       try {
@@ -263,10 +309,10 @@ ${window.location.href}`;
           doc.text(String(item.addedBy), 95, currentY);
           doc.text(String(item.quantity), 145, currentY);
           if (equalSplit) {
-            doc.text(`\u20B9${item.price}`, 165, currentY);
-            doc.text(`\u20B9${item.lineTotal}`, 196, currentY, { align: 'right' });
+            drawRupeeText(doc, item.price, 165, currentY);
+            drawRupeeText(doc, item.lineTotal, 196, currentY, 'right');
           } else {
-            doc.text(`\u20B9${item.lineTotal}`, 196, currentY, { align: 'right' });
+            drawRupeeText(doc, item.lineTotal, 196, currentY, 'right');
           }
           currentY += 8;
         });
@@ -279,51 +325,63 @@ ${window.location.href}`;
         currentY += 4;
         doc.setFontSize(9);
         doc.text('Subtotal:', 130, currentY);
-        doc.text(`\u20B9${subtotal}`, 196, currentY, { align: 'right' });
+        drawRupeeText(doc, subtotal, 196, currentY, 'right');
         currentY += 6;
         doc.text('Delivery Charges:', 130, currentY);
-        doc.text(`\u20B9${deliveryFee}`, 196, currentY, { align: 'right' });
+        drawRupeeText(doc, deliveryFee, 196, currentY, 'right');
         currentY += 6;
         doc.text('Taxes & Fees:', 130, currentY);
-        doc.text(`\u20B9${(taxes + platformFee).toFixed(2)}`, 196, currentY, { align: 'right' });
+        drawRupeeText(doc, taxes + platformFee, 196, currentY, 'right');
         currentY += 6;
         doc.text('Group Discount:', 130, currentY);
-        doc.text(`-\u20B9${discountApplied}`, 196, currentY, { align: 'right' });
+        drawRupeeText(doc, -discountApplied, 196, currentY, 'right');
         currentY += 8;
 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(10);
         doc.setTextColor(22, 163, 74); // Green accent
         doc.text('Grand Total:', 130, currentY);
-        doc.text(`\u20B9${grandTotal}`, 196, currentY, { align: 'right' });
+        drawRupeeText(doc, grandTotal, 196, currentY, 'right');
         
         // Individual Summary Table Header
         currentY += 15;
         doc.setTextColor(17, 24, 39);
         doc.setFontSize(13);
         doc.text('Smart Split Details', 14, currentY);
-        doc.setFontSize(9);
+        
+        currentY += 6;
+        doc.setFontSize(9.5);
         doc.setFont('Helvetica', 'normal');
-        doc.text(`Split Mode: ${equalSplit ? 'Equal Split' : 'Custom Split'}`, 14, currentY + 5);
-        currentY += 12;
-
+        doc.text('Split Mode:', 14, currentY);
+        doc.setFont('Helvetica', 'bold');
+        doc.text(equalSplit ? 'Equal Split' : 'Custom Split', 34, currentY);
+        
         // Payment Completion Progress & Paid Count
+        currentY += 8;
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(9.5);
         doc.text(`Payment Progress: ${paidCount} of ${memberCount} Paid (${Math.round((paidCount / memberCount) * 100)}%)`, 14, currentY);
         
         if (discountApplied > 0) {
           doc.setTextColor(22, 163, 74);
-          doc.text(`Group Savings Highlight: \u20B9${discountApplied} saved!`, 196, currentY, { align: 'right' });
+          doc.text('Group Savings:', 130, currentY);
+          drawRupeeText(doc, discountApplied, 196, currentY, 'right');
         }
         
         // Progress Bar
+        currentY += 3;
         doc.setFillColor(241, 245, 249);
-        doc.roundedRect(14, currentY + 3, 182, 4, 2, 2, 'F');
+        doc.roundedRect(14, currentY, 182, 4, 2, 2, 'F');
         doc.setFillColor(22, 163, 74);
-        doc.roundedRect(14, currentY + 3, 182 * (paidCount / memberCount), 4, 2, 2, 'F');
+        doc.roundedRect(14, currentY, 182 * (paidCount / memberCount), 4, 2, 2, 'F');
         
-        currentY += 16;
+        currentY += 12;
+        doc.setTextColor(17, 24, 39);
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('Members:', 14, currentY);
+        
+        currentY += 6;
 
         // Members list loop
         if (equalSplit) {
@@ -344,20 +402,21 @@ ${window.location.href}`;
             
             // Member Name
             doc.setFont('Helvetica', 'bold');
-            doc.setFontSize(10);
+            doc.setFontSize(10.5);
             doc.setTextColor(17, 24, 39);
             doc.text(member.name, 22, currentY + 7);
             
             doc.setFont('Helvetica', 'normal');
             doc.setFontSize(8.5);
             doc.setTextColor(107, 114, 128);
-            doc.text('Equal Split Share', 22, currentY + 14);
+            doc.text('Split Type: Equal Split', 22, currentY + 14);
             
             // Amount
             doc.setFont('Helvetica', 'bold');
             doc.setFontSize(9.5);
             doc.setTextColor(22, 163, 74);
-            doc.text(`\u20B9${equalShare}`, 190, currentY + 14, { align: 'right' });
+            doc.text('Amount To Pay:', 110, currentY + 14);
+            drawRupeeText(doc, equalShare, 190, currentY + 14, 'right');
             
             // Status Badge
             const isPaid = member.paymentStatus === 'Paid';
@@ -372,7 +431,9 @@ ${window.location.href}`;
         } else {
           memberDetails.forEach((member) => {
             const itemsCount = member.items.length;
-            const cardHeight = 36 + (itemsCount * 6);
+            const itemsHeight = itemsCount * 6;
+            const cardHeight = 32 + itemsHeight; // Dynamic card height with proper padding
+            
             if (currentY + cardHeight > 275) {
               doc.addPage();
               currentY = 15;
@@ -392,43 +453,60 @@ ${window.location.href}`;
             doc.setTextColor(17, 24, 39);
             doc.text(member.name, 22, currentY + 7);
             
-            // Spender and Status Badges
+            // Role: Spender
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Role:', 22, currentY + 13);
+            doc.setFont('Helvetica', 'bold');
+            doc.setTextColor(30, 64, 175);
+            doc.text('Spender', 32, currentY + 13);
+            
+            // Items header
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(55, 65, 81);
+            doc.text('Items:', 22, currentY + 20);
+            
+            // Items List
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(55, 65, 81);
+            let itemY = currentY + 25;
+            member.items.forEach((item) => {
+              doc.text(`${item.food.name || item.name} x${item.quantity}`, 22, itemY);
+              drawRupeeText(doc, item.lineTotal, 190, itemY, 'right');
+              itemY += 6;
+            });
+            
+            // Extra Charges (Delivery Share, Taxes Share, Discount Share)
+            doc.setFontSize(8);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Delivery Share:', 22, itemY);
+            drawRupeeText(doc, member.deliveryFeeShare, 45, itemY, 'left');
+            
+            doc.text('Taxes Share:', 75, itemY);
+            drawRupeeText(doc, member.taxShare + member.platformFeeShare, 95, itemY, 'left');
+            
+            doc.text('Discount:', 135, itemY);
+            drawRupeeText(doc, -member.discountShare, 150, itemY, 'left');
+            
+            itemY += 6;
+            
+            // Final Payable & Status
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(9.5);
+            doc.setTextColor(22, 163, 74);
+            doc.text('Final Payable:', 22, itemY + 4);
+            drawRupeeText(doc, member.finalAmount, 190, itemY + 4, 'right');
+            
+            // Status Badge
             const isPaid = member.paymentStatus === 'Paid';
             doc.setFillColor(isPaid ? 220 : 254, isPaid ? 252 : 243, isPaid ? 231 : 199);
             doc.roundedRect(145, currentY + 3, 20, 6, 2, 2, 'F');
             doc.setFontSize(7.5);
             doc.setTextColor(isPaid ? 22 : 217, isPaid ? 163 : 119, isPaid ? 74 : 6);
             doc.text(isPaid ? 'PAID' : 'PENDING', 155, currentY + 7, { align: 'center' });
-            
-            if (itemsCount > 0) {
-              doc.setFillColor(219, 234, 254);
-              doc.roundedRect(115, currentY + 3, 22, 6, 2, 2, 'F');
-              doc.setTextColor(30, 64, 175);
-              doc.text('Spender', 126, currentY + 7, { align: 'center' });
-            }
-            
-            // Items List
-            doc.setFont('Helvetica', 'normal');
-            doc.setFontSize(8.5);
-            doc.setTextColor(55, 65, 81);
-            let itemY = currentY + 14;
-            member.items.forEach((item) => {
-              doc.text(`${item.food.name || item.name} x${item.quantity}`, 22, itemY);
-              doc.text(`\u20B9${item.lineTotal}`, 190, itemY, { align: 'right' });
-              itemY += 6;
-            });
-            
-            // Extra Charges
-            doc.setFontSize(8);
-            doc.setTextColor(107, 114, 128);
-            doc.text(`Delivery Share: \u20B9${member.deliveryFeeShare}  |  Taxes & Fees Share: \u20B9${(member.taxShare + member.platformFeeShare).toFixed(2)}  |  Group Discount: -\u20B9${member.discountShare}`, 22, itemY + 2);
-            
-            // Final Payable
-            doc.setFont('Helvetica', 'bold');
-            doc.setFontSize(9.5);
-            doc.setTextColor(22, 163, 74);
-            doc.text('Final Payable:', 22, itemY + 9);
-            doc.text(`\u20B9${member.finalAmount}`, 190, itemY + 9, { align: 'right' });
             
             currentY += cardHeight + 8;
           });
@@ -448,10 +526,43 @@ ${window.location.href}`;
         doc.setTextColor(22, 163, 74);
         doc.text(window.location.href, 50, currentY);
 
-        // Branding Footer
-        doc.setFontSize(9);
+        // Draw Footer at the end of the PDF
+        const footerHeight = 40;
+        if (currentY + footerHeight > 275) {
+          doc.addPage();
+          currentY = 20;
+        } else {
+          currentY += 10;
+        }
+        
+        doc.setDrawColor(22, 163, 74); // Green accent
+        doc.setLineWidth(0.3);
+        doc.line(40, currentY, 170, currentY);
+        
+        currentY += 6;
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(22, 163, 74);
+        doc.text('Thank you for ordering with QuickBite!', 105, currentY, { align: 'center' });
+        
+        currentY += 5;
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(8.5);
         doc.setTextColor(107, 114, 128);
-        doc.text('Thank you for ordering together with QuickBite \u2764\uFE0F', 105, 280, { align: 'center' });
+        doc.text('We hope you enjoyed your Group Feast.', 105, currentY, { align: 'center' });
+        
+        currentY += 4;
+        doc.text('Share more meals, split smarter, and eat happier.', 105, currentY, { align: 'center' });
+        
+        currentY += 5;
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(22, 163, 74);
+        doc.text('FAST \u2022 FRESH \u2022 DELICIOUS', 105, currentY, { align: 'center' });
+        
+        currentY += 4;
+        doc.setDrawColor(22, 163, 74);
+        doc.line(40, currentY, 170, currentY);
 
         doc.save(equalSplit ? 'QuickBite_Equal_Split_Receipt.pdf' : 'QuickBite_Custom_Split_Receipt.pdf');
         toast.success('Invoice downloaded!');
