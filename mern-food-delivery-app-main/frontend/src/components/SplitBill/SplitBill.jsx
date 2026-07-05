@@ -220,7 +220,7 @@ ${window.location.href}`;
         doc.setTextColor(255, 255, 255);
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(18);
-        doc.text('QuickBite Group Feast Receipt', 44, 18);
+        doc.text(equalSplit ? 'QuickBite Feast Receipt' : 'QuickBite Custom Split Receipt', 44, 18);
         
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(9);
@@ -232,14 +232,21 @@ ${window.location.href}`;
         doc.setFont('Helvetica', 'bold');
         doc.text('Order Summary', 14, 52);
 
-        // Render Items Table
+        // Render Items Table Header
         doc.setFontSize(9);
         doc.setFont('Helvetica', 'bold');
-        doc.text('Item', 14, 62);
-        doc.text('Added By', 95, 62);
-        doc.text('Qty', 145, 62);
-        doc.text('Price', 170, 62);
-        doc.text('Total', 190, 62, { align: 'right' });
+        if (equalSplit) {
+          doc.text('Item Name', 14, 62);
+          doc.text('Added By', 95, 62);
+          doc.text('Quantity', 140, 62);
+          doc.text('Price', 165, 62);
+          doc.text('Total', 190, 62, { align: 'right' });
+        } else {
+          doc.text('Item Name', 14, 62);
+          doc.text('Ordered By', 95, 62);
+          doc.text('Qty', 145, 62);
+          doc.text('Amount', 190, 62, { align: 'right' });
+        }
 
         doc.setDrawColor(22, 163, 74); // Green accent line
         doc.setLineWidth(0.5);
@@ -255,8 +262,12 @@ ${window.location.href}`;
           doc.text(String(item.food.name || item.itemId).substring(0, 38), 14, currentY);
           doc.text(String(item.addedBy), 95, currentY);
           doc.text(String(item.quantity), 145, currentY);
-          doc.text(`\u20B9${item.price}`, 170, currentY);
-          doc.text(`\u20B9${item.lineTotal}`, 196, currentY, { align: 'right' });
+          if (equalSplit) {
+            doc.text(`\u20B9${item.price}`, 165, currentY);
+            doc.text(`\u20B9${item.lineTotal}`, 196, currentY, { align: 'right' });
+          } else {
+            doc.text(`\u20B9${item.lineTotal}`, 196, currentY, { align: 'right' });
+          }
           currentY += 8;
         });
 
@@ -286,52 +297,140 @@ ${window.location.href}`;
         doc.text('Grand Total:', 130, currentY);
         doc.text(`\u20B9${grandTotal}`, 196, currentY, { align: 'right' });
         
-        // Individual Summary Table
+        // Individual Summary Table Header
         currentY += 15;
         doc.setTextColor(17, 24, 39);
         doc.setFontSize(13);
         doc.text('Smart Split Details', 14, currentY);
         doc.setFontSize(9);
         doc.setFont('Helvetica', 'normal');
-        doc.text(`Split Type: ${equalSplit ? 'Equal Split' : 'Order Based Split'}`, 14, currentY + 5);
+        doc.text(`Split Mode: ${equalSplit ? 'Equal Split' : 'Custom Split'}`, 14, currentY + 5);
         currentY += 12;
 
+        // Payment Completion Progress & Paid Count
         doc.setFont('Helvetica', 'bold');
-        doc.text('Member', 14, currentY);
-        doc.text('Items Ordered', 70, currentY);
-        doc.text('Amount Owed', 150, currentY);
-        doc.text('Status', 180, currentY);
+        doc.setFontSize(9.5);
+        doc.text(`Payment Progress: ${paidCount} of ${memberCount} Paid (${Math.round((paidCount / memberCount) * 100)}%)`, 14, currentY);
         
-        doc.setDrawColor(22, 163, 74);
-        doc.setLineWidth(0.5);
-        doc.line(14, currentY + 3, 196, currentY + 3);
-        currentY += 9;
+        if (discountApplied > 0) {
+          doc.setTextColor(22, 163, 74);
+          doc.text(`Group Savings Highlight: \u20B9${discountApplied} saved!`, 196, currentY, { align: 'right' });
+        }
+        
+        // Progress Bar
+        doc.setFillColor(241, 245, 249);
+        doc.roundedRect(14, currentY + 3, 182, 4, 2, 2, 'F');
+        doc.setFillColor(22, 163, 74);
+        doc.roundedRect(14, currentY + 3, 182 * (paidCount / memberCount), 4, 2, 2, 'F');
+        
+        currentY += 16;
 
-        doc.setFont('Helvetica', 'normal');
+        // Members list loop
         if (equalSplit) {
           members.forEach((member) => {
-            if (currentY > 260) {
+            const cardHeight = 22;
+            if (currentY + cardHeight > 275) {
               doc.addPage();
-              currentY = 20;
+              currentY = 15;
             }
-            doc.text(member.name, 14, currentY);
-            doc.text('Equal Split Share', 70, currentY);
-            doc.text(`\u20B9${equalShare}`, 150, currentY);
-            doc.text(member.paymentStatus || 'Pending', 180, currentY);
-            currentY += 8;
+            
+            // Draw card background
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(14, currentY, 182, cardHeight, 4, 4, 'F');
+            
+            // Left green accent bar
+            doc.setFillColor(22, 163, 74);
+            doc.rect(14, currentY, 3, cardHeight, 'F');
+            
+            // Member Name
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(17, 24, 39);
+            doc.text(member.name, 22, currentY + 7);
+            
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Equal Split Share', 22, currentY + 14);
+            
+            // Amount
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(9.5);
+            doc.setTextColor(22, 163, 74);
+            doc.text(`\u20B9${equalShare}`, 190, currentY + 14, { align: 'right' });
+            
+            // Status Badge
+            const isPaid = member.paymentStatus === 'Paid';
+            doc.setFillColor(isPaid ? 220 : 254, isPaid ? 252 : 243, isPaid ? 231 : 199);
+            doc.roundedRect(145, currentY + 3, 20, 6, 2, 2, 'F');
+            doc.setFontSize(7.5);
+            doc.setTextColor(isPaid ? 22 : 217, isPaid ? 163 : 119, isPaid ? 74 : 6);
+            doc.text(isPaid ? 'PAID' : 'PENDING', 155, currentY + 7, { align: 'center' });
+            
+            currentY += cardHeight + 6;
           });
         } else {
           memberDetails.forEach((member) => {
-            if (currentY > 260) {
+            const itemsCount = member.items.length;
+            const cardHeight = 36 + (itemsCount * 6);
+            if (currentY + cardHeight > 275) {
               doc.addPage();
-              currentY = 20;
+              currentY = 15;
             }
-            doc.text(member.name, 14, currentY);
-            const itemNames = member.items.map((i) => `${i.food.name || i.name} x${i.quantity}`).join(', ');
-            doc.text(itemNames.length > 35 ? itemNames.substring(0, 32) + '...' : itemNames, 70, currentY);
-            doc.text(`\u20B9${member.finalAmount}`, 150, currentY);
-            doc.text(member.paymentStatus, 180, currentY);
-            currentY += 8;
+            
+            // Draw card background
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(14, currentY, 182, cardHeight, 4, 4, 'F');
+            
+            // Left green accent bar
+            doc.setFillColor(22, 163, 74);
+            doc.rect(14, currentY, 3, cardHeight, 'F');
+            
+            // Member Name
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(17, 24, 39);
+            doc.text(member.name, 22, currentY + 7);
+            
+            // Spender and Status Badges
+            const isPaid = member.paymentStatus === 'Paid';
+            doc.setFillColor(isPaid ? 220 : 254, isPaid ? 252 : 243, isPaid ? 231 : 199);
+            doc.roundedRect(145, currentY + 3, 20, 6, 2, 2, 'F');
+            doc.setFontSize(7.5);
+            doc.setTextColor(isPaid ? 22 : 217, isPaid ? 163 : 119, isPaid ? 74 : 6);
+            doc.text(isPaid ? 'PAID' : 'PENDING', 155, currentY + 7, { align: 'center' });
+            
+            if (itemsCount > 0) {
+              doc.setFillColor(219, 234, 254);
+              doc.roundedRect(115, currentY + 3, 22, 6, 2, 2, 'F');
+              doc.setTextColor(30, 64, 175);
+              doc.text('Spender', 126, currentY + 7, { align: 'center' });
+            }
+            
+            // Items List
+            doc.setFont('Helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(55, 65, 81);
+            let itemY = currentY + 14;
+            member.items.forEach((item) => {
+              doc.text(`${item.food.name || item.name} x${item.quantity}`, 22, itemY);
+              doc.text(`\u20B9${item.lineTotal}`, 190, itemY, { align: 'right' });
+              itemY += 6;
+            });
+            
+            // Extra Charges
+            doc.setFontSize(8);
+            doc.setTextColor(107, 114, 128);
+            doc.text(`Delivery Share: \u20B9${member.deliveryFeeShare}  |  Taxes & Fees Share: \u20B9${(member.taxShare + member.platformFeeShare).toFixed(2)}  |  Group Discount: -\u20B9${member.discountShare}`, 22, itemY + 2);
+            
+            // Final Payable
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(9.5);
+            doc.setTextColor(22, 163, 74);
+            doc.text('Final Payable:', 22, itemY + 9);
+            doc.text(`\u20B9${member.finalAmount}`, 190, itemY + 9, { align: 'right' });
+            
+            currentY += cardHeight + 8;
           });
         }
 
@@ -343,6 +442,7 @@ ${window.location.href}`;
         }
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(9);
+        doc.setTextColor(17, 24, 39);
         doc.text('Join QuickBite Feast:', 14, currentY);
         doc.setFont('Helvetica', 'normal');
         doc.setTextColor(22, 163, 74);
@@ -351,9 +451,9 @@ ${window.location.href}`;
         // Branding Footer
         doc.setFontSize(9);
         doc.setTextColor(107, 114, 128);
-        doc.text('Thank you for ordering with QuickBite \u2764\uFE0F', 105, 280, { align: 'center' });
+        doc.text('Thank you for ordering together with QuickBite \u2764\uFE0F', 105, 280, { align: 'center' });
 
-        doc.save(`QuickBite_Feast_${groupCode}.pdf`);
+        doc.save(equalSplit ? 'QuickBite_Equal_Split_Receipt.pdf' : 'QuickBite_Custom_Split_Receipt.pdf');
         toast.success('Invoice downloaded!');
       } catch (error) {
         console.error(error);
