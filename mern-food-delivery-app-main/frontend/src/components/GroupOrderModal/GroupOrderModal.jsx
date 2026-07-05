@@ -133,13 +133,9 @@ const GroupOrderModal = ({ cartLines, onClose }) => {
       });
       return;
     }
-    if (!cartItemsPayload.length) {
-      toast.error('Add items to cart before creating a group order');
-      return;
-    }
     setGenerating(true);
     const response = await groupOrderAPI.createGroupOrder({ 
-      cartItems: cartItemsPayload,
+      cartItems: [],
       groupName: groupName,
       note: noteToGroup,
       maxParticipants: maxParticipants,

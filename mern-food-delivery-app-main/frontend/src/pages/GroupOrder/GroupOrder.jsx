@@ -348,8 +348,8 @@ const GroupOrder = () => {
       toast.error('The shared cart is empty');
       return;
     }
-    localStorage.setItem('groupOrderCheckout', JSON.stringify(group.cartItems));
-    localStorage.setItem('groupOrderCode', group.groupCode);
+    const itemsToAdd = group.cartItems.map((item) => ({ itemId: item.itemId, quantity: item.quantity }));
+    await addItemsToCart(itemsToAdd);
     navigate('/order');
   };
 
