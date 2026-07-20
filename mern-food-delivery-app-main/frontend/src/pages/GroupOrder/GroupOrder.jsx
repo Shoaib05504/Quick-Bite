@@ -10,8 +10,16 @@ import { FiChevronLeft, FiShare2, FiUsers, FiClock, FiShoppingCart, FiLock, FiUn
 import toast from 'react-hot-toast';
 
 const getSocketServerUrl = () => {
-  const socketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  return socketUrl.replace(/\/$/, '');
+  const envSocketUrl = import.meta.env.VITE_SOCKET_URL;
+  const envApiUrl = import.meta.env.VITE_API_URL;
+  if (envSocketUrl) return envSocketUrl.replace(/\/$/, '');
+  if (envApiUrl) return envApiUrl.replace(/\/$/, '');
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return window.location.origin.replace(/\/$/, '');
+    }
+  }
+  return 'http://localhost:8000';
 };
 const socketServerUrl = getSocketServerUrl();
 
@@ -178,8 +186,8 @@ const GroupOrder = () => {
   const connectSocket = useCallback(() => {
     if (socketRef.current) return;
 
-    const socket = io(socketServerUrl, {
-      transports: ['websocket', 'polling'],
+    const socket = io(getSocketServerUrl(), {
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
@@ -350,7 +358,12 @@ const GroupOrder = () => {
     }
 
     if (!socketRef.current?.connected) {
-      toast.error('Real-time session disconnected');
+      if (socketRef.current) {
+        socketRef.current.connect();
+      } else {
+        connectSocket();
+      }
+      toast.error('Reconnecting to group session... Please try again');
       return;
     }
 
