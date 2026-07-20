@@ -23,11 +23,9 @@ import GroupOrder from './pages/GroupOrder/GroupOrder';
 import SmartSplitBill from './pages/SmartSplitBill/SmartSplitBill';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { StoreContext } from './components/context/StoreContext';
-import GroupOrderModal from './components/GroupOrderModal/GroupOrderModal';
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
-  const [showGroupModal, setShowGroupModal] = useState(false);
   const [search, setSearch] = useState('');
   const { token } = useContext(StoreContext);
   const [searchParams] = useSearchParams();
@@ -66,34 +64,14 @@ const App = () => {
       />
 
       {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
-      {showGroupModal && (
-        <GroupOrderModal
-          cartLines={[]}
-          onClose={() => setShowGroupModal(false)}
-        />
-      )}
 
       <div className="app">
-        <Navbar
-          setShowLogin={setShowLogin}
-          search={search}
-          setSearch={setSearch}
-          onOpenGroupModal={() => setShowGroupModal(true)}
-        />
+        <Navbar setShowLogin={setShowLogin} search={search} setSearch={setSearch} />
 
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<RoleSelect />} />
-          <Route
-            path="/home"
-            element={
-              <Home
-                search={search}
-                setSearch={setSearch}
-                onOpenGroupModal={() => setShowGroupModal(true)}
-              />
-            }
-          />
+          <Route path="/home" element={<Home search={search} setSearch={setSearch} />} />
           <Route path="/verify" element={<Verify />} />
           <Route path="/success" element={<Success />} />
           <Route path="/track/:id" element={<TrackOrder />} />

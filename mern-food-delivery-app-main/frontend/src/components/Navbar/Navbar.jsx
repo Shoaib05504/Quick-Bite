@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { StoreContext } from './../context/StoreContext';
 import { FaShoppingCart } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, ChefHat, Smartphone, MessageSquare, Users } from 'lucide-react';
+import { Home, ChefHat, Smartphone, MessageSquare } from 'lucide-react';
 
 const menuItems = [
   {
@@ -25,15 +25,6 @@ const menuItems = [
     gradient: "radial-gradient(circle, rgba(255,138,0,0.15) 0%, rgba(255,138,0,0.06) 50%, rgba(255,138,0,0) 100%)",
     iconColor: "icon-orange",
     key: 'Explore Menu'
-  },
-  {
-    icon: <Users className="h-4 w-4" />,
-    label: "Group Order",
-    to: null,
-    action: 'group-order',
-    gradient: "radial-gradient(circle, rgba(168,85,247,0.15) 0%, rgba(168,85,247,0.06) 50%, rgba(168,85,247,0) 100%)",
-    iconColor: "icon-purple",
-    key: 'Group Order'
   },
   {
     icon: <Smartphone className="h-4 w-4" />,
@@ -84,7 +75,7 @@ const sharedTransition = {
   duration: 0.5,
 };
 
-const Navbar = ({ setShowLogin, search, setSearch, onOpenGroupModal }) => {
+const Navbar = ({ setShowLogin, search, setSearch }) => {
   const [menu, setMenu] = useState('home');
   const [profileOpen, setProfileOpen] = useState(false);
   const { getTotalCartItems, token, setToken, userProfile, setUserProfile, logout: contextLogout, url } = useContext(StoreContext);
@@ -119,14 +110,6 @@ const Navbar = ({ setShowLogin, search, setSearch, onOpenGroupModal }) => {
   };
 
   const handleNavClick = (e, item) => {
-    if (item.action === 'group-order') {
-      e.preventDefault();
-      setMenu(item.key);
-      if (typeof onOpenGroupModal === 'function') {
-        onOpenGroupModal();
-      }
-      return;
-    }
     if (item.href) {
       const hashIndex = item.href.indexOf('#');
       if (hashIndex !== -1) {

@@ -71,7 +71,7 @@ const pinnedCardVariants = {
   }
 };
 
-const GroupOrderModal = ({ cartLines = [], onClose }) => {
+const GroupOrderModal = ({ cartLines, onClose }) => {
   const navigate = useNavigate();
   const [generating, setGenerating] = useState(false);
 
@@ -114,11 +114,29 @@ const GroupOrderModal = ({ cartLines = [], onClose }) => {
   );
 
   const handleCreateGroup = async () => {
-    const finalName = groupName.trim() || 'QuickBite Group Feast';
+    if (!groupName.trim()) {
+      toast('⚠️ Please enter a group name to start your feast', {
+        position: 'top-right',
+        duration: 3000,
+        style: {
+          background: 'rgba(6, 95, 70, 0.85)',
+          color: '#ffffff',
+          border: '1px solid rgba(209, 250, 229, 0.25)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderRadius: '14px',
+          padding: '12px 18px',
+          fontSize: '14px',
+          fontWeight: '600',
+          boxShadow: '0 10px 30px rgba(16, 185, 129, 0.2)',
+        }
+      });
+      return;
+    }
     setGenerating(true);
     const response = await groupOrderAPI.createGroupOrder({ 
-      cartItems: cartItemsPayload,
-      groupName: finalName,
+      cartItems: [],
+      groupName: groupName,
       note: noteToGroup,
       maxParticipants: maxParticipants,
       expiry: groupExpiry
