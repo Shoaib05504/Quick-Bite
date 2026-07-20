@@ -450,15 +450,17 @@ const PlaceOrder = () => {
         }
       );
       if (response.data.success) {
-        const { order_id, orderId, amount } = response.data;
+        const { order_id, orderId, amount, key } = response.data;
 
         if (!window.Razorpay) {
           toast.error('Razorpay checkout is not loaded yet. Please wait a moment and try again.');
           return;
         }
 
+        const razorpayKey = key || import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_SlKtVCKlDVhR4J';
+
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_placeholder',
+          key: razorpayKey,
           amount: amount,
           currency: 'INR',
           name: 'QuickBite',

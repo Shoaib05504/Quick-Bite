@@ -86,6 +86,7 @@ const placeOrder = async (req, res) => {
       order_id: razorpayOrder.id,
       orderId: newOrder._id,
       amount: razorpayOrder.amount,
+      key: process.env.RAZORPAY_KEY_ID,
       serverAmount, // let frontend know the authoritative price
     });
   } catch (error) {
