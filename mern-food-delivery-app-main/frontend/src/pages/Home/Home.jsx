@@ -6,9 +6,8 @@ import FoodDisplay from '../../components/FoodDisplay/FoodDisplay'
 import AppDownload from '../../components/AppDownload/AppDownload'
 import MoodBite from '../../components/MoodBite/MoodBite'
 
-const Home = ({search,setSearch}) => {
-
-  const [category, setCategory] = useState('All')
+const Home = ({ search, setSearch, onOpenGroupModal }) => {
+  const [category, setCategory] = useState('All');
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -22,10 +21,10 @@ const Home = ({search,setSearch}) => {
       }, 500);
     }
   }, []);
- 
+
   return (
     <div>
-      <Header/>
+      <Header onOpenGroupModal={onOpenGroupModal} />
       <MoodBite />
       <ExploreMenu category={category} setCategory={setCategory}/>
       <FoodDisplay category={category}
