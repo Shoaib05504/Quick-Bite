@@ -40,9 +40,17 @@ export const chatbotLimiter = rateLimit({
  */
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Never rate-limit Socket.IO polling, static upload images, or static web assets
+    if (req.path.startsWith('/socket.io')) return true;
+    if (req.path.startsWith('/images')) return true;
+    if (req.path.startsWith('/assets')) return true;
+    if (!req.path.startsWith('/api')) return true;
+    return false;
+  },
   message: {
     success: false,
     message: 'Too many requests. Please slow down.',
