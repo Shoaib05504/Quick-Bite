@@ -10,20 +10,8 @@ import { FiChevronLeft, FiShare2, FiUsers, FiClock, FiShoppingCart, FiLock, FiUn
 import toast from 'react-hot-toast';
 
 const getSocketServerUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (import.meta.env.MODE === 'development') {
-    return envUrl || 'http://localhost:8000';
-  }
-  if (typeof window !== 'undefined') {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return envUrl || 'http://localhost:8000';
-    }
-    if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-      return window.location.origin;
-    }
-    return envUrl || window.location.origin;
-  }
-  return envUrl || 'http://localhost:8000';
+  const socketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  return socketUrl.replace(/\/$/, '');
 };
 const socketServerUrl = getSocketServerUrl();
 
@@ -188,9 +176,10 @@ const GroupOrder = () => {
   };
 
   const connectSocket = useCallback(() => {
+    if (socketRef.current) return;
+
     const socket = io(socketServerUrl, {
-      transports: ['websocket'],
-      autoConnect: false,
+      transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
@@ -198,14 +187,12 @@ const GroupOrder = () => {
       timeout: 20000,
     });
 
-    socket.connect();
-
     socket.on('connect', () => {
       console.log('Real-time socket connected');
     });
 
     socket.on('reconnect', () => {
-      toast.success('Real-time connection restored! \uD83D\uDFE2');
+      toast.success('Real-time connection restored! 🟢');
     });
 
     socket.on('group:joined', (payload) => {
@@ -227,8 +214,8 @@ const GroupOrder = () => {
     });
 
     socket.on('group:remind', ({ senderName }) => {
-      toast(`\uD83D\uDD14 ${senderName} sent you a payment reminder!`, {
-        icon: '\uD83D\uDCB0',
+      toast(`🔔 ${senderName} sent you a payment reminder!`, {
+        icon: '💰',
         duration: 5000,
         style: {
           border: '1px solid #eab308',
@@ -250,8 +237,11 @@ const GroupOrder = () => {
   useEffect(() => {
     connectSocket();
     return () => {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
+      if (socketRef.current) {
+        socketRef.current.removeAllListeners();
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
     };
   }, [connectSocket]);
 

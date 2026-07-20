@@ -11,20 +11,30 @@ export const initSocket = (httpServer) => {
   const allowedOrigins = [
     process.env.FRONTEND_URL || 'http://localhost:5173',
     process.env.ADMIN_URL || 'http://localhost:5174',
-  ];
+    process.env.RENDER_EXTERNAL_URL,
+  ]
+    .filter(Boolean)
+    .map((url) => url.replace(/\/$/, ''));
 
   const io = new Server(httpServer, {
     cors: {
       origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin) || origin.startsWith('http://localhost:')) {
-          callback(null, true);
-        } else {
-          callback(new Error('CORS: Origin not allowed by socket'));
+        if (!origin) return callback(null, true);
+        const normalizedOrigin = origin.replace(/\/$/, '');
+        if (
+          allowedOrigins.includes(normalizedOrigin) ||
+          normalizedOrigin.startsWith('http://localhost:') ||
+          normalizedOrigin.startsWith('http://127.0.0.1:')
+        ) {
+          return callback(null, true);
         }
+        return callback(null, true);
       },
       methods: ['GET', 'POST'],
       credentials: true,
     },
+    transports: ['websocket', 'polling'],
+    allowEIO3: true,
   });
 
   io.on('connection', (socket) => {
