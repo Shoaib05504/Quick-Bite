@@ -67,16 +67,25 @@
     font-family: inherit;
     transition: all 0.3s ease;
     background: #fafafa;
+    color: #1c1c1c;
 }
 
 .login-popup-inputs input:focus{
     border-color: #ef4f5f;
     background: white;
+    color: #1c1c1c;
     box-shadow: 0 0 0 3px rgba(239, 79, 95, 0.1);
 }
 
 .login-popup-inputs input::placeholder{
     color: #999;
+}
+
+.login-popup-inputs input:-webkit-autofill,
+.login-popup-inputs input:-webkit-autofill:hover, 
+.login-popup-inputs input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #1c1c1c;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 .login-popup-container button{

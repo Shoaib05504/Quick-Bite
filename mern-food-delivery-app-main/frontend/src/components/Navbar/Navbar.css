@@ -147,6 +147,7 @@ background-color: #fff4f2;
     border: 1px solid #ddd;
     outline: none;
     min-width: 180px;
+    color: #1c1c1c;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
