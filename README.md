@@ -1,4 +1,14 @@
-# 🚚 QuickBite - Food Delivery Application (MERN Stack)
+ <p align="center">
+  <img src="mern-food-delivery-app-main/frontend/src/assets/logo.png" alt="QuickBite Logo" width="180"/>
+</p>
+
+<h1 align="center">QuickBite - Food Delivery Application (MERN Stack)</h1>
+
+<p align="center">
+🌐 <strong>Live Demo:</strong><br>
+https://quickbite-9qd2.onrender.com
+</p>
+
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build & Security Scan](https://github.com/Shoaib05504/Quick-Bite/actions/workflows/security.yml/badge.svg)](https://github.com/Shoaib05504/Quick-Bite/actions/workflows/security.yml)
