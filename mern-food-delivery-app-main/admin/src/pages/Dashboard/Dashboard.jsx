@@ -57,6 +57,11 @@ const Dashboard = ({ url }) => {
           setError(response.data.message || 'Unable to load analytics');
         }
       } catch (err) {
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          setTimeout(() => window.location.reload(), 1200);
+        }
         setError(err.response?.data?.message || err.message || 'Unable to load analytics');
       } finally {
         setLoading(false);

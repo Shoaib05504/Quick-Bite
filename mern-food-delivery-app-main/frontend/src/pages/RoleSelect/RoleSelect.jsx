@@ -4,6 +4,8 @@ import { useState } from "react";
 import MagicBento from "../../components/MagicBento/MagicBento";
 import "./RoleSelect.css";
 
+import axios from "axios";
+
 const RoleSelect = () => {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
@@ -41,13 +43,31 @@ const RoleSelect = () => {
     navigate("/smart-split-bill");
   };
 
-  const handleAdminLogin = () => {
-    if (name === "admin" && password === "1234") {
-      localStorage.setItem("role", "admin");
-      localStorage.setItem("adminName", name);
-      window.location.href = window.location.port === "5173" ? "http://localhost:5175/" : "/admin/";
-    } else {
-      setError("Invalid name or password ❌");
+  const handleAdminLogin = async () => {
+    try {
+      setError("");
+      const apiUrl = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : window.location.origin);
+      const emailToUse = (name === "admin" || !name) ? "admin@quickbite.com" : name;
+      const response = await axios.post(`${apiUrl}/api/user/login`, {
+        email: emailToUse,
+        password: password
+      });
+
+      if (response.data.success && response.data.role === 'admin') {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("role", "admin");
+        localStorage.setItem("userId", response.data.userId);
+        localStorage.setItem("adminName", name || "Admin");
+        if (window.location.port === "5173") {
+          window.location.href = "http://localhost:5174/admin/";
+        } else {
+          window.location.href = "/admin/";
+        }
+      } else {
+        setError("Access denied. Admin role required ❌");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid name or password ❌");
     }
   };
 

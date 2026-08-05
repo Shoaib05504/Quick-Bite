@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import "./Add.css";
 import axios from "axios";
 
-const Add = () => {
+const Add = ({ url }) => {
   const [data, setData] = useState({
   name: "",
   description: "",
   price: "",
   category: "Salad",
-  image: "",   // ✅ added
+  image: "",
 });
-const url = "http://localhost:8000";        // ✅ ADD
+const apiUrl = url || import.meta.env.VITE_API_URL || "http://localhost:8000";
 
  const handleSubmit = async (e) => {
   e.preventDefault();
@@ -29,7 +29,7 @@ const url = "http://localhost:8000";        // ✅ ADD
   try {
     const token = localStorage.getItem('token');
     const response = await axios.post(
-      url + "/api/food/add",
+      `${apiUrl}/api/food/add`,
       {
         name: data.name,
         description: data.description,

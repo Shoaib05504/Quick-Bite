@@ -7,10 +7,15 @@ const Logout = () => {
 
   useEffect(() => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     localStorage.removeItem('userId');
+    localStorage.removeItem('adminName');
     setTimeout(() => {
-      // Redirect to the frontend dev server. Try common Vite ports.
-      window.location.href = 'http://localhost:5175/';
+      if (window.location.port === "5174") {
+        window.location.href = 'http://localhost:5173/';
+      } else {
+        window.location.href = '/';
+      }
     }, 350);
   }, [navigate]);
 

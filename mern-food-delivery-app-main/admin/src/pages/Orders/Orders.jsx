@@ -22,10 +22,11 @@ const Orders = ({url}) => {
         toast.error(response.data.message || "Failed to load orders");
       }
     } catch (error) {
-      if (error.response?.status === 401) {
-        toast.error("Session expired. Please login again.");
-      } else if (error.response?.status === 403) {
-        toast.error("Access forbidden. Admin role required.");
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        toast.error("Session expired or admin role required. Please login again.");
+        setTimeout(() => window.location.reload(), 1200);
       } else {
         toast.error("Error loading orders.");
       }

@@ -2,8 +2,10 @@ import mongoose from "mongoose";
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
+import bcrypt from 'bcrypt';
 import { fileURLToPath } from 'url';
 import foodModel from "../models/foodModel.js";
+import userModel from "../models/userModel.js";
 
 const normalizeMongoUri = (uri) => {
   try {
@@ -176,6 +178,23 @@ export const connectDB = async () => {
     if (seededCount > 0) console.log(`Seeded ${seededCount} missing food items successfully. ✅`);
     if (updatedCount > 0) console.log(`Updated ${updatedCount} food items with correct image references. ✅`);
     if (seededCount === 0 && updatedCount === 0) console.log("All expected food items already exist and are up to date. ✅");
+
+    // Seed default Admin user if none exists
+    const adminExists = await userModel.findOne({ role: 'admin' });
+    if (!adminExists) {
+      const salt = await bcrypt.genSalt(12);
+      const hashedPassword = await bcrypt.hash('admin123', salt);
+      const adminUser = new userModel({
+        name: 'QuickBite Admin',
+        firstName: 'QuickBite',
+        lastName: 'Admin',
+        email: 'admin@quickbite.com',
+        password: hashedPassword,
+        role: 'admin',
+      });
+      await adminUser.save();
+      console.log('Seeded default Admin user (admin@quickbite.com / admin123) successfully. ✅');
+    }
 
   } catch (error) {
     console.error("Database connection/seeding failed:", error);

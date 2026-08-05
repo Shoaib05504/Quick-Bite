@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
 import { Routes, Route } from "react-router-dom";
@@ -7,12 +7,41 @@ import Add from "./pages/Add/Add";
 import List from "./pages/List/List";
 import Orders from "./pages/Orders/Orders";
 import Logout from "./pages/Logout/Logout";
+import Login from "./pages/Login/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const url = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const App = () => {
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [role, setRole] = useState(localStorage.getItem("role") || "");
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setToken(localStorage.getItem("token") || "");
+      setRole(localStorage.getItem("role") || "");
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const handleLoginSuccess = (newToken) => {
+    setToken(newToken);
+    setRole("admin");
+  };
+
+  const isAdminAuthenticated = Boolean(token && role === "admin");
+
+  if (!isAdminAuthenticated) {
+    return (
+      <div>
+        <ToastContainer />
+        <Login url={url} onLoginSuccess={handleLoginSuccess} />
+      </div>
+    );
+  }
+
   return (
     <div>
       <ToastContainer />
