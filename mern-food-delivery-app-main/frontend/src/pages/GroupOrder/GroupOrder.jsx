@@ -216,13 +216,43 @@ const GroupOrder = () => {
       setExpired(payload.groupOrder.isExpired || new Date() > new Date(payload.groupOrder.expiresAt));
     });
 
-    socket.on('group:memberJoined', (payload) => {
-      setGroup(payload.groupOrder);
-      setActivities(payload.groupOrder.activities || []);
+    socket.on('group:notification', (payload) => {
+      if (payload?.message) {
+        toast(payload.message, {
+          icon: payload.type === 'member_joined' ? '👋' : payload.type === 'cart_updated' ? '🍕' : payload.type === 'lock_toggled' ? '🔒' : '🔔',
+          duration: 3500,
+          style: {
+            borderRadius: '12px',
+            background: '#0f172a',
+            color: '#ffffff',
+            fontWeight: '600',
+            fontSize: '14px',
+          },
+        });
+      }
+    });
+
+    socket.on('group:checkoutStarted', (payload) => {
+      toast.success('💳 Host started checkout! Navigating to checkout...');
+      if (payload?.groupOrder?.cartItems?.length) {
+        const itemsToAdd = payload.groupOrder.cartItems.map((item) => ({ itemId: item.itemId, quantity: item.quantity }));
+        addItemsToCart(itemsToAdd);
+        localStorage.setItem('groupOrderCheckout', JSON.stringify(payload.groupOrder.cartItems));
+        localStorage.setItem('groupOrderCode', groupCode);
+      }
+      setTimeout(() => {
+        navigate('/order');
+      }, 1200);
+    });
+
+    socket.on('group:kicked', (payload) => {
+      toast.error(payload?.message || 'You were removed from the Group Feast by the host.');
+      setJoined(false);
+      navigate('/home');
     });
 
     socket.on('group:remind', ({ senderName }) => {
-      toast(`🔔 ${senderName} sent you a payment reminder!`, {
+      toast(`🔔 ${senderName} sent a payment reminder to all members!`, {
         icon: '💰',
         duration: 5000,
         style: {
@@ -371,7 +401,7 @@ const GroupOrder = () => {
     const price = Number(item.price || 0);
     socketRef.current.emit(
       'group:updateCart',
-      { groupCode, action, itemId, quantity, addedBy: currentName, price },
+      { groupCode, action, itemId, quantity, addedBy: currentName, price, name: item.name || '', image: item.image || '' },
       (response) => {
         if (response?.success) {
           setGroup(response.groupOrder);
@@ -379,7 +409,7 @@ const GroupOrder = () => {
           setExpired(response.groupOrder.isExpired || new Date() > new Date(response.groupOrder.expiresAt));
           
           if (action === 'add') {
-            toast.success('🍽️ Item added to Group Feast');
+            toast.success(`🍽️ Added ${item.name || 'item'} to Group Feast`);
           }
         } else {
           if (response?.message?.includes('locked')) {
@@ -402,16 +432,74 @@ const GroupOrder = () => {
     // Optimistically update the single source of truth immediately for instant UI responsiveness
     setGroup((prev) => prev ? { ...prev, isLocked: nextLocked } : prev);
 
-    socketRef.current.emit('group:toggleLock', { groupCode, isLocked: nextLocked }, (response) => {
+    socketRef.current.emit('group:toggleLock', { groupCode, isLocked: nextLocked, requesterName: currentName }, (response) => {
       if (response?.success) {
         setGroup(response.groupOrder);
         toast.success(nextLocked ? 'Shared cart is now LOCKED 🔒' : 'Shared cart is now UNLOCKED 🔓');
       } else {
-        // Rollback state if server request fails
         setGroup((prev) => prev ? { ...prev, isLocked: !nextLocked } : prev);
         toast.error('Failed to toggle lock status');
       }
     });
+  };
+
+  const handleRemoveMember = (memberName) => {
+    if (!isHost) {
+      toast.error('Only the host can remove members');
+      return;
+    }
+    if (memberName === currentName) {
+      toast.error('Host cannot remove themselves');
+      return;
+    }
+    if (!socketRef.current?.connected) {
+      toast.error('Session disconnected');
+      return;
+    }
+    socketRef.current.emit(
+      'group:removeMember',
+      { groupCode, memberName, requesterName: currentName },
+      (response) => {
+        if (response?.success) {
+          setGroup(response.groupOrder);
+          toast.success(`Removed ${memberName} from feast`);
+        } else {
+          toast.error(response?.message || 'Failed to remove member');
+        }
+      }
+    );
+  };
+
+  const handleStartCheckout = async () => {
+    if (!isHost) {
+      toast.error('Only the host can start group checkout');
+      return;
+    }
+    if (!group?.cartItems?.length) {
+      toast.error('The shared cart is empty');
+      return;
+    }
+    if (!socketRef.current?.connected) {
+      toast.error('Session disconnected');
+      return;
+    }
+    socketRef.current.emit(
+      'group:startCheckout',
+      { groupCode, requesterName: currentName },
+      async (response) => {
+        if (response?.success) {
+          setGroup(response.groupOrder);
+          const itemsToAdd = response.groupOrder.cartItems.map((item) => ({ itemId: item.itemId, quantity: item.quantity }));
+          await addItemsToCart(itemsToAdd);
+          localStorage.setItem('groupOrderCheckout', JSON.stringify(response.groupOrder.cartItems));
+          localStorage.setItem('groupOrderCode', groupCode);
+          toast.success('Group checkout started! 💳');
+          navigate('/order');
+        } else {
+          toast.error(response?.message || 'Unable to start checkout');
+        }
+      }
+    );
   };
 
   const handleCheckout = async () => {
