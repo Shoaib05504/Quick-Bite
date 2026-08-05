@@ -191,3 +191,19 @@ For reporting security issues or vulnerabilities, please review our [Security Po
 
 ## 🤝 Contributing
 Feel free to fork the repository, make changes, and open a Pull Request. Ensure that security checks pass locally and no credential variables are altered.
+
+---
+
+## 👨‍💻 Author
+
+# Shoaib S W #
+
+🎓 Final Year B.E. Information Science & Engineering Student
+
+📧 Email: shoaibsw05786@gmail.com
+
+🐙 GitHub: https://github.com/Shoaib05504
+
+💼 LinkedIn: **[Follow me on LinkedIn](https://www.linkedin.com/in/shoaibsw05786)**
+
+⭐ If you like this project, please give it a ⭐ on GitHub!
