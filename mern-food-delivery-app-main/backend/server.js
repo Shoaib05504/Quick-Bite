@@ -77,9 +77,6 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // ── General rate limiter — scoped strictly to API endpoints ────────────────
 app.use('/api', generalLimiter);
 
-// ── DB connection ─────────────────────────────────────────────────────────────
-connectDB();
-
 // ── Static uploads (images served publicly) ─────────────────────────────────
 app.use('/images', express.static(path.resolve(__dirname, 'uploads')));
 
@@ -163,6 +160,7 @@ const startServer = (p) => {
     console.log(`✅ QuickBite API running on http://localhost:${p}`);
     httpServer.removeListener('error', onError);
     httpServer.removeListener('listening', onListening);
+    connectDB();
   };
 
   httpServer.once('error', onError);

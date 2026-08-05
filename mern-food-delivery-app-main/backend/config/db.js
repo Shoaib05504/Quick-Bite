@@ -51,6 +51,7 @@ const downloadImage = async (url, filename) => {
       url,
       method: 'GET',
       responseType: 'stream',
+      timeout: 4000,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       }
@@ -80,7 +81,7 @@ export const connectDB = async () => {
     }
 
     const normalizedUri = normalizeMongoUri(mongoUri);
-    await mongoose.connect(normalizedUri);
+    await mongoose.connect(normalizedUri, { serverSelectionTimeoutMS: 5000 });
     console.log("MongoDB Connected ✅");
 
     // Automatically download Coffee & Refreshments images if missing
@@ -96,9 +97,9 @@ export const connectDB = async () => {
       { url: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&auto=format&fit=crop&q=80", filename: "menu_coffee.png" }
     ];
 
-    for (const item of imagesToDownload) {
-      await downloadImage(item.url, item.filename);
-    }
+    // Download images asynchronously in background so DB connection is fast and server starts listening immediately
+    Promise.allSettled(imagesToDownload.map(item => downloadImage(item.url, item.filename)))
+      .catch(err => console.error('[Downloader] Background image download error:', err.message));
 
     // Comprehensive list of all 42 expected foods with their exact original local matching images
     const allExpectedFoods = [
