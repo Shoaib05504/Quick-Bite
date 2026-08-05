@@ -25,7 +25,7 @@ https://quickbite-9qd2.onrender.com
 
 ## 🗺️ System Architecture
 
-```mermaid
+''' mermaid
 graph TD
     subgraph Frontend Client
         C[Customer UI - React]
@@ -55,9 +55,11 @@ graph TD
     B -->|Storage| CL
     B -->|AI Chatbot Query| GM
     B -->|Order Invoices| NM
-```
-
+    
+'''
 ---
+
+
 
 ## ✨ Features
 
