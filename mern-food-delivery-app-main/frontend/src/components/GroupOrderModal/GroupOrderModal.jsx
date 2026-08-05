@@ -126,7 +126,7 @@ const GroupOrderModal = ({ cartLines = [], onClose }) => {
     setGenerating(false);
 
     if (response.success) {
-      toast.success('Group Feast Created! 🚀');
+      toast.success('Group Feast Created! 🚀', { duration: 5000 });
       onClose(); // Close modal immediately
       navigate(`/group-order/${response.groupOrder.groupCode}`); // Navigate directly to live Group Room
     } else {
