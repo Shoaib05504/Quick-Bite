@@ -14,6 +14,7 @@ const groupOrderSchema = new mongoose.Schema(
       default: 'active',
     },
     createdBy: { type: mongoose.Types.ObjectId, ref: 'user', default: null },
+    isStarted: { type: Boolean, default: false },
     isLocked: { type: Boolean, default: false },
     isExpired: { type: Boolean, default: false },
     totalAmount: { type: Number, default: 0 },
@@ -44,6 +45,15 @@ const groupOrderSchema = new mongoose.Schema(
       {
         message: { type: String, required: true },
         createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    chatMessages: [
+      {
+        messageId: { type: String, required: true },
+        sender: { type: String, required: true },
+        initials: { type: String, default: '' },
+        text: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now },
       },
     ],
   },

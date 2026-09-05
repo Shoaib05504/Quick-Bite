@@ -2,6 +2,7 @@ import express from 'express'
 import { 
     loginUser, 
     registerUser, 
+    googleAuthUser,
     getUserProfile, 
     updateProfile, 
     changePassword, 
@@ -18,6 +19,7 @@ const userRouter = express.Router();
 // Authentication routes
 userRouter.post('/register', registerUser)
 userRouter.post('/login', loginUser)
+userRouter.post('/google-auth', googleAuthUser)
 
 // Profile routes (protected)
 userRouter.get('/profile', authMiddleware, getUserProfile)

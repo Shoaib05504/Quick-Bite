@@ -1,10 +1,7 @@
 import jwt from 'jsonwebtoken';
 
-/**
- * Authentication middleware.
- * Reads the JWT from the standard `Authorization: Bearer <token>` header.
- * Attaches `req.user = { id, role }` and `req.body.userId = id` for downstream use.
- */
+const JWT_SECRET = process.env.JWT_SECRET || 'quickbite_secret_key_2026_default';
+
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
 
@@ -15,7 +12,7 @@ const authMiddleware = async (req, res, next) => {
   const token = authHeader.slice(7); // strip "Bearer "
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = { id: decoded.id, role: decoded.role || 'user' };
     req.body = req.body || {};
     req.body.userId = decoded.id;

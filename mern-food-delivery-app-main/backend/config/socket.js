@@ -8,6 +8,8 @@ import {
   updateSocketPresence,
   updateMemberPayment,
   remindUnpaid,
+  addChatMessage,
+  startGroupFeast,
 } from '../controllers/groupOrderController.js';
 
 export const initSocket = (httpServer) => {
@@ -179,6 +181,40 @@ export const initSocket = (httpServer) => {
         const updatedGroup = await remindUnpaid(groupCode, senderName);
         if (updatedGroup) {
           io.to(groupCode).emit('group:remind', { senderName });
+          io.to(groupCode).emit('group:updated', { groupOrder: updatedGroup });
+          if (callback) callback({ success: true, groupOrder: updatedGroup });
+        } else {
+          if (callback) callback({ success: false, message: 'Group not found' });
+        }
+      } catch (err) {
+        if (callback) callback({ success: false, message: err.message });
+      }
+    });
+
+    // Real-Time Group Chat Message
+    socket.on('group:sendMessage', async ({ groupCode, sender, text }, callback) => {
+      try {
+        const result = await addChatMessage(groupCode, sender, text);
+        if (result && result.message) {
+          io.to(groupCode).emit('group:chatMessage', {
+            message: result.message,
+            groupOrder: result.updatedGroup,
+          });
+          if (callback) callback({ success: true, message: result.message });
+        } else {
+          if (callback) callback({ success: false, message: 'Failed to send message' });
+        }
+      } catch (err) {
+        if (callback) callback({ success: false, message: err.message });
+      }
+    });
+
+    // Start Group Feast Session
+    socket.on('group:startFeast', async ({ groupCode, requesterName }, callback) => {
+      try {
+        const updatedGroup = await startGroupFeast(groupCode, requesterName);
+        if (updatedGroup) {
+          io.to(groupCode).emit('group:feastStarted', { groupOrder: updatedGroup });
           io.to(groupCode).emit('group:updated', { groupOrder: updatedGroup });
           if (callback) callback({ success: true, groupOrder: updatedGroup });
         } else {

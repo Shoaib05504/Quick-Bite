@@ -58,8 +58,14 @@ app.use(cors({
     
     if (
       allowedOrigins.includes(normalizedOrigin) || 
+      normalizedOrigin === 'https://localhost' ||
+      normalizedOrigin === 'http://localhost' ||
+      normalizedOrigin === 'capacitor://localhost' ||
       normalizedOrigin.startsWith('http://localhost:') || 
       normalizedOrigin.startsWith('http://127.0.0.1:') ||
+      normalizedOrigin.startsWith('http://192.168.') ||
+      normalizedOrigin.startsWith('http://10.') ||
+      normalizedOrigin.startsWith('http://172.') ||
       (process.env.RENDER_EXTERNAL_URL && normalizedOrigin === process.env.RENDER_EXTERNAL_URL.replace(/\/$/, ''))
     ) {
       callback(null, true);

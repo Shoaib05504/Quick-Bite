@@ -332,6 +332,73 @@ const remindUnpaid = async (groupCode, senderName) => {
   return groupOrder;
 };
 
+const addChatMessage = async (groupCode, senderName, text) => {
+  const groupOrder = await groupOrderModel.findOne({ groupCode });
+  if (!groupOrder) return null;
+  await markExpiredIfNeeded(groupOrder);
+  if (groupOrder.isExpired) {
+    throw new Error('Group order has expired');
+  }
+
+  const cleanText = String(text || '').trim();
+  if (!cleanText) return null;
+
+  const senderMember = groupOrder.members.find((m) => m.name === senderName);
+  const senderDisplayName = senderMember ? senderMember.name : senderName;
+  const initials = senderDisplayName.charAt(0).toUpperCase();
+
+  const messageObj = {
+    messageId: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    sender: senderDisplayName,
+    initials,
+    text: cleanText,
+    timestamp: new Date(),
+  };
+
+  if (!groupOrder.chatMessages) {
+    groupOrder.chatMessages = [];
+  }
+
+  groupOrder.chatMessages.push(messageObj);
+  if (groupOrder.chatMessages.length > 100) {
+    groupOrder.chatMessages = groupOrder.chatMessages.slice(-100);
+  }
+
+  await groupOrder.save();
+  return { updatedGroup: groupOrder, message: messageObj };
+};
+
+const startGroupFeast = async (groupCode, requesterName) => {
+  const groupOrder = await groupOrderModel.findOne({ groupCode });
+  if (!groupOrder) return null;
+  await markExpiredIfNeeded(groupOrder);
+  if (groupOrder.isExpired) {
+    throw new Error('Group order has expired');
+  }
+
+  const hostMember = (groupOrder.members && groupOrder.members.find((m) => m.isHost)) || (groupOrder.members && groupOrder.members[0]);
+  const hostName = requesterName || (hostMember ? hostMember.name : 'Host');
+
+  groupOrder.isStarted = true;
+  groupOrder.status = 'active';
+  appendActivity(groupOrder, `🎉 Host ${hostName} started the Group Feast! Everyone can now add items.`);
+  await groupOrder.save();
+  return groupOrder;
+};
+
+const startGroupFeastRoute = async (req, res) => {
+  try {
+    const { groupCode, requesterName } = req.body;
+    const updatedGroup = await startGroupFeast(groupCode, requesterName);
+    if (!updatedGroup) {
+      return res.status(404).json({ success: false, message: 'Group order not found' });
+    }
+    return res.json({ success: true, groupOrder: updatedGroup });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 export {
   createGroupOrder,
   getGroupOrder,
@@ -345,5 +412,8 @@ export {
   updateSocketPresence,
   updateMemberPayment,
   remindUnpaid,
+  addChatMessage,
+  startGroupFeast,
+  startGroupFeastRoute,
 };
 
