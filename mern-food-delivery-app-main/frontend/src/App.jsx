@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar/Navbar';
-import { Route, Routes, Navigate, useSearchParams } from 'react-router-dom';
+import { Route, Routes, Navigate, useSearchParams, useNavigate } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import Cart from './pages/Cart/Cart';
 import Admin from './pages/Admin/Admin.jsx';
@@ -29,8 +29,10 @@ const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showGroupModal, setShowGroupModal] = useState(false);
   const [search, setSearch] = useState('');
+  const [submittedSearch, setSubmittedSearch] = useState('');
   const { token } = useContext(StoreContext);
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // Auto-open login popup when redirected by ProtectedRoute
   useEffect(() => {
@@ -38,6 +40,28 @@ const App = () => {
       setShowLogin(true);
     }
   }, [searchParams, token]);
+
+  // Handle food search submission when Enter key is pressed
+  const handleSearchSubmit = (queryText) => {
+    const query = (queryText !== undefined ? queryText : search).trim();
+    setSubmittedSearch(query);
+
+    if (query !== '') {
+      if (window.location.pathname !== '/home') {
+        navigate('/home');
+      }
+      setTimeout(() => {
+        const foodSection = document.getElementById('food-display') || document.getElementById('explore-menu');
+        if (foodSection) {
+          foodSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 120);
+    }
+  };
+
+  const handleSearchClear = () => {
+    setSubmittedSearch('');
+  };
 
   return (
     <>
@@ -78,6 +102,8 @@ const App = () => {
           setShowLogin={setShowLogin}
           search={search}
           setSearch={setSearch}
+          onSearchSubmit={handleSearchSubmit}
+          onSearchClear={handleSearchClear}
           onOpenGroupModal={() => setShowGroupModal(true)}
         />
 
@@ -89,6 +115,7 @@ const App = () => {
             element={
               <Home
                 search={search}
+                submittedSearch={submittedSearch}
                 setSearch={setSearch}
                 onOpenGroupModal={() => setShowGroupModal(true)}
               />

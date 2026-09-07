@@ -1,26 +1,10 @@
 import axios from 'axios';
-
-const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (import.meta.env.MODE === 'development') {
-    return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
-  }
-  if (typeof window !== 'undefined') {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
-    }
-    if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-      return `${window.location.origin}/api`;
-    }
-    return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
-  }
-  return envUrl ? `${envUrl}/api` : 'http://localhost:8000/api';
-};
-const API_BASE_URL = getApiBaseUrl();
+import { API_BASE_URL } from '../config/apiConfig';
 
 // Axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 45000,
   headers: { 'Content-Type': 'application/json' },
 });
 

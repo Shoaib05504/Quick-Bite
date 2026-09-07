@@ -94,7 +94,7 @@
 .magic-bento-card__title {
   font-weight: 600;
   font-size: 1.25rem;
-  margin: 0 0 0.35em;
+  margin: 0 0 0.85rem;
   color: var(--white);
 }
 
@@ -123,17 +123,29 @@
   line-clamp: var(--clamp-desc);
 }
 
-@media (max-width: 599px) {
+@media (max-width: 768px) {
   .card-grid {
     grid-template-columns: 1fr;
     width: 100%;
-    padding: 1em;
+    padding: 1em 0.5em;
   }
 
   .magic-bento-card {
     width: 100%;
-    min-height: 180px;
-    aspect-ratio: 16/9;
+    min-height: auto !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
+    overflow: visible !important;
+    padding: 1.25em 1em;
+  }
+
+  .magic-bento-card--text-autohide .magic-bento-card__title,
+  .magic-bento-card--text-autohide .magic-bento-card__description {
+    -webkit-line-clamp: unset !important;
+    line-clamp: unset !important;
+    max-height: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
   }
 }
 

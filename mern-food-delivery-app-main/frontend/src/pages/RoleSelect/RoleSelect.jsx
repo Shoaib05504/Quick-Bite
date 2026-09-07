@@ -5,6 +5,7 @@ import MagicBento from "../../components/MagicBento/MagicBento";
 import "./RoleSelect.css";
 
 import axios from "axios";
+import { API_BASE_URL } from "../../config/apiConfig";
 
 const RoleSelect = () => {
   const navigate = useNavigate();
@@ -46,9 +47,8 @@ const RoleSelect = () => {
   const handleAdminLogin = async () => {
     try {
       setError("");
-      const apiUrl = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : window.location.origin);
       const emailToUse = (name === "admin" || !name) ? "admin@quickbite.com" : name;
-      const response = await axios.post(`${apiUrl}/api/user/login`, {
+      const response = await axios.post(`${API_BASE_URL}/user/login`, {
         email: emailToUse,
         password: password
       });
@@ -61,13 +61,17 @@ const RoleSelect = () => {
         if (window.location.port === "5173") {
           window.location.href = "http://localhost:5174/admin/";
         } else {
-          window.location.href = "/admin/";
+          navigate("/admin");
         }
       } else {
         setError("Access denied. Admin role required ❌");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid name or password ❌");
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Server is currently unavailable. Please try again later. ⚠️");
+      }
     }
   };
 
@@ -122,8 +126,8 @@ const RoleSelect = () => {
       color: '#090d16',
       title: 'Real-Time Order Tracking',
       description: (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '0.5rem' }}>
-          <p style={{ margin: 0, fontSize: '0.95rem', color: '#9ca3af', lineHeight: '1.5' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
+          <p style={{ margin: 0, fontSize: '0.9rem', color: '#9ca3af', lineHeight: '1.5' }}>
             Track your order status in real time from confirmation to delivery with live status updates and estimated delivery time (ETA).
           </p>
           <div style={{ 
@@ -133,61 +137,62 @@ const RoleSelect = () => {
             background: 'rgba(255, 255, 255, 0.03)', 
             border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '16px',
-            padding: '1.25rem 1rem',
+            padding: '1rem 0.5rem',
             marginTop: '0.5rem',
             backdropFilter: 'blur(10px)',
-            position: 'relative'
+            position: 'relative',
+            gap: '2px'
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, position: 'relative', zIndex: 2 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0, position: 'relative', zIndex: 2 }}>
               <div style={{ 
-                width: '12px', 
-                height: '12px', 
+                width: '10px', 
+                height: '10px', 
                 borderRadius: '50%', 
                 background: '#a855f7', 
                 boxShadow: '0 0 10px #a855f7',
-                marginBottom: '0.5rem'
+                marginBottom: '0.4rem'
               }}></div>
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#fff', textAlign: 'center' }}>Confirmed</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#fff', textAlign: 'center', wordBreak: 'break-word' }}>Confirmed</span>
             </div>
 
-            <div style={{ height: '2px', background: '#a855f7', flex: 0.6, position: 'relative', top: '-10px', zIndex: 1 }}></div>
+            <div style={{ height: '2px', background: '#a855f7', flex: 0.5, position: 'relative', top: '-8px', zIndex: 1 }}></div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, position: 'relative', zIndex: 2 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0, position: 'relative', zIndex: 2 }}>
               <div style={{ 
-                width: '12px', 
-                height: '12px', 
+                width: '10px', 
+                height: '10px', 
                 borderRadius: '50%', 
                 background: '#a855f7', 
                 boxShadow: '0 0 10px #a855f7',
-                marginBottom: '0.5rem'
+                marginBottom: '0.4rem'
               }}></div>
-              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#fff', textAlign: 'center' }}>Preparing</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#fff', textAlign: 'center', wordBreak: 'break-word' }}>Preparing</span>
             </div>
 
-            <div style={{ height: '2px', background: 'rgba(255, 255, 255, 0.1)', flex: 0.6, position: 'relative', top: '-10px', zIndex: 1 }}></div>
+            <div style={{ height: '2px', background: 'rgba(255, 255, 255, 0.1)', flex: 0.5, position: 'relative', top: '-8px', zIndex: 1 }}></div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, position: 'relative', zIndex: 2 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0, position: 'relative', zIndex: 2 }}>
               <div style={{ 
-                width: '12px', 
-                height: '12px', 
+                width: '10px', 
+                height: '10px', 
                 borderRadius: '50%', 
                 background: 'rgba(255, 255, 255, 0.2)', 
-                marginBottom: '0.5rem'
+                marginBottom: '0.4rem'
               }}></div>
-              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#9ca3af', textAlign: 'center' }}>Out for Delivery</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#9ca3af', textAlign: 'center', wordBreak: 'break-word' }}>Out for Delivery</span>
             </div>
 
-            <div style={{ height: '2px', background: 'rgba(255, 255, 255, 0.1)', flex: 0.6, position: 'relative', top: '-10px', zIndex: 1 }}></div>
+            <div style={{ height: '2px', background: 'rgba(255, 255, 255, 0.1)', flex: 0.5, position: 'relative', top: '-8px', zIndex: 1 }}></div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, position: 'relative', zIndex: 2 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0, position: 'relative', zIndex: 2 }}>
               <div style={{ 
-                width: '12px', 
-                height: '12px', 
+                width: '10px', 
+                height: '10px', 
                 borderRadius: '50%', 
                 background: 'rgba(255, 255, 255, 0.2)', 
-                marginBottom: '0.5rem'
+                marginBottom: '0.4rem'
               }}></div>
-              <span style={{ fontSize: '0.72rem', fontWeight: '600', color: '#9ca3af', textAlign: 'center' }}>Delivered</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#9ca3af', textAlign: 'center', wordBreak: 'break-word' }}>Delivered</span>
             </div>
           </div>
         </div>

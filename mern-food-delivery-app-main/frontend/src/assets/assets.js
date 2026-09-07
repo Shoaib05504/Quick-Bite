@@ -1,5 +1,6 @@
 import basket_icon from './basket_icon.png'
 import logo from './logo.png'
+import { SERVER_BASE_URL } from '../config/apiConfig'
 import header_img from './header_img.png'
 import search_icon from './search_icon.png'
 import menu_1 from './menu_1.png'
@@ -82,20 +83,7 @@ export const assets = {
     bag_icon,
     parcel_icon
 }
-const resolveApiUrl = () => {
-    const envUrl = import.meta.env.VITE_API_URL;
-    if (import.meta.env.MODE === 'development') {
-        return envUrl || 'http://localhost:8000';
-    }
-    if (typeof window !== 'undefined') {
-        if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-            return window.location.origin;
-        }
-        return envUrl || window.location.origin;
-    }
-    return envUrl || '';
-};
-export const url = resolveApiUrl();
+export const url = SERVER_BASE_URL;
 export const menu_list = [
     {
         menu_name: "Salad",
@@ -135,7 +123,7 @@ export const menu_list = [
     },
     {
         menu_name: "☕ Coffee & Refreshments",
-        menu_image: `${url}/images/menu_coffee.png`
+        menu_image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300&auto=format&fit=crop&q=80"
     }
 ]
 
@@ -373,7 +361,7 @@ export const food_list = [
     {
         _id: "33",
         name: "Cold Coffee",
-        image: "food_33.png",
+        image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=500&auto=format&fit=crop&q=80",
         price: 120,
         description: "Refreshing blended iced coffee with milk and rich chocolate syrup.",
         category: "☕ Coffee & Refreshments"
@@ -381,7 +369,7 @@ export const food_list = [
     {
         _id: "34",
         name: "Cappuccino",
-        image: "food_34.png",
+        image: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=500&auto=format&fit=crop&q=80",
         price: 140,
         description: "Classic espresso with steamed milk and a thick layer of foam.",
         category: "☕ Coffee & Refreshments"
@@ -389,7 +377,7 @@ export const food_list = [
     {
         _id: "35",
         name: "Café Latte",
-        image: "food_35.png",
+        image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=500&auto=format&fit=crop&q=80",
         price: 150,
         description: "Smooth espresso blended with steamed milk and light foam.",
         category: "☕ Coffee & Refreshments"
@@ -397,7 +385,7 @@ export const food_list = [
     {
         _id: "36",
         name: "Espresso",
-        image: "food_36.png",
+        image: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=500&auto=format&fit=crop&q=80",
         price: 110,
         description: "Rich and bold single shot of pure espresso coffee.",
         category: "☕ Coffee & Refreshments"
@@ -405,7 +393,7 @@ export const food_list = [
     {
         _id: "37",
         name: "Fresh Lime Soda",
-        image: "food_37.png",
+        image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
         price: 90,
         description: "Fizzy lime beverage served sweet or salted to refresh your senses.",
         category: "☕ Coffee & Refreshments"
@@ -413,7 +401,7 @@ export const food_list = [
     {
         _id: "38",
         name: "Virgin Mojito",
-        image: "food_38.png",
+        image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500&auto=format&fit=crop&q=80",
         price: 130,
         description: "Refreshing lime and mint mocktail served over crushed ice.",
         category: "☕ Coffee & Refreshments"
@@ -421,7 +409,7 @@ export const food_list = [
     {
         _id: "39",
         name: "Mango Smoothie",
-        image: "food_39.png",
+        image: "https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?w=500&auto=format&fit=crop&q=80",
         price: 160,
         description: "Thick and creamy tropical smoothie made with sweet mangoes.",
         category: "☕ Coffee & Refreshments"
@@ -429,9 +417,25 @@ export const food_list = [
     {
         _id: "40",
         name: "Chocolate Milkshake",
-        image: "food_40.png",
+        image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=500&auto=format&fit=crop&q=80",
         price: 170,
         description: "Indulgent milkshake with rich Belgian chocolate and vanilla cream.",
         category: "☕ Coffee & Refreshments"
+    },
+    {
+        _id: "41",
+        name: "Margherita Pizza",
+        image: pizza_img,
+        price: 220,
+        description: "Classic Italian pizza loaded with fresh mozzarella, tomatoes, and basil.",
+        category: "Pizza"
+    },
+    {
+        _id: "42",
+        name: "Cheese Pizza",
+        image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&auto=format&fit=crop&q=80",
+        price: 240,
+        description: "Delicious pizza topped with blend of gooey cheeses and savory sauce.",
+        category: "Pizza"
     }
 ]

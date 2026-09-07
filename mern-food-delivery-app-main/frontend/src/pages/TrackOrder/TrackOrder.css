@@ -27,9 +27,9 @@
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 30px;
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
 }
 
 .track-food-image {
@@ -406,34 +406,214 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .track-content {
-    grid-template-columns: 1fr;
-    gap: 20px;
+  .track-container {
+    min-height: auto;
+    height: auto;
+    padding: 14px 8px 30px;
   }
 
   .track-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 4px;
   }
 
-  .track-card {
-    padding: 20px;
+  .order-id {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+
+  .track-food-image {
+    margin: 6px 0 12px;
+  }
+
+  .track-food-image img {
+    width: 68px;
+    height: 68px;
+    border-width: 2px;
+  }
+
+  .track-content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .track-card,
+  .map-card {
+    padding: 10px 8px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .timeline {
+    margin-bottom: 10px;
+  }
+
+  .timeline-item {
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .circle {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+    margin-right: 6px;
+  }
+
+  .line {
+    left: 15px;
+    top: 32px;
+    height: 22px;
+    width: 2px;
+  }
+
+  .content h4 {
+    font-size: 0.78rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .content span {
+    font-size: 0.68rem;
+  }
+
+  .eta-section {
+    padding: 8px 10px;
+    margin: 8px 0;
+    border-radius: 12px;
   }
 
   .eta-display {
-    flex-direction: column;
-    text-align: center;
-    gap: 15px;
+    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .delivery-bike {
+    font-size: 1.4rem;
+  }
+
+  .eta-info h3 {
+    font-size: 0.88rem;
+    margin-bottom: 2px;
+  }
+
+  .eta-info p {
+    font-size: 0.72rem;
   }
 
   .track-bottom {
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
+    margin-top: 8px;
   }
 
   .track-bottom span,
   .track-bottom button {
     width: 100%;
-    text-align: center;
+    padding: 6px 4px;
+    font-size: 0.72rem;
+    border-radius: 10px;
     justify-content: center;
+  }
+
+  .map-card-header {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .map-card-header h3 {
+    font-size: 0.92rem;
+  }
+
+  .map-card-header p {
+    font-size: 0.72rem;
+    margin-top: 2px;
+  }
+
+  .map-card-header span {
+    font-size: 1.2rem;
+  }
+
+  .map-preview {
+    border-radius: 12px;
+  }
+
+  .map-preview .leaflet-container {
+    height: 140px !important;
+    border-radius: 12px !important;
+  }
+
+  .map-card-footer {
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    font-size: 0.72rem;
+  }
+
+  /* Live Delivery Tracker Modal Mobile Layout */
+  .map-modal {
+    width: 94%;
+    max-height: 90vh;
+    border-radius: 20px;
+  }
+
+  .modal-header {
+    padding: 14px 16px 8px;
+  }
+
+  .modal-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .modal-header p {
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+
+  .close-modal-btn {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    border-radius: 12px;
+  }
+
+  .modal-map-wrapper {
+    height: 220px;
+  }
+
+  .modal-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 12px 14px 16px;
+  }
+
+  .modal-tag {
+    padding: 10px 12px;
+    border-radius: 14px;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .modal-tag.destination-card,
+  .modal-tag:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .modal-tag h4 {
+    font-size: 0.82rem;
+    margin-bottom: 4px;
+  }
+
+  .modal-tag p {
+    font-size: 0.82rem;
+    line-height: 1.3;
+    word-break: normal;
+    overflow-wrap: break-word;
   }
 }

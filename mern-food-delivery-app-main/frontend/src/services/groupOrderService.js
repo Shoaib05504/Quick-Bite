@@ -43,4 +43,16 @@ export const groupOrderAPI = {
       };
     }
   },
+
+  startGroupFeast: async (payload) => {
+    try {
+      const response = await api.post('/group-order/start-feast', payload);
+      return response.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  },
 };

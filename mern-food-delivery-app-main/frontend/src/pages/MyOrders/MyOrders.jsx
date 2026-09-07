@@ -53,6 +53,14 @@ const MyOrders = () => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  const getImageUrl = (imgSrc) => {
+    if (!imgSrc) return assets.parcel_icon;
+    if (typeof imgSrc === 'string' && (imgSrc.startsWith('http') || imgSrc.startsWith('data:') || imgSrc.startsWith('/assets') || imgSrc.startsWith('blob:'))) {
+      return imgSrc;
+    }
+    return `${url}/images/${imgSrc}`;
+  };
+
   const handleReorder = (orderId) => {
     toast.success('Reorder request sent.');
     // future: navigate to reorder workflow or add items to cart
@@ -106,15 +114,51 @@ const MyOrders = () => {
               : (order.paid ? 'Paid' : 'Pending'));
             const paymentClass = String(paymentText).toLowerCase() === 'paid' ? 'paid' : 'pending';
 
+            const itemsList = Array.isArray(order.items) ? order.items : [];
+
             return (
               <div key={orderId} className="my-orders-card">
-                <div className="my-orders-card-image">
-                  <img
-                    src={item.image || assets.parcel_icon}
-                    alt={item.name || 'Food item'}
-                    onError={(e) => { e.target.src = assets.parcel_icon; }}
-                  />
-                </div>
+                {/* ORDER IMAGE DISPLAY LOGIC */}
+                {(() => {
+                  if (itemsList.length <= 1) {
+                    const singleItem = itemsList[0] || item || {};
+                    return (
+                      <div className="my-orders-card-image single-order-image">
+                        <img
+                          src={getImageUrl(singleItem.image || item.image)}
+                          alt={singleItem.name || item.name || 'Food item'}
+                          onError={(e) => { e.target.src = assets.parcel_icon; }}
+                        />
+                      </div>
+                    );
+                  } else if (itemsList.length >= 2 && itemsList.length <= 3) {
+                    return (
+                      <div className="my-orders-card-image order-image-stack">
+                        {itemsList.slice(0, 3).map((it, idx) => (
+                          <img
+                            key={idx}
+                            src={getImageUrl(it.image)}
+                            alt={it.name || `Item ${idx + 1}`}
+                            onError={(e) => { e.target.src = assets.parcel_icon; }}
+                          />
+                        ))}
+                      </div>
+                    );
+                  } else {
+                    const primaryItem = itemsList[0] || item || {};
+                    const remainingCount = itemsList.length - 1;
+                    return (
+                      <div className="my-orders-card-image bulk-order-image">
+                        <img
+                          src={getImageUrl(primaryItem.image || item.image)}
+                          alt={primaryItem.name || item.name || 'Food item'}
+                          onError={(e) => { e.target.src = assets.parcel_icon; }}
+                        />
+                        <span className="item-count-badge">+{remainingCount} items</span>
+                      </div>
+                    );
+                  }
+                })()}
 
                 <div className="my-orders-card-content">
                   <div className="my-orders-card-header">
@@ -127,31 +171,24 @@ const MyOrders = () => {
 
                   <div className="order-detail-grid">
                     <div className="order-detail-block">
-                      <span>Ordered</span>
+                      <span>Ordered Date</span>
                       <strong>{formatOrderDate(order.date)}</strong>
-                    </div>
-                    <div className="order-detail-block">
-                      <span>Items</span>
-                      <strong>{itemsPreview}</strong>
                     </div>
                     <div className="order-detail-block">
                       <span>Quantity</span>
                       <strong>{totalQuantity}</strong>
                     </div>
                     <div className="order-detail-block">
-                      <span>Payment</span>
+                      <span>Items</span>
+                      <strong>{itemsPreview}</strong>
+                    </div>
+                    <div className="order-detail-block">
+                      <span>Payment Status</span>
                       <strong className={`payment-tag ${paymentClass}`}>{paymentText}</strong>
                     </div>
-                  </div>
-
-                  <div className="my-orders-card-footer">
-                    <div>
-                      <p className="order-summary-label">Total amount</p>
-                      <p className="order-price">₹{currencyAmount}</p>
-                    </div>
-                    <div className="order-summary-meta">
-                      <span>{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>
-                      <span>{order.location || order.deliveryAddress?.city || 'QuickBite delivery'}</span>
+                    <div className="order-detail-block full-width-detail">
+                      <span>Total Amount</span>
+                      <strong className="order-price-value">₹{currencyAmount}</strong>
                     </div>
                   </div>
                 </div>

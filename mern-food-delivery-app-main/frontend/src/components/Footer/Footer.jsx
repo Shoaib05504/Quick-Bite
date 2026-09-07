@@ -74,15 +74,21 @@ const Footer = () => {
           </p>
           <div className="contact-info-list">
             <div className="contact-info-item">
-              <MapPin className="contact-icon" />
+              <div className="contact-icon-wrapper">
+                <MapPin size={24} className="contact-icon" />
+              </div>
               <span>Bengaluru, Karnataka, India</span>
             </div>
             <div className="contact-info-item">
-              <Phone className="contact-icon" />
+              <div className="contact-icon-wrapper">
+                <Phone size={24} className="contact-icon" />
+              </div>
               <span>+91 XXXXX XXXXX</span>
             </div>
             <div className="contact-info-item">
-              <Mail className="contact-icon" />
+              <div className="contact-icon-wrapper">
+                <Mail size={24} className="contact-icon" />
+              </div>
               <a href="mailto:support@quickbite.com">support@quickbite.com</a>
             </div>
           </div>

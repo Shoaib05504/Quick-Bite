@@ -2,44 +2,82 @@
 
 :root, html {
   color-scheme: light !important;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
-*{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    font-family: Outfit, 'Poppins', sans-serif;
-  }
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: Outfit, 'Poppins', sans-serif;
+}
 
-  body{
-    min-height: 100vh;
-    background-color: #fcfcfc;
-  }
+body {
+  min-height: 100vh;
+  background-color: #fcfcfc;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
+}
 
-  a{
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+a {
   text-decoration: none;
   color: inherit;
 }
 
-hr{
-    border: none;
-    height: 1px;
-    background-color: #a9a9a9;
+hr {
+  border: none;
+  height: 1px;
+  background-color: #a9a9a9;
 }
 
-.app-content{
+.app-content {
   display: flex;
+  width: 100%;
 }
 
-.flex-col{
+.admin-app-container {
+  display: flex;
+  width: 100%;
+}
+
+.admin-main-content {
+  flex: 1;
+  padding: 24px 26px;
+  min-height: 100vh;
+  background: #090b17;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.flex-col {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.cursor{
+.cursor {
   cursor: pointer;
 }
-body{
-  font-family:'Poppins',sans-serif;
+
+@media (max-width: 768px) {
+  .admin-app-container {
+    flex-direction: column;
+  }
+  .admin-main-content {
+    padding: 16px 14px;
+    min-height: calc(100vh - 120px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }

@@ -12,10 +12,18 @@ const FoodItem = ({ id, name, price, description, image }) => {
   const navigate = useNavigate();
   const API_URL = url;
 
-  const imageSrc =
-    image && image.startsWith('http')
-      ? image
-      : `${API_URL}/images/${image}`;
+  const resolveImageSrc = (img) => {
+    if (!img) return assets.header_img;
+    if (typeof img === 'string') {
+      if (img.startsWith('http') || img.startsWith('/') || img.startsWith('data:') || img.includes('/assets/')) {
+        return img;
+      }
+      return `${API_URL}/images/${img}`;
+    }
+    return img;
+  };
+
+  const imageSrc = resolveImageSrc(image);
 
   const handleAddToCart = () => {
     addToCart(id);
@@ -45,7 +53,15 @@ const FoodItem = ({ id, name, price, description, image }) => {
   return (
     <div className="food-item">
       <div className="food-item-img-container">
-        <img src={imageSrc} className="food-item-image" alt={name} />
+        <img
+          src={imageSrc}
+          className="food-item-image"
+          alt={name}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = assets.header_img;
+          }}
+        />
         {cartItems[id] > 0 && (
           <span className="food-item-qty-badge">{cartItems[id]} in cart</span>
         )}

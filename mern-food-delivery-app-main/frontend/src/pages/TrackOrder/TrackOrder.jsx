@@ -235,18 +235,17 @@ const TrackOrder = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <motion.h2 
-        className="track-title"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, duration: 0.3 }}
-      >
-        Track Your Order
-      </motion.h2>
-      <p className="order-id">Order ID: {id}</p>
+      <div className="track-header-wrapper">
+        <motion.h2 
+          className="track-title"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+        >
+          Track Your Order
+        </motion.h2>
+        <p className="order-id">Order ID: {id}</p>
 
-      <div className="track-content">
-        {/* Food Image */}
         <motion.div 
           className="track-food-image"
           initial={{ scale: 0 }}
@@ -258,6 +257,9 @@ const TrackOrder = () => {
             alt="food"
           />
         </motion.div>
+      </div>
+
+      <div className="track-content">
 
         {/* Main Tracking Card */}
         <motion.div 
@@ -466,7 +468,7 @@ const TrackOrder = () => {
               </div>
 
               <div className="modal-info">
-                <div className="modal-tag">
+                <div className="modal-tag destination-card">
                   <h4>Destination</h4>
                   <p>{addressData.street}</p>
                   <p>{addressData.city}, {addressData.state} {addressData.zipcode}</p>

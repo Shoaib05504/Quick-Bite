@@ -1,84 +1,67 @@
-.header{
-    height: 34vw;
-    margin: 30px auto;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+.header-banner-container {
+    width: 100%;
+    margin: 20px 0 30px 0;
+    box-sizing: border-box;
+}
+
+.header-banner-wrapper {
     position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
     border-radius: 28px;
     overflow: hidden;
-    box-shadow: 0 26px 80px rgba(17, 13, 39, 0.35);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+    background: #000000;
 }
 
-.header::after{
-    content: "";
+.header-banner-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 28px;
+}
+
+/* Transparent clickable overlay positioned exactly over the "Order Now" button in the image */
+.order-now-overlay-btn {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(15, 10, 35, 0.12), rgba(6, 2, 18, 0.92));
-    pointer-events: none;
-}
-
-.header-contents{
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5vw;
-    max-width: 50%;
-    bottom: 10%;
-    left: 6vw;
-    animation: fadeIn 3s;
-    z-index: 1;
-}
-
-.header-contents h2{
-    font-weight: 700;
-    color: #f8f7ff;
-    font-size:max(4.5vw, 28px);
-    text-shadow: 0 18px 40px rgba(102, 40, 255, 0.22);
-}
-
-.header-contents p {
-    color: rgba(255, 255, 255, 0.84);
-    font-size: 1rem;
-    max-width: 590px;
-    line-height: 1.6;
-}
-
-.header-contents button{
+    top: 73.8%;
+    left: 29.8%;
+    width: 22.2%;
+    height: 13.6%;
+    background: transparent;
     border: none;
-    color: #f9f8ff;
-    font-weight: 600;
-    padding: 0.95rem 2rem;
-    background: linear-gradient(135deg, #7c4dff, #ff6da0);
-    font-size: max(1vw,14px);
     border-radius: 999px;
-    box-shadow: 0 16px 30px rgba(124, 77, 255, 0.28);
     cursor: pointer;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    outline: none;
+    z-index: 10;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.header-contents button:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 24px 40px rgba(124, 77, 255, 0.32);
+/* Interactive feedback on hover & active tap */
+.order-now-overlay-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 16px rgba(255, 122, 53, 0.45);
 }
 
-@media (max-width:1050px){
-.header-contents{
-    max-width: 55%;
-}
+.order-now-overlay-btn:active {
+    transform: scale(0.97);
 }
 
-@media (max-width:750px){
-    .header-contents{
-        max-width: 80%;
+@media (max-width: 768px) {
+    .header-banner-container {
+        margin: 12px 0 20px 0;
     }
-
-    .header-contents p {
-        font-size: 0.98rem;
+    .header-banner-wrapper,
+    .header-banner-img {
+        border-radius: 20px;
     }
+}
 
-    .header-contents button{
-        padding: 1rem 2.5rem;
+@media (max-width: 480px) {
+    .header-banner-wrapper,
+    .header-banner-img {
+        border-radius: 16px;
     }
 }

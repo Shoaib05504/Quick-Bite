@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QuickBite</string>
+    <string name="title_activity_main">QuickBite</string>
+    <string name="package_name">com.quickbite.delivery</string>
+    <string name="custom_url_scheme">com.quickbite.delivery</string>
+    <string name="server_client_id">875272692734-fuje7g7h9p8o8m33kdp81vug8nadm0vp.apps.googleusercontent.com</string>
+</resources>
+

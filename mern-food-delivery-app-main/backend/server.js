@@ -66,6 +66,9 @@ app.use(cors({
       normalizedOrigin.startsWith('http://192.168.') ||
       normalizedOrigin.startsWith('http://10.') ||
       normalizedOrigin.startsWith('http://172.') ||
+      normalizedOrigin.startsWith('https://10.') ||
+      normalizedOrigin.startsWith('https://192.168.') ||
+      normalizedOrigin.startsWith('https://172.') ||
       (process.env.RENDER_EXTERNAL_URL && normalizedOrigin === process.env.RENDER_EXTERNAL_URL.replace(/\/$/, ''))
     ) {
       callback(null, true);
@@ -163,7 +166,7 @@ const startServer = (p) => {
   };
 
   const onListening = () => {
-    console.log(`✅ QuickBite API running on http://localhost:${p}`);
+    console.log(`✅ QuickBite API running on http://0.0.0.0:${p} (Local LAN: http://10.80.218.217:${p})`);
     httpServer.removeListener('error', onError);
     httpServer.removeListener('listening', onListening);
     connectDB();
@@ -171,7 +174,7 @@ const startServer = (p) => {
 
   httpServer.once('error', onError);
   httpServer.once('listening', onListening);
-  httpServer.listen(p);
+  httpServer.listen(p, '0.0.0.0');
 };
 
 startServer(port);

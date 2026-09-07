@@ -2,20 +2,38 @@
 
 :root, html {
   color-scheme: light !important;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-text-size-adjust: 100%;
 }
 
 *{
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: Outfit;
+  font-family: Outfit, sans-serif;
   scroll-behavior: smooth;
 }
 
 body{
+  width: 100%;
+  max-width: 100vw;
   min-height: 100vh;
   background-color: #ffffff;
   color: #262626;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 a{
@@ -26,6 +44,35 @@ a{
 .app{
   width: 80%;
   margin: auto;
+  min-height: 100vh;
+  transition: width 0.3s ease;
+}
+
+@media (max-width: 1050px) {
+  .app {
+    width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .app {
+    width: 95%;
+    padding: 0 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app {
+    width: 100%;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .app {
+    width: 100%;
+    padding: 0 6px;
+  }
 }
 
 @keyframes fadeIn {

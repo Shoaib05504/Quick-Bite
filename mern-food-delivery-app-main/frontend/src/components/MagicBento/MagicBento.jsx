@@ -169,6 +169,58 @@ const ParticleCard = ({
     });
   }, [initializeParticles]);
 
+  const handleClick = useCallback(
+    e => {
+      if (onClick) {
+        onClick(e);
+      }
+      if (!clickEffect || !cardRef.current || disableAnimations) return;
+
+      const element = cardRef.current;
+      const rect = element.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const maxDistance = Math.max(
+        Math.hypot(x, y),
+        Math.hypot(x - rect.width, y),
+        Math.hypot(x, y - rect.height),
+        Math.hypot(x - rect.width, y - rect.height)
+      );
+
+      const ripple = document.createElement('div');
+      ripple.style.cssText = `
+        position: absolute;
+        width: ${maxDistance * 2}px;
+        height: ${maxDistance * 2}px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(${glowColor}, 0.4) 0%, rgba(${glowColor}, 0.2) 30%, transparent 70%);
+        left: ${x - maxDistance}px;
+        top: ${y - maxDistance}px;
+        pointer-events: none;
+        z-index: 1000;
+      `;
+
+      element.appendChild(ripple);
+
+      gsap.fromTo(
+        ripple,
+        {
+          scale: 0,
+          opacity: 1
+        },
+        {
+          scale: 1,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          onComplete: () => ripple.remove()
+        }
+      );
+    },
+    [onClick, clickEffect, disableAnimations, glowColor]
+  );
+
   useEffect(() => {
     if (disableAnimations || !cardRef.current) return;
 
@@ -247,74 +299,25 @@ const ParticleCard = ({
       }
     };
 
-    const handleClick = e => {
-      if (onClick) {
-        onClick(e);
-      }
-      if (!clickEffect) return;
-
-      const rect = element.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const maxDistance = Math.max(
-        Math.hypot(x, y),
-        Math.hypot(x - rect.width, y),
-        Math.hypot(x, y - rect.height),
-        Math.hypot(x - rect.width, y - rect.height)
-      );
-
-      const ripple = document.createElement('div');
-      ripple.style.cssText = `
-        position: absolute;
-        width: ${maxDistance * 2}px;
-        height: ${maxDistance * 2}px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(${glowColor}, 0.4) 0%, rgba(${glowColor}, 0.2) 30%, transparent 70%);
-        left: ${x - maxDistance}px;
-        top: ${y - maxDistance}px;
-        pointer-events: none;
-        z-index: 1000;
-      `;
-
-      element.appendChild(ripple);
-
-      gsap.fromTo(
-        ripple,
-        {
-          scale: 0,
-          opacity: 1
-        },
-        {
-          scale: 1,
-          opacity: 0,
-          duration: 0.8,
-          ease: 'power2.out',
-          onComplete: () => ripple.remove()
-        }
-      );
-    };
-
     element.addEventListener('mouseenter', handleMouseEnter);
     element.addEventListener('mouseleave', handleMouseLeave);
     element.addEventListener('mousemove', handleMouseMove);
-    element.addEventListener('click', handleClick);
 
     return () => {
       isHoveredRef.current = false;
       element.removeEventListener('mouseenter', handleMouseEnter);
       element.removeEventListener('mouseleave', handleMouseLeave);
       element.removeEventListener('mousemove', handleMouseMove);
-      element.removeEventListener('click', handleClick);
       clearAllParticles();
     };
-  }, [animateParticles, clearAllParticles, disableAnimations, enableTilt, enableMagnetism, clickEffect, glowColor, onClick]);
+  }, [animateParticles, clearAllParticles, disableAnimations, enableTilt, enableMagnetism]);
 
   return (
     <div
       ref={cardRef}
       className={`${className} particle-container`}
-      style={{ ...style, position: 'relative', overflow: 'hidden' }}
+      style={{ ...style, position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
+      onClick={handleClick}
     >
       {children}
     </div>
@@ -545,115 +548,10 @@ const MagicBento = ({
             <div
               key={index}
               {...cardProps}
-              ref={el => {
-                if (!el) return;
-
-                const handleMouseMove = e => {
-                  if (shouldDisableAnimations) return;
-
-                  const rect = el.getBoundingClientRect();
-                  const x = e.clientX - rect.left;
-                  const y = e.clientY - rect.top;
-                  const centerX = rect.width / 2;
-                  const centerY = rect.height / 2;
-
-                  if (enableTilt) {
-                    const rotateX = ((y - centerY) / centerY) * -10;
-                    const rotateY = ((x - centerX) / centerX) * 10;
-                    gsap.to(el, {
-                      rotateX,
-                      rotateY,
-                      duration: 0.1,
-                      ease: 'power2.out',
-                      transformPerspective: 1000
-                    });
-                  }
-
-                  if (enableMagnetism) {
-                    const magnetX = (x - centerX) * 0.05;
-                    const magnetY = (y - centerY) * 0.05;
-                    gsap.to(el, {
-                      x: magnetX,
-                      y: magnetY,
-                      duration: 0.3,
-                      ease: 'power2.out'
-                    });
-                  }
-                };
-
-                const handleMouseLeave = () => {
-                  if (shouldDisableAnimations) return;
-
-                  if (enableTilt) {
-                    gsap.to(el, {
-                      rotateX: 0,
-                      rotateY: 0,
-                      duration: 0.3,
-                      ease: 'power2.out'
-                    });
-                  }
-
-                  if (enableMagnetism) {
-                    gsap.to(el, {
-                      x: 0,
-                      y: 0,
-                      duration: 0.3,
-                      ease: 'power2.out'
-                    });
-                  }
-                };
-
-                const handleClick = e => {
-                  if (card.onClick) {
-                    card.onClick(e);
-                  }
-                  if (!clickEffect || shouldDisableAnimations) return;
-
-                  const rect = el.getBoundingClientRect();
-                  const x = e.clientX - rect.left;
-                  const y = e.clientY - rect.top;
-
-                  const maxDistance = Math.max(
-                    Math.hypot(x, y),
-                    Math.hypot(x - rect.width, y),
-                    Math.hypot(x, y - rect.height),
-                    Math.hypot(x - rect.width, y - rect.height)
-                  );
-
-                  const ripple = document.createElement('div');
-                  ripple.style.cssText = `
-                    position: absolute;
-                    width: ${maxDistance * 2}px;
-                    height: ${maxDistance * 2}px;
-                    border-radius: 50%;
-                    background: radial-gradient(circle, rgba(${glowColor}, 0.4) 0%, rgba(${glowColor}, 0.2) 30%, transparent 70%);
-                    left: ${x - maxDistance}px;
-                    top: ${y - maxDistance}px;
-                    pointer-events: none;
-                    z-index: 1000;
-                  `;
-
-                  el.appendChild(ripple);
-
-                  gsap.fromTo(
-                    ripple,
-                    {
-                      scale: 0,
-                      opacity: 1
-                    },
-                    {
-                      scale: 1,
-                      opacity: 0,
-                      duration: 0.8,
-                      ease: 'power2.out',
-                      onComplete: () => ripple.remove()
-                    }
-                  );
-                };
-
-                el.addEventListener('mousemove', handleMouseMove);
-                el.addEventListener('mouseleave', handleMouseLeave);
-                el.addEventListener('click', handleClick);
+              onClick={(e) => {
+                if (card.onClick) {
+                  card.onClick(e);
+                }
               }}
             >
               <div className="magic-bento-card__header">

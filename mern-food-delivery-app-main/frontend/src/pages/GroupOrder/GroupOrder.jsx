@@ -8,20 +8,10 @@ import QRCodeBox from '../../components/QRCodeBox/QRCodeBox';
 import './GroupOrder.css';
 import { FiChevronLeft, FiShare2, FiUsers, FiClock, FiShoppingCart, FiLock, FiUnlock, FiSearch, FiLayers, FiList, FiActivity } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { groupOrderAPI } from '../../services/groupOrderService';
+import { SOCKET_SERVER_URL } from '../../config/apiConfig';
 
-const getSocketServerUrl = () => {
-  const envSocketUrl = import.meta.env.VITE_SOCKET_URL;
-  const envApiUrl = import.meta.env.VITE_API_URL;
-  if (envSocketUrl) return envSocketUrl.replace(/\/$/, '');
-  if (envApiUrl) return envApiUrl.replace(/\/$/, '');
-  if (typeof window !== 'undefined') {
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      return window.location.origin.replace(/\/$/, '');
-    }
-  }
-  return 'http://localhost:8000';
-};
-const socketServerUrl = getSocketServerUrl();
+const socketServerUrl = SOCKET_SERVER_URL;
 
 const formatTimer = (milliseconds) => {
   if (milliseconds <= 0) return '00:00';
@@ -72,6 +62,7 @@ const GroupOrder = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [chatMessages, setChatMessages] = useState([]);
   const [inputText, setInputText] = useState('');
+  const chatEndRef = useRef(null);
 
   useEffect(() => {
     const bannerTimer = setTimeout(() => {
@@ -82,60 +73,42 @@ const GroupOrder = () => {
 
   const handleSendMessage = () => {
     if (!inputText.trim()) return;
-    const newMsg = {
-      id: `user-${Date.now()}`,
-      type: 'user',
-      sender: currentName,
-      initials: currentName.charAt(0).toUpperCase(),
-      text: inputText.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      reactions: {}
-    };
-    setChatMessages((prev) => [...prev, newMsg]);
+    if (!socketRef.current) {
+      toast.error('Not connected to live group room');
+      return;
+    }
+    const messageText = inputText.trim();
     setInputText('');
 
-    // Simulated reply from other joined members only!
-    const joinedOtherMembers = group?.members?.filter(m => m.name !== currentName) || [];
-    if (joinedOtherMembers.length > 0) {
-      setTimeout(() => {
-        const replies = [
-          "Sounds like a plan! Let's get started. 🚀",
-          "Yum! Can't wait for the feast. 🍔",
-          "I'll add my items to the cart now!",
-          "Budget looks great, let's keep it under limit! 💸"
-        ];
-        const randomReply = replies[Math.floor(Math.random() * replies.length)];
-        const responder = joinedOtherMembers[Math.floor(Math.random() * joinedOtherMembers.length)].name;
-        
-        const replyMsg = {
-          id: `reply-${Date.now()}`,
-          type: 'user',
-          sender: responder,
-          initials: responder.charAt(0).toUpperCase(),
-          text: randomReply,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          reactions: {}
-        };
-        setChatMessages((prev) => [...prev, replyMsg]);
-        
-        // Increment unread count if chat is closed
-        if (!showChat) {
-          setUnreadCount((prev) => prev + 1);
+    socketRef.current.emit(
+      'group:sendMessage',
+      {
+        groupCode,
+        sender: currentName,
+        text: messageText,
+      },
+      (response) => {
+        if (!response?.success) {
+          toast.error(response?.message || 'Failed to send message');
         }
-      }, 2500);
-    }
-  };
-
-  const handleAddReaction = (msgId, emoji) => {
-    setChatMessages((prev) =>
-      prev.map((msg) => {
-        if (msg.id !== msgId) return msg;
-        const reactions = { ...msg.reactions };
-        reactions[emoji] = (reactions[emoji] || 0) + 1;
-        return { ...msg, reactions };
-      })
+      }
     );
   };
+
+  useEffect(() => {
+    if (showChat) {
+      setUnreadCount(0);
+      setTimeout(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [showChat]);
+
+  useEffect(() => {
+    if (showChat) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, showChat]);
   
   // Menu selection states
   const [searchQuery, setSearchQuery] = useState('');
@@ -206,6 +179,9 @@ const GroupOrder = () => {
     socket.on('group:joined', (payload) => {
       setGroup(payload.groupOrder);
       setActivities(payload.groupOrder.activities || []);
+      if (payload.groupOrder.chatMessages) {
+        setChatMessages(payload.groupOrder.chatMessages);
+      }
       setJoined(true);
       setExpired(payload.groupOrder.isExpired || new Date() > new Date(payload.groupOrder.expiresAt));
     });
@@ -213,7 +189,29 @@ const GroupOrder = () => {
     socket.on('group:updated', (payload) => {
       setGroup(payload.groupOrder);
       setActivities(payload.groupOrder.activities || []);
+      if (payload.groupOrder.chatMessages) {
+        setChatMessages(payload.groupOrder.chatMessages);
+      }
       setExpired(payload.groupOrder.isExpired || new Date() > new Date(payload.groupOrder.expiresAt));
+    });
+
+    socket.on('group:feastStarted', (payload) => {
+      setGroup(payload.groupOrder);
+      toast.success('🎉 Group Feast has started! Everyone can now add items.');
+    });
+
+    socket.on('group:chatMessage', (payload) => {
+      if (payload?.message) {
+        setChatMessages((prev) => {
+          const msgId = payload.message.messageId || payload.message._id;
+          const exists = prev.some((m) => (m.messageId && m.messageId === msgId) || (m._id && m._id === msgId));
+          if (exists) return prev;
+          return [...prev, payload.message];
+        });
+        if (!showChat) {
+          setUnreadCount((prev) => prev + 1);
+        }
+      }
     });
 
     socket.on('group:notification', (payload) => {
@@ -291,6 +289,9 @@ const GroupOrder = () => {
       if (data.success) {
         setGroup(data.groupOrder);
         setActivities(data.groupOrder.activities || []);
+        if (data.groupOrder.chatMessages) {
+          setChatMessages(data.groupOrder.chatMessages);
+        }
         setExpired(data.isExpired || new Date() > new Date(data.groupOrder.expiresAt));
         const alreadyMember = data.groupOrder.members.some((member) => member.name === userProfile?.name);
         if (alreadyMember) {
@@ -422,6 +423,59 @@ const GroupOrder = () => {
     );
   };
 
+  const handleStartFeast = async () => {
+    if (!isHost) {
+      toast.error('Only the host can start the Group Feast');
+      return;
+    }
+
+    // Optimistically unlock feast session immediately for instant UI responsiveness
+    setGroup((prev) => (prev ? { ...prev, isStarted: true } : prev));
+    toast.success('🎉 Group Feast Started! Everyone can now add items to the shared cart.');
+
+    // Emit Socket event to notify all connected room members in real-time
+    if (socketRef.current?.connected) {
+      socketRef.current.emit(
+        'group:startFeast',
+        { groupCode, requesterName: currentName },
+        (response) => {
+          if (response?.success) {
+            setGroup(response.groupOrder);
+          }
+        }
+      );
+    }
+
+    // Backup REST API call to guarantee database update
+    const res = await groupOrderAPI.startGroupFeast({ groupCode, requesterName: currentName });
+    if (res?.success && res.groupOrder) {
+      setGroup(res.groupOrder);
+    }
+  };
+
+  const handleCopyInviteMessage = () => {
+    if (!group) return;
+    const inviteMessage = `🍽️ Join my QuickBite Group Feast!\n\nCode: ${group.groupCode}\n\n🔗 Link: ${window.location.origin}/group-order/${group.groupCode}`;
+    navigator.clipboard.writeText(inviteMessage).then(() => {
+      toast.success('✅ Invitation copied! Share it with your friends.', {
+        duration: 4000,
+        style: {
+          borderRadius: '12px',
+          background: '#0f172a',
+          color: '#ffffff',
+          fontWeight: '600',
+          fontSize: '14px',
+        },
+      });
+    });
+  };
+
+  const handleShareWhatsApp = () => {
+    if (!group) return;
+    const inviteMessage = `🍽️ Join my QuickBite Group Feast!\n\nCode: ${group.groupCode}\n\n🔗 Link: ${window.location.origin}/group-order/${group.groupCode}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(inviteMessage)}`, '_blank');
+  };
+
   const handleToggleLock = () => {
     if (!socketRef.current?.connected) {
       toast.error('Real-time session disconnected');
@@ -533,10 +587,14 @@ const GroupOrder = () => {
   // Identify Host
   const isHost = useMemo(() => {
     if (!group) return false;
+    const isSavedHost = localStorage.getItem(`isHost_${group.groupCode}`) === 'true';
     const isCreator = group.createdBy && userProfile && String(group.createdBy) === String(userProfile._id);
-    const isFirstMember = group.members[0] && group.members[0].name === currentName;
-    return Boolean(isCreator || isFirstMember);
+    const hostMember = (group.members && group.members.find((m) => m.isHost)) || (group.members && group.members[0]);
+    const isHostByName = hostMember && (hostMember.name === currentName || currentName === 'Guest' || currentName === 'Host');
+    return Boolean(isSavedHost || isCreator || isHostByName);
   }, [group, userProfile, currentName]);
+
+  const isStarted = Boolean(group?.isStarted);
 
   // List of categories derived from menu data
   const categories = useMemo(() => {
@@ -584,44 +642,56 @@ const GroupOrder = () => {
         animate={{ opacity: 1, y: 0 }}
         className="group-order-container"
       >
-        {!started ? (
+        {/* Success Banner */}
+        <AnimatePresence>
+          {showSuccessBanner && (
+            <motion.div
+              className="success-banner"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              onClick={() => setShowSuccessBanner(false)}
+            >
+              <span>✅ Group Feast Live! Code: {group.groupCode}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* HEADER BAR */}
+        <div className="group-order-header">
+          <button type="button" className="back-button" onClick={() => navigate('/cart')}>
+            <FiChevronLeft /> Back to cart
+          </button>
+          <div className="header-meta">
+            <p className="group-order-label">QuickBite Group Feast: {group.groupName}</p>
+            <h1>{group.groupCode}</h1>
+          </div>
+        </div>
+
+        {/* STAGE 1: BEFORE FEAST STARTS (ONLY SHOW GROUP SESSION PANEL) */}
+        {!isStarted ? (
           <motion.div
-            className="group-lobby-panel"
+            key="stage1"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.4 }}
+            className="group-order-stage1-container"
+            style={{ maxWidth: '640px', margin: '0 auto', width: '100%' }}
           >
-            {/* Success Banner */}
-            <AnimatePresence>
-              {showSuccessBanner && (
-                <motion.div
-                  className="success-banner"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  onClick={() => setShowSuccessBanner(false)}
-                >
-                  <span>✅ Group Created Successfully!</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             <div className="lobby-card glass-card">
               <div className="lobby-header">
                 <h2>{group.groupName}</h2>
-                <span className="lobby-tag">Lobby</span>
+                <span className="badge live" style={{ background: '#fef08a', color: '#854d0e', fontWeight: '800' }}>
+                  LOBBY / WAITING
+                </span>
               </div>
 
-              {/* Frozen Timer */}
+              {/* Timer */}
               <div className="lobby-timer-section">
                 <div className="circular-timer-wrapper muted">
                   <svg width="100" height="100" className="circular-timer-svg">
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      className="timer-bg-circle"
-                    />
+                    <circle cx="50" cy="50" r="40" className="timer-bg-circle" />
                     <circle
                       cx="50"
                       cy="50"
@@ -633,10 +703,10 @@ const GroupOrder = () => {
                   </svg>
                   <div className="timer-text-overlay">{formatLobbyTimer(group.expiry)}</div>
                 </div>
-                <p className="timer-label-beneath">Timer starts when you enter the room</p>
+                <p className="timer-label-beneath">Session Timer: {formatTimer(timeLeft)}</p>
               </div>
 
-              {/* Group Code Block */}
+              {/* Group Code */}
               <div className="lobby-code-block">
                 <p className="code-label">Group Code</p>
                 <div className="code-row">
@@ -646,7 +716,7 @@ const GroupOrder = () => {
                     className="copy-code-btn"
                     onClick={() => {
                       navigator.clipboard.writeText(group.groupCode);
-                      toast.success('Copied!');
+                      toast.success('Group Code Copied!');
                     }}
                   >
                     Copy Code
@@ -661,20 +731,14 @@ const GroupOrder = () => {
                   <button
                     type="button"
                     className="invite-btn whatsapp-btn"
-                    onClick={() => {
-                      const shareMsg = `Join my group order "${group.groupName}"!\nCode: ${group.groupCode}\nLink: ${shareUrl}`;
-                      window.open(`https://wa.me/?text=${encodeURIComponent(shareMsg)}`, '_blank');
-                    }}
+                    onClick={handleShareWhatsApp}
                   >
                     WhatsApp
                   </button>
                   <button
                     type="button"
                     className="invite-btn link-btn"
-                    onClick={() => {
-                      navigator.clipboard.writeText(shareUrl);
-                      toast.success('Link Copied!');
-                    }}
+                    onClick={handleCopyInviteMessage}
                   >
                     Copy Link
                   </button>
@@ -688,7 +752,7 @@ const GroupOrder = () => {
                 </div>
               </div>
 
-              {/* Live Members Panel */}
+              {/* Members Joined List */}
               <div className="lobby-members-section">
                 <div className="members-header">
                   👥 {group.members.length} / {group.maxParticipants} Members Joined
@@ -725,24 +789,62 @@ const GroupOrder = () => {
                 </div>
               </div>
 
-              {/* Group Note card */}
+              {/* Food Preference / Allergy Info */}
               <div className="lobby-note-card">
-                <span>📌 {group.note}</span>
+                <span>📌 Food Preference / Allergy Info: {group.note || 'No special requests'}</span>
               </div>
 
-              {/* Primary CTA */}
-              <button
-                type="button"
-                className="enter-room-btn"
-                onClick={() => {
-                  setStarted(true);
-                  toast.success('Session started!');
-                }}
-              >
-                🟢 Enter Group Room
-              </button>
+              {/* Inline Join Section if !joined */}
+              {!joined && (
+                <div className="join-group-card">
+                  <div className="join-card-header">
+                    <h3>👋 Join the Group Feast</h3>
+                    <p>Enter your name to join the group session.</p>
+                  </div>
+                  <div className="join-input-row">
+                    <input
+                      type="text"
+                      className="join-name-input"
+                      placeholder="Enter your name"
+                      value={joinName}
+                      onChange={(e) => setJoinName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleJoinGroup();
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="join-feast-btn-green"
+                      onClick={handleJoinGroup}
+                      disabled={expired}
+                    >
+                      {expired ? 'Session Expired' : 'Join Group Feast'}
+                    </button>
+                  </div>
+                </div>
+              )}
 
-              {/* Secondary CTA */}
+              {/* Host vs Member Primary CTA */}
+              {joined && (
+                <div style={{ marginTop: '12px' }}>
+                  {isHost ? (
+                    <button
+                      type="button"
+                      className="start-feast-btn-hero"
+                      onClick={handleStartFeast}
+                      disabled={expired}
+                    >
+                      🚀 Start Group Feast
+                    </button>
+                  ) : (
+                    <div className="waiting-host-pill">
+                      ⏳ Waiting for the host to start the feast
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Group Chat Button */}
               <button
                 type="button"
                 className="chat-toggle-btn"
@@ -750,129 +852,156 @@ const GroupOrder = () => {
                   setShowChat(true);
                   setUnreadCount(0);
                 }}
+                style={{ marginTop: '12px', width: '100%' }}
               >
-                💬 Group Chat {unreadCount > 0 && <span className="chat-badge">{unreadCount}</span>}
+                💬 Group Chat {joined ? '🔓' : '🔒'} {unreadCount > 0 && <span className="chat-badge">{unreadCount}</span>}
               </button>
             </div>
           </motion.div>
         ) : (
-          <>
-            <div className="group-order-header">
-              <button type="button" className="back-button" onClick={() => navigate('/cart')}>
-                <FiChevronLeft /> Back to cart
-              </button>
-              <div className="header-meta">
-                <p className="group-order-label">QuickBite Group Feast: {group.groupName}</p>
-                <h1>{group.groupCode}</h1>
+          /* STAGE 2: AFTER HOST CLICKS "START GROUP FEAST" (FULL DASHBOARD UNLOCKED) */
+          <motion.div
+            key="stage2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            {/* Top Summary Card */}
+            <div className="lobby-card glass-card" style={{ width: '100%', boxSizing: 'border-box', marginBottom: '24px' }}>
+              <div className="lobby-header">
+                <h2>{group.groupName}</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span className="feast-started-badge">🎉 Feast Started</span>
+                  <span className={`badge ${expired ? 'expired' : 'live'}`}>{expired ? 'Expired' : 'LIVE'}</span>
+                </div>
+              </div>
+
+              <div className="joined-actions-bar">
+                <button type="button" className="start-feast-btn-hero" disabled style={{ width: 'auto', padding: '10px 20px', fontSize: '0.9rem' }}>
+                  🎉 Feast Started
+                </button>
+                <button
+                  type="button"
+                  className="joined-action-btn chat-btn"
+                  onClick={() => {
+                    setShowChat(true);
+                    setUnreadCount(0);
+                  }}
+                >
+                  💬 Group Chat 🔓 {chatMessages.length > 0 && `(${chatMessages.length})`}
+                </button>
               </div>
             </div>
 
             <div className="group-order-body">
-              {/* LEFT SIDEBAR PANEL */}
-              <div className="group-order-left">
-                <motion.div
-                  className="group-order-panel glass-card"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
+          {/* LEFT SIDEBAR PANEL */}
+          <div className="group-order-left">
+            <motion.div
+              className="group-order-panel glass-card"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div className="panel-heading">
+                <div>
+                  <p className="panel-title">Group session</p>
+                  <p className="panel-subtitle">Share code to invite others.</p>
+                </div>
+                <span className={`badge ${expired ? 'expired' : 'live'}`}>{expired ? 'Expired' : 'Live'}</span>
+              </div>
+              <div className="invite-cta">
+                <p className="invite-code">{group.groupCode}</p>
+                <button
+                  type="button"
+                  className="invite-link-btn"
+                  onClick={handleCopyInviteMessage}
                 >
-                  <div className="panel-heading">
-                    <div>
-                      <p className="panel-title">Group session</p>
-                      <p className="panel-subtitle">Share code to invite others.</p>
-                    </div>
-                    <span className={`badge ${expired ? 'expired' : 'live'}`}>{expired ? 'Expired' : 'Live'}</span>
+                  <FiShare2 style={{ marginRight: '6px' }} /> Copy invite link
+                </button>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="group-order-panel glass-card group-qr-card"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.05 }}
+            >
+              <div className="panel-heading">
+                <div>
+                  <p className="panel-title">Invite QR</p>
+                  <p className="panel-subtitle">Scan to join instantly.</p>
+                </div>
+              </div>
+              <div className="qr-preview">
+                <QRCodeBox value={shareUrl} />
+              </div>
+            </motion.div>
+
+            {/* CATEGORY SELECTOR FOR THE COLLABORATIVE MENU */}
+            {isStarted && !expired && !group.isLocked && (
+              <motion.div
+                className="group-order-panel glass-card category-sidebar"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+              >
+                <div className="panel-heading">
+                  <div>
+                    <p className="panel-title"><FiLayers /> Categories</p>
+                    <p className="panel-subtitle">Filter menu items</p>
                   </div>
-                  <div className="invite-cta">
-                    <p className="invite-code">{group.groupCode}</p>
+                </div>
+                <div className="category-vertical-list">
+                  {categories.map((cat) => (
                     <button
+                      key={cat}
                       type="button"
-                      className="invite-link-btn"
-                      onClick={() => navigator.clipboard.writeText(shareUrl).then(() => toast.success('Invite link copied'))}
+                      className="category-list-btn"
+                      onClick={() => setSelectedCategory(cat)}
                     >
-                      <FiShare2 style={{ marginRight: '6px' }} /> Copy invite link
+                      {cat}
                     </button>
-                  </div>
-                </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </div>
 
-                <motion.div
-                  className="group-order-panel glass-card group-qr-card"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.05 }}
-                >
-                  <div className="panel-heading">
-                    <div>
-                      <p className="panel-title">Invite QR</p>
-                      <p className="panel-subtitle">Scan to join instantly.</p>
-                    </div>
-                  </div>
-                  <div className="qr-preview">
-                    <QRCodeBox value={shareUrl} />
-                  </div>
-                </motion.div>
-
-                {/* CATEGORY SELECTOR FOR THE COLLABORATIVE MENU */}
-                {joined && !expired && !group.isLocked && (
-                  <motion.div
-                    className="group-order-panel glass-card category-sidebar"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
+          {/* CENTER PANE - COLLABORATIVE FEAST MENU & BILL SPLIT */}
+          <div className="group-order-center">
+            {/* REAL-TIME COLLABORATIVE MENU (UNLOCKED ONLY AFTER STARTING FEAST) */}
+            {!isStarted ? (
+              <div className="feast-locked-banner glass-card">
+                <div className="locked-banner-icon">{isHost ? '🎉' : '⏳'}</div>
+                <h3>
+                  {isHost
+                    ? 'Ready to start ordering?'
+                    : 'Waiting for the host to start the Group Feast'}
+                </h3>
+                <p>
+                  {isHost
+                    ? 'Click "Start Group Feast" to unlock the food menu for all joined members.'
+                    : 'The host will unlock the food menu shortly. You can chat with the group in the meantime!'}
+                </p>
+                {isHost && (
+                  <button
+                    type="button"
+                    className="start-feast-main-btn"
+                    onClick={handleStartFeast}
                   >
-                    <div className="panel-heading">
-                      <div>
-                        <p className="panel-title"><FiLayers /> Categories</p>
-                        <p className="panel-subtitle">Filter menu items</p>
-                      </div>
-                    </div>
-                    <div className="category-vertical-list">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          className="category-list-btn"
-                          onClick={() => setSelectedCategory(cat)}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
+                    🎉 Start Group Feast
+                  </button>
                 )}
               </div>
-
-              {/* CENTER PANE - COLLABORATIVE FEAST MENU & BILL SPLIT */}
-              <div className="group-order-center">
-                {!joined ? (
-                  <motion.div
-                    className="group-order-join glass-card"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
-                  >
-                    <h2>Join this feast</h2>
-                    <p>Enter your name and join the shared cart session.</p>
-                    <input
-                      type="text"
-                      placeholder="Your name"
-                      value={joinName}
-                      onChange={(e) => setJoinName(e.target.value)}
-                    />
-                    <button type="button" onClick={handleJoinGroup} disabled={expired}>
-                      {expired ? 'Session locked' : 'Join group order'}
-                    </button>
-                  </motion.div>
-                ) : (
-                  <>
-                    {/* REAL-TIME COLLABORATIVE MENU */}
-                    {!expired && !group.isLocked && (
-                      <motion.div
-                        className="group-order-panel glass-card feast-menu-panel"
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.1 }}
-                      >
+            ) : (
+              !expired && !group.isLocked && (
+                <motion.div
+                  className="group-order-panel glass-card feast-menu-panel"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                >
                         <div className="menu-header">
                           <div>
                             <h3>Add Items to Shared Cart</h3>
@@ -927,7 +1056,8 @@ const GroupOrder = () => {
                           })}
                         </div>
                       </motion.div>
-                    )}
+                    )
+            )}
 
                     {/* SHARED CART PREVIEW */}
                     <motion.div
@@ -974,8 +1104,6 @@ const GroupOrder = () => {
                         </div>
                       )}
                     </motion.div>
-                  </>
-                )}
 
                 {/* SMART BILL SPLIT CONTAINER */}
                 {joined && group.cartItems.length > 0 && (
@@ -1135,23 +1263,20 @@ const GroupOrder = () => {
                 </motion.div>
               </div>
             </div>
-          </>
+          </motion.div>
         )}
-      </motion.div>
 
       {/* Floating Chat Trigger Button in Group Room */}
-      {started && (
-        <button
-          type="button"
-          className="floating-chat-trigger"
-          onClick={() => {
-            setShowChat(true);
-            setUnreadCount(0);
-          }}
-        >
-          💬 Chat {unreadCount > 0 && <span className="chat-badge">{unreadCount}</span>}
-        </button>
-      )}
+      <button
+        type="button"
+        className="floating-chat-trigger"
+        onClick={() => {
+          setShowChat(true);
+          setUnreadCount(0);
+        }}
+      >
+        💬 Chat {joined ? '🔓' : '🔒'} {unreadCount > 0 && <span className="chat-badge">{unreadCount}</span>}
+      </button>
 
       {/* QR Code Modal Bottom Sheet */}
       <AnimatePresence>
@@ -1193,114 +1318,110 @@ const GroupOrder = () => {
             >
               <div className="sheet-drag-handle" />
               <div className="chat-header">
-                <h3>💬 Live Group Chat</h3>
+                <h3>💬 Live Group Chat {!joined && '🔒'}</h3>
                 <button type="button" className="chat-close-btn" onClick={() => setShowChat(false)}>✕</button>
               </div>
 
-              {/* Message Feed */}
-              <div className="chat-messages-container">
-                {/* Interleaved User and System messages */}
-                {[
-                  ...activities.map((act, idx) => ({
-                    id: act._id || `sys-${idx}`,
-                    type: 'system',
-                    text: act.message,
-                    timestamp: act.createdAt ? new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'
-                  })),
-                  ...chatMessages
-                ].map((msg) => {
-                  if (msg.type === 'system') {
-                    return (
-                      <div key={msg.id} className="chat-message-row system">
-                        <span className="system-text">📢 {msg.text}</span>
-                        <span className="system-time">{msg.timestamp}</span>
-                      </div>
-                    );
-                  }
-
-                  const isMe = msg.sender === currentName;
-                  const isHostMsg = msg.sender === 'Shoaib' || (group.members[0] && msg.sender === group.members[0].name);
-
-                  return (
-                    <div key={msg.id} className={`chat-message-row user ${isMe ? 'me' : 'others'}`}>
-                      {!isMe && (
-                        <div className="msg-avatar">
-                          {msg.initials}
-                        </div>
-                      )}
-                      <div className="msg-content-wrapper">
-                        <div className="msg-info">
-                          <span className={`msg-sender ${isHostMsg ? 'host-name' : ''}`}>
-                            {msg.sender} {isHostMsg && <span className="host-chat-badge">Host</span>}
-                          </span>
-                          <span className="msg-time">{msg.timestamp}</span>
-                        </div>
-                        <div className="msg-bubble">
-                          <p>{msg.text}</p>
-                          {msg.reactions && Object.keys(msg.reactions).length > 0 && (
-                            <div className="message-reactions-row">
-                              {Object.entries(msg.reactions).map(([emoji, count]) => (
-                                <button
-                                  key={emoji}
-                                  type="button"
-                                  className="reaction-pill"
-                                  onClick={() => handleAddReaction(msg.id, emoji)}
-                                >
-                                  {emoji} {count}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="quick-reaction-triggers">
-                          {['👍', '🔥', '❤️', '🍕'].map(emoji => (
-                            <button
-                              key={emoji}
-                              type="button"
-                              onClick={() => handleAddReaction(msg.id, emoji)}
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Chat Input */}
-              <div className="chat-input-bar">
-                <input
-                  type="text"
-                  placeholder="Type a message..."
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSendMessage();
-                  }}
-                />
-                <div className="emoji-quick-picks">
-                  {['👍', '🔥', '🍕', '🎉'].map(emoji => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      className="emoji-pick-btn"
-                      onClick={() => setInputText(prev => prev + emoji)}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
+              {!joined ? (
+                <div className="chat-locked-container">
+                  <div className="chat-locked-icon">🔒</div>
+                  <h4>Group Chat</h4>
+                  <p>Join the group to view and participate in the conversation.</p>
+                  <button
+                    type="button"
+                    className="join-feast-btn-green"
+                    onClick={() => {
+                      setShowChat(false);
+                      const inputEl = document.querySelector('.join-name-input');
+                      if (inputEl) {
+                        inputEl.focus();
+                        inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }
+                    }}
+                  >
+                    Join Group Feast
+                  </button>
                 </div>
-                <button type="button" className="chat-send-btn" onClick={handleSendMessage}>
-                  Send
-                </button>
-              </div>
+              ) : (
+                <>
+                  {/* Message Feed */}
+                  <div className="chat-messages-container">
+                    {loading ? (
+                      <div className="chat-loading-state">
+                        <p>Loading messages...</p>
+                      </div>
+                    ) : chatMessages.length === 0 ? (
+                      <div className="chat-empty-state">
+                        <p>No messages yet. Start the conversation!</p>
+                      </div>
+                    ) : (
+                      chatMessages.map((msg, idx) => {
+                        const isMe = msg.sender === currentName;
+                        const isHostMsg = group?.members?.[0] && msg.sender === group.members[0].name;
+                        const initials = msg.initials || (msg.sender ? msg.sender.charAt(0).toUpperCase() : '?');
+                        const formattedTime = msg.timestamp
+                          ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          : 'Just now';
+
+                        return (
+                          <div key={msg.messageId || msg._id || `msg-${idx}`} className={`chat-message-row user ${isMe ? 'me' : 'others'}`}>
+                            {!isMe && (
+                              <div className="msg-avatar">
+                                {initials}
+                              </div>
+                            )}
+                            <div className="msg-content-wrapper">
+                              <div className="msg-info">
+                                <span className={`msg-sender ${isHostMsg ? 'host-name' : ''}`}>
+                                  {msg.sender} {isHostMsg && <span className="host-chat-badge">Host</span>}
+                                </span>
+                                <span className="msg-time">{formattedTime}</span>
+                              </div>
+                              <div className="msg-bubble">
+                                <p>{msg.text}</p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                    <div ref={chatEndRef} />
+                  </div>
+
+                  {/* Chat Input */}
+                  <div className="chat-input-bar">
+                    <input
+                      type="text"
+                      placeholder="Type a message..."
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSendMessage();
+                      }}
+                    />
+                    <div className="emoji-quick-picks">
+                      {['👍', '🔥', '🍕', '🎉'].map(emoji => (
+                        <button
+                          key={emoji}
+                          type="button"
+                          className="emoji-pick-btn"
+                          onClick={() => setInputText(prev => prev + emoji)}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                    <button type="button" className="chat-send-btn" onClick={handleSendMessage}>
+                      Send
+                    </button>
+                  </div>
+                </>
+              )}
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+      </motion.div>
     </div>
   );
 };

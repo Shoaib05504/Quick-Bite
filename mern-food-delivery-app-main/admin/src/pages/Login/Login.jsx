@@ -36,7 +36,11 @@ const Login = ({ url, onLoginSuccess }) => {
         setError(response.data.message || 'Login failed.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid credentials or server error.');
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Server is currently unavailable. Please try again later.');
+      }
     } finally {
       setLoading(false);
     }

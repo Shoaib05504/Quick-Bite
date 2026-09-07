@@ -6,7 +6,7 @@ import FoodDisplay from '../../components/FoodDisplay/FoodDisplay'
 import AppDownload from '../../components/AppDownload/AppDownload'
 import MoodBite from '../../components/MoodBite/MoodBite'
 
-const Home = ({ search, setSearch, onOpenGroupModal }) => {
+const Home = ({ search, submittedSearch, setSearch, onOpenGroupModal }) => {
   const [category, setCategory] = useState('All');
 
   useEffect(() => {
@@ -27,8 +27,7 @@ const Home = ({ search, setSearch, onOpenGroupModal }) => {
       <Header onOpenGroupModal={onOpenGroupModal} />
       <MoodBite />
       <ExploreMenu category={category} setCategory={setCategory}/>
-      <FoodDisplay category={category}
-      search={search}/>
+      <FoodDisplay category={category} search={submittedSearch !== undefined ? submittedSearch : ''}/>
       <AppDownload/>
     </div>
   )

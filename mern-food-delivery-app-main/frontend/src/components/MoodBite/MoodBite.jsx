@@ -95,11 +95,21 @@ const TEXT_MESSAGES = {
 };
 
 const MoodFoodCard = ({ item, onAddToCart, onOrderNow, cartCount }) => {
+  const { url } = useContext(StoreContext);
   const API_URL = url;
-  const imageSrc =
-    item.image && item.image.startsWith("http")
-      ? item.image
-      : `${API_URL}/images/${item.image}`;
+  
+  const resolveImageSrc = (img) => {
+    if (!img) return assets.header_img;
+    if (typeof img === 'string') {
+      if (img.startsWith('http') || img.startsWith('/') || img.startsWith('data:') || img.includes('/assets/')) {
+        return img;
+      }
+      return `${API_URL}/images/${img}`;
+    }
+    return img;
+  };
+
+  const imageSrc = resolveImageSrc(item?.image);
 
   return (
     <motion.div
@@ -108,7 +118,15 @@ const MoodFoodCard = ({ item, onAddToCart, onOrderNow, cartCount }) => {
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
       <div className="mood-food-image-wrap">
-        <img src={imageSrc} alt={item.name} className="mood-food-image" />
+        <img
+          src={imageSrc}
+          alt={item.name}
+          className="mood-food-image"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = assets.header_img;
+          }}
+        />
         <div className="mood-food-favorite"> <FaHeart /> </div>
       </div>
       <div className="mood-food-body">

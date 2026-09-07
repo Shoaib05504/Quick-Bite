@@ -64,24 +64,18 @@ const formatAddressLine = (address) => {
 };
 
 const tabContentVariants = {
-  hidden: { opacity: 0, y: 30, rotateX: 10, scale: 0.97 },
+  hidden: { opacity: 0, y: 15 },
   visible: { 
     opacity: 1, 
     y: 0, 
-    rotateX: 0, 
-    scale: 1, 
     transition: { 
-      type: "spring",
-      stiffness: 90,
-      damping: 14,
-      mass: 0.8
+      duration: 0.25,
+      ease: "easeOut"
     } 
   },
   exit: { 
     opacity: 0, 
-    y: -20, 
-    rotateX: -5, 
-    scale: 0.97, 
+    y: -10, 
     transition: { duration: 0.2 } 
   }
 };
@@ -604,20 +598,20 @@ const ProfileDashboard = () => {
           </AnimatePresence>
         </header>
 
-<div className="top-offer-banner">
-  <h3>🔥 Flat 50% OFF on First Order</h3>
+<div className="top-offer-banner offer-banner">
+  <h3 className="offer-title">🔥 Flat 50% OFF on First Order</h3>
 
-  <p>
+  <p className="offer-description">
     Enjoy delicious meals with super fast delivery only on QuickBite.
   </p>
 </div>
 
 <section className="hero-section">
           <motion.div className="hero-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <div className="hero-left">
+            <div className="hero-left welcome-message">
               <div className="hero-tag">Premium Dashboard</div>
-              <h1>Welcome back, {userProfile.firstName}</h1>
-              <p>Manage your profile, orders and rewards with a sleek futuristic interface.</p>
+              <h1 className="welcome-title">Welcome back, {userProfile.firstName}</h1>
+              <p className="welcome-description">Manage your profile, orders and rewards with a sleek futuristic interface.</p>
               <div className="hero-meta">
                 <div>
                   <span>Member since</span>
@@ -643,50 +637,47 @@ const ProfileDashboard = () => {
         </section>
         <section className="dashboard-grid">
           <motion.div 
-            className="profile-panel glass-card" 
-            initial={{ opacity: 0, y: 40, rotateX: 12, scale: 0.95 }} 
-            animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }} 
-            transition={{ type: "spring", stiffness: 85, damping: 13, delay: 0.1 }}
-            style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+            className="profile-panel glass-card profile-snapshot" 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.3, delay: 0.1 }}
           >
             <div className="panel-header">
               <div>
                 <p className="panel-label">Profile Snapshot</p>
-                <h2>{userProfile.firstName} {userProfile.lastName}</h2>
+                <h2 className="profile-name">{userProfile.firstName} {userProfile.lastName}</h2>
               </div>
-              <button className="secondary-pill">{isVerifiedVal ? 'Verified' : 'Unverified'}</button>
+              <button className="secondary-pill verified-badge">{isVerifiedVal ? 'Verified' : 'Unverified'}</button>
             </div>
             <div className="profile-details">
-              <div><FaUserAlt className="detail-icon" /><span>{userProfile.email}</span></div>
-              <div><FaPhoneAlt className="detail-icon" /><span>{userProfile.phone}</span></div>
-              <div><FaMapMarkerAlt className="detail-icon" /><span>{primaryAddress || 'No saved address yet'}</span></div>
+              <div className="info-card"><FaUserAlt className="detail-icon icon" /><span>{userProfile.email}</span></div>
+              <div className="info-card"><FaPhoneAlt className="detail-icon icon" /><span>{userProfile.phone}</span></div>
+              <div className="info-card"><FaMapMarkerAlt className="detail-icon icon" /><span>{primaryAddress || 'No saved address yet'}</span></div>
             </div>
-            <div className="panel-progress">
+            <div className="panel-progress profile-strength">
               <div className="progress-heading"><span>Profile Strength</span><strong>{userProfile.profileCompletion}%</strong></div>
               <div className="progress-track"><div className="progress-fill" style={{ width: `${userProfile.profileCompletion}%` }} /></div>
               <p className="progress-description">Complete your profile to unlock faster orders and premium offers.</p>
             </div>
           </motion.div>
           <motion.div 
-            className="stats-panel" 
-            initial={{ opacity: 0, y: 40, rotateX: 12, scale: 0.95 }} 
-            animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }} 
-            transition={{ type: "spring", stiffness: 85, damping: 13, delay: 0.2 }}
-            style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+            className="stats-panel profile-stats" 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.3, delay: 0.2 }}
           >
-            <div className="stats-grid">
+            <div className="stats-grid profile-stats">
               {statistics.map((stat, index) => (
                 <motion.div 
                   key={stat.label} 
-                  className="stat-card" 
-                  style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-                  initial={{ opacity: 0, scale: 0.8, rotateY: 15 }}
-                  animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                  transition={{ type: "spring", stiffness: 100, damping: 12, delay: 0.3 + index * 0.08 }}
-                  whileHover={{ y: -6, scale: 1.02, rotateX: 1.5, rotateY: -1.5, transition: { duration: 0.2 } }}
+                  className="stat-card profile-stat-card" 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: 0.2 + index * 0.05 }}
+                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
                 >
-                  <div className="stat-icon-wrap" style={{ background: `${stat.color}20`, color: stat.color }}>{stat.icon}</div>
-                  <div><p>{stat.label}</p><h3>{stat.value}</h3></div>
+                  <div className="stat-icon-wrap icon" style={{ background: `${stat.color}20`, color: stat.color }}>{stat.icon}</div>
+                  <div><p className="label">{stat.label}</p><h3 className="value">{stat.value}</h3></div>
                 </motion.div>
               ))}
             </div>
@@ -699,9 +690,9 @@ const ProfileDashboard = () => {
                 key={tab.key} 
                 className={`tab-btn ${activeTab === tab.key ? 'active' : ''}`} 
                 onClick={() => setActiveTab(tab.key)}
-                style={{ position: 'relative', transformStyle: 'preserve-3d', perspective: 1000 }}
-                whileHover={{ y: -3, scale: 1.02, rotateX: 2, rotateY: -2, transition: { duration: 0.2 } }}
-                whileTap={{ scale: 0.96, translateZ: -5 }}
+                style={{ position: 'relative' }}
+                whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                whileTap={{ y: 0 }}
               >
                 {activeTab === tab.key && (
                   <motion.span 
@@ -725,15 +716,14 @@ const ProfileDashboard = () => {
         <section className="tab-content-area">
           <AnimatePresence mode="wait">
             {activeTab === 'overview' && (
-              <motion.div key="overview" className="tab-content" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" style={{ transformStyle: 'preserve-3d', perspective: 1000 }}>
-                <div className="overview-grid">
+              <motion.div key="overview" className="tab-content" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit">
+                <div className="overview-grid overview-content">
                   <motion.div 
                     className="glass-card overview-card"
-                    style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-                    initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
-                    animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-                    transition={{ type: "spring", stiffness: 95, damping: 13, delay: 0.1 }}
-                    whileHover={{ scale: 1.01, rotateX: 1, rotateY: -1, transition: { duration: 0.2 } }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: 0.1 }}
+                    whileHover={{ y: -2, transition: { duration: 0.2 } }}
                   >
                     <div className="overview-header"><div><p className="panel-label">Rewards Summary</p><h2>Points balance</h2></div><div className="badge-pill">{membershipVal} Tier</div></div>
                     <div className="reward-total"><FaGift size={28} /><div><h3>{rewardPointsVal.toLocaleString('en-IN')}</h3><span>QuickBite points</span></div></div>
@@ -742,11 +732,10 @@ const ProfileDashboard = () => {
                   </motion.div>
                   <motion.div 
                     className="glass-card orders-summary"
-                    style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-                    initial={{ opacity: 0, scale: 0.9, rotateX: -10 }}
-                    animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-                    transition={{ type: "spring", stiffness: 95, damping: 13, delay: 0.2 }}
-                    whileHover={{ scale: 1.01, rotateX: 1, rotateY: -1, transition: { duration: 0.2 } }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: 0.15 }}
+                    whileHover={{ y: -2, transition: { duration: 0.2 } }}
                   >
                     <div className="overview-header"><div><p className="panel-label">Recent Orders</p><h2>Delivered items</h2></div><span className="status-pill">Latest 3</span></div>
                     {ordersLoading ? (
@@ -761,7 +750,7 @@ const ProfileDashboard = () => {
                           const isSavedDelivered = localStorage.getItem(`track_order_status_${orderId}`) === 'Delivered';
                           const displayStatus = isSavedDelivered ? 'Delivered' : (order.status || 'Processing');
                           return (
-                            <motion.div key={orderId} className="order-card" whileHover={{ y: -6 }}>
+                            <motion.div key={orderId} className="order-card" whileHover={{ y: -3 }}>
                               <img src={resolveImageSrc(item.image || fallbackProfileImage)} alt={item.name || 'Order item'} onError={handleImageError} />
                               <div className="order-info"><h4>{item.name || 'Order item'}</h4><p>{item.restaurant || 'QuickBite'}</p><div className="order-meta"><span className={`badge-status ${String(displayStatus).toLowerCase().includes('deliver') ? 'delivered' : 'processing'}`}>{displayStatus}</span><span>{formatOrderDate(order.date)}</span></div></div>
                               <div className="order-action"><span className="price"><FaRupeeSign size={12} /> {order.amount?.toFixed ? order.amount.toFixed(0) : order.amount}</span><button className="btn btn-secondary small" style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#ffffff', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '10px' }} onClick={() => handleReorder(order)}>Reorder</button></div>
@@ -775,15 +764,14 @@ const ProfileDashboard = () => {
               </motion.div>
             )}
             {activeTab === 'rewards' && (
-              <motion.div key="rewards" className="tab-content" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" style={{ transformStyle: 'preserve-3d', perspective: 1000 }}>
+              <motion.div key="rewards" className="tab-content" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit">
                 <div className="rewards-grid">
                   <motion.div 
                     className="glass-card reward-card"
-                    style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-                    initial={{ opacity: 0, scale: 0.8, rotateY: 15 }}
-                    animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                    transition={{ type: "spring", stiffness: 100, damping: 12, delay: 0.1 }}
-                    whileHover={{ scale: 1.01, rotateX: 1, rotateY: -1, transition: { duration: 0.2 } }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: 0.1 }}
+                    whileHover={{ y: -2, transition: { duration: 0.2 } }}
                   >
                     <div className="reward-header"><div><p className="panel-label">Level</p><h2>{membershipVal} Member</h2></div><FaStar className="reward-icon" size={24} /></div>
                     <p>Enjoy priority delivery, exclusive offers and premium support.</p>
@@ -791,11 +779,10 @@ const ProfileDashboard = () => {
                   </motion.div>
                   <motion.div 
                     className="glass-card coupon-card"
-                    style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-                    initial={{ opacity: 0, scale: 0.8, rotateY: -15 }}
-                    animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                    transition={{ type: "spring", stiffness: 100, damping: 12, delay: 0.2 }}
-                    whileHover={{ scale: 1.01, rotateX: 1, rotateY: -1, transition: { duration: 0.2 } }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: 0.15 }}
+                    whileHover={{ y: -2, transition: { duration: 0.2 } }}
                   >
                     <div className="coupon-header"><div><p className="panel-label">Available Coupon</p><span className="coupon-code">SAVE15</span></div></div>
                     <h3>15% off on next order</h3>
@@ -806,7 +793,7 @@ const ProfileDashboard = () => {
               </motion.div>
             )}
             {activeTab === 'addresses' && (
-              <motion.div key="addresses" className="tab-content" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" style={{ transformStyle: 'preserve-3d', perspective: 1000 }}>
+              <motion.div key="addresses" className="tab-content" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit">
                 <div className="address-controls"><div><p className="panel-label">Delivery Addresses</p><h2>Saved locations</h2></div><button className="btn btn-primary" onClick={() => { setEditingAddressId(null); setAddressFormData({ type: 'Home', name: '', phone: '', street: '', city: '', state: '', pincode: '', landmark: '' }); setAddressModal(true); }}><FaPlus /> Add address</button></div>
                 <div className="address-grid">
                   {addresses.length === 0 ? (
@@ -815,11 +802,10 @@ const ProfileDashboard = () => {
                     <motion.div 
                       key={addr.id} 
                       className="address-card" 
-                      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-                      initial={{ opacity: 0, rotateY: 90, scale: 0.85 }}
-                      animate={{ opacity: 1, rotateY: 0, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 100, damping: 13, delay: index * 0.08 }}
-                      whileHover={{ y: -6, scale: 1.01, rotateX: 1.5, rotateY: -1.5, transition: { duration: 0.2 } }}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, delay: index * 0.05 }}
+                      whileHover={{ y: -3, transition: { duration: 0.2 } }}
                       layout
                     >
                       <div className="address-card-top"><div className="icon-circle">{addr.icon || iconMap[addr.type] || <FaMapMarkerAlt size={18} />}</div><div><h4>{addr.type}</h4><p>{addr.street}</p></div></div>
@@ -830,7 +816,7 @@ const ProfileDashboard = () => {
               </motion.div>
             )}
             {activeTab === 'orders' && (
-              <motion.div key="orders" className="tab-content" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" style={{ transformStyle: 'preserve-3d', perspective: 1000 }}>
+              <motion.div key="orders" className="tab-content" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit">
                 <div className="orders-view"><div className="orders-header"><div><p className="panel-label">Order History</p><h2>Recent deliveries</h2></div><button className="btn btn-secondary" style={{ background: 'linear-gradient(135deg, #3B82F6, #8B5CF6)', color: '#ffffff', border: 'none', padding: '0.5rem 1rem', borderRadius: '12px' }} onClick={handleViewAllOrders}>View all</button></div>
                   <div className="orders-grid-large">
                     {ordersLoading ? (
@@ -847,11 +833,10 @@ const ProfileDashboard = () => {
                           <motion.div 
                             key={orderId} 
                             className="order-card-large" 
-                            style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-                            initial={{ opacity: 0, x: -60, rotateY: 15, scale: 0.95 }}
-                            animate={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
-                            transition={{ type: "spring", stiffness: 95, damping: 14, delay: index * 0.08 }}
-                            whileHover={{ y: -6, scale: 1.005, rotateX: 0.8, rotateY: -0.8, transition: { duration: 0.2 } }}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.25, delay: index * 0.05 }}
+                            whileHover={{ y: -3, transition: { duration: 0.2 } }}
                           >
                             <img src={resolveImageSrc(item.image || fallbackProfileImage)} alt={item.name || 'Order item'} onError={handleImageError} />
                             <div className="order-content"><h3>{item.name || 'Order item'}</h3><p>{item.restaurant || 'QuickBite'}</p><div className="order-row"><span className={`badge-status ${String(displayStatus).toLowerCase().includes('deliver') ? 'delivered' : 'processing'}`}>{displayStatus}</span><span>{formatOrderDate(order.date)}</span></div><div className="order-meta-row"><strong>₹{order.amount?.toFixed ? order.amount.toFixed(0) : order.amount}</strong><button className="btn btn-primary small" style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#ffffff', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '10px' }} onClick={() => handleReorder(order)}>Reorder</button></div></div>

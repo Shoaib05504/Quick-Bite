@@ -127,6 +127,11 @@ const GroupOrderModal = ({ cartLines = [], onClose }) => {
 
     if (response.success) {
       toast.success('Group Feast Created! 🚀', { duration: 5000 });
+      if (response.groupOrder?.groupCode) {
+        localStorage.setItem(`isHost_${response.groupOrder.groupCode}`, 'true');
+        const creatorName = response.groupOrder.members?.[0]?.name || 'Host';
+        localStorage.setItem('groupUserName', creatorName);
+      }
       onClose(); // Close modal immediately
       navigate(`/group-order/${response.groupOrder.groupCode}`); // Navigate directly to live Group Room
     } else {

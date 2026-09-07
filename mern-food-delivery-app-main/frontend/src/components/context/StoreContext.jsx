@@ -1,30 +1,17 @@
 import { createContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { profileAPI } from '../../services/apiService';
+import { food_list as defaultFoodList } from '../../assets/assets';
+import { SERVER_BASE_URL, API_BASE_URL } from '../../config/apiConfig';
 
 export const StoreContext = createContext(null);
 
-const getApiUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (import.meta.env.MODE === 'development') {
-    return envUrl || 'http://localhost:8000';
-  }
-  if (typeof window !== 'undefined') {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return envUrl || 'http://localhost:8000';
-    }
-    if (envUrl && !envUrl.includes(window.location.hostname) && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-      return window.location.origin;
-    }
-    return envUrl || window.location.origin;
-  }
-  return envUrl || 'http://localhost:8000';
-};
-const API_URL = getApiUrl();
+export const getApiUrl = () => SERVER_BASE_URL;
+const API_URL = SERVER_BASE_URL;
 
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
-  const [food_list, setFoodList] = useState([]);
+  const [food_list, setFoodList] = useState(defaultFoodList);
   const [foodLoading, setFoodLoading] = useState(true);
   const [foodError, setFoodError] = useState(null);
   const [token, setToken] = useState('');
@@ -157,15 +144,15 @@ const StoreContextProvider = (props) => {
     setFoodError(null);
     try {
       const response = await axios.get(`${API_URL}/api/food/list`);
-      if (response.data?.success) {
-        setFoodList(response.data.data || []);
+      if (response.data?.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
+        setFoodList(response.data.data);
       } else {
-        throw new Error(response.data?.message || 'Failed to load food list');
+        setFoodList(defaultFoodList);
       }
     } catch (error) {
-      console.error('Failed to fetch food list:', error.message);
+      console.error('Failed to fetch food list, using demo food list fallback:', error.message);
       setFoodError(error.message);
-      setFoodList([]);
+      setFoodList(defaultFoodList);
     } finally {
       setFoodLoading(false);
     }
@@ -180,8 +167,15 @@ const StoreContextProvider = (props) => {
         setUserProfile(response.user);
         return response.user;
       }
+      if (response.message && response.message.includes('401')) {
+        logout();
+      }
     } catch (error) {
-      console.error('Failed to load user profile:', error.message);
+      if (error.response?.status === 401) {
+        logout();
+      } else {
+        console.error('Failed to load user profile:', error.message);
+      }
     }
     setUserProfile(null);
     return null;
@@ -189,6 +183,7 @@ const StoreContextProvider = (props) => {
 
   // ── Load cart from server ─────────────────────────────────────────────────────
   const loadCartData = async (authToken) => {
+    if (!authToken) return;
     try {
       const response = await axios.post(
         `${API_URL}/api/cart/get`,
@@ -199,7 +194,11 @@ const StoreContextProvider = (props) => {
         setCartItems(sanitizeCart(response.data.cartData || {}));
       }
     } catch (error) {
-      console.error('Failed to load cart:', error.message);
+      if (error.response?.status === 401) {
+        logout();
+      } else {
+        console.error('Failed to load cart:', error.message);
+      }
     }
   };
 
@@ -216,6 +215,9 @@ const StoreContextProvider = (props) => {
   // ── Bootstrap on mount ────────────────────────────────────────────────────────
   useEffect(() => {
     const bootstrap = async () => {
+      // Trigger background health check to warm up Render server if sleeping
+      axios.get(`${API_URL}/api/health`, { timeout: 45000 }).catch(() => {});
+
       await fetchFoodList();
       const savedToken = localStorage.getItem('token');
       if (savedToken) {

@@ -215,8 +215,9 @@
 .contact-info-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
+  margin-top: 6px;
 }
 
 .contact-info-item {
@@ -225,33 +226,66 @@
   gap: 12px;
   font-size: 14.5px;
   color: #4B5563;
-  transition: transform 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
-.contact-info-item:hover {
-  transform: translateX(4px);
+.contact-icon-wrapper {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  border-radius: 8px !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.18) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  transform: none !important;
 }
 
+.contact-info-item:hover .contact-icon-wrapper {
+  transform: none !important;
+  background: rgba(16, 185, 129, 0.16) !important;
+}
+
+.contact-info-item span,
 .contact-info-item a {
+  font-size: 14.5px;
+  line-height: 1.35;
+  color: #4B5563;
   text-decoration: none;
-  color: inherit;
-  transition: color 0.2s;
+  word-break: normal;
+  overflow-wrap: break-word;
+  transition: color 0.2s ease;
 }
 
 .contact-info-item a:hover {
   color: #16A34A;
 }
 
+.contact-info-item svg,
+.contact-info-item img,
+.contact-icon-wrapper svg,
 .contact-icon {
-  width: 24px; /* Reduced & standardized to 24px */
-  height: 24px;
-  color: #10B981; /* Contact icon (Mint Green) */
-  flex-shrink: 0;
-  transition: transform 0.2s ease, color 0.2s ease;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  max-width: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
+  color: #10B981;
+  flex-shrink: 0 !important;
+  transform: none !important;
+  transition: color 0.2s ease;
 }
 
 .contact-info-item:hover .contact-icon {
-  transform: scale(1.15);
   color: #16A34A;
 }
 
@@ -435,25 +469,113 @@
 
 @media (max-width: 640px) {
   .footer {
-    padding: 50px 5vw 25px 5vw;
-    margin-top: 50px;
+    padding: 30px 4vw 25px 4vw;
+    margin-top: 30px;
   }
 
   .footer-services-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
   }
-  
+
+  .footer-service-card {
+    padding: 14px 8px;
+    min-height: auto;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .service-icon-wrapper {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 8px;
+  }
+
+  .service-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .footer-service-card h3 {
+    font-size: 0.82rem;
+    line-height: 1.2;
+    text-align: center;
+    margin-bottom: 4px;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .footer-service-card p {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    text-align: center;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
   .footer-columns-grid {
-    grid-template-columns: 1fr;
-    gap: 35px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 12px;
+    width: 100%;
+  }
+
+  .brand-info-col {
+    grid-column: 1 / -1;
+  }
+
+  .download-app-col {
+    grid-column: 1 / -1;
+    margin-top: 10px;
   }
 
   .footer-column h3 {
-    margin-bottom: 16px;
+    font-size: 0.88rem;
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-links-list {
+    gap: 8px;
+  }
+
+  .footer-links-list a {
+    font-size: 0.82rem;
+    word-break: normal;
+    overflow-wrap: break-word;
   }
 
   .coming-soon-card {
-    padding: 20px;
+    padding: 16px;
+  }
+
+  .contact-info-list {
+    gap: 10px;
+  }
+
+  .contact-icon-wrapper {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    border-radius: 9px;
+  }
+
+  .contact-icon {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  .contact-info-item {
+    gap: 10px;
+  }
+
+  .contact-info-item span,
+  .contact-info-item a {
+    font-size: 0.84rem;
   }
 }
