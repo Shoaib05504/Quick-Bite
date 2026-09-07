@@ -66,4 +66,8 @@ export const API_BASE_URL = `${SERVER_BASE_URL}/api`;
 // Socket server URL
 export const SOCKET_SERVER_URL = SERVER_BASE_URL;
 
+export const getSocketServerUrl = () => {
+  return resolveServerBaseUrl();
+};
+
 export default API_BASE_URL;

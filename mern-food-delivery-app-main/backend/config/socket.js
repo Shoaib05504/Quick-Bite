@@ -17,6 +17,7 @@ export const initSocket = (httpServer) => {
     process.env.FRONTEND_URL || 'http://localhost:5173',
     process.env.ADMIN_URL || 'http://localhost:5174',
     process.env.RENDER_EXTERNAL_URL,
+    'https://quickbite-9qd2.onrender.com',
   ]
     .filter(Boolean)
     .map((url) => url.replace(/\/$/, ''));

@@ -9,7 +9,7 @@ import './GroupOrder.css';
 import { FiChevronLeft, FiShare2, FiUsers, FiClock, FiShoppingCart, FiLock, FiUnlock, FiSearch, FiLayers, FiList, FiActivity } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { groupOrderAPI } from '../../services/groupOrderService';
-import { SOCKET_SERVER_URL } from '../../config/apiConfig';
+import { SOCKET_SERVER_URL, getSocketServerUrl } from '../../config/apiConfig';
 
 const socketServerUrl = SOCKET_SERVER_URL;
 
@@ -159,115 +159,123 @@ const GroupOrder = () => {
   const connectSocket = useCallback(() => {
     if (socketRef.current) return;
 
-    const socket = io(getSocketServerUrl(), {
-      transports: ['polling', 'websocket'],
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      timeout: 20000,
-    });
+    try {
+      const socket = io(getSocketServerUrl(), {
+        transports: ['polling', 'websocket'],
+        reconnection: true,
+        reconnectionAttempts: Infinity,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000,
+      });
 
-    socket.on('connect', () => {
-      console.log('Real-time socket connected');
-    });
+      socket.on('connect', () => {
+        console.log('Real-time socket connected');
+      });
 
-    socket.on('reconnect', () => {
-      toast.success('Real-time connection restored! 🟢');
-    });
+      socket.on('connect_error', (err) => {
+        console.warn('Real-time socket connection error:', err?.message || err);
+      });
 
-    socket.on('group:joined', (payload) => {
-      setGroup(payload.groupOrder);
-      setActivities(payload.groupOrder.activities || []);
-      if (payload.groupOrder.chatMessages) {
-        setChatMessages(payload.groupOrder.chatMessages);
-      }
-      setJoined(true);
-      setExpired(payload.groupOrder.isExpired || new Date() > new Date(payload.groupOrder.expiresAt));
-    });
+      socket.on('reconnect', () => {
+        toast.success('Real-time connection restored! 🟢');
+      });
 
-    socket.on('group:updated', (payload) => {
-      setGroup(payload.groupOrder);
-      setActivities(payload.groupOrder.activities || []);
-      if (payload.groupOrder.chatMessages) {
-        setChatMessages(payload.groupOrder.chatMessages);
-      }
-      setExpired(payload.groupOrder.isExpired || new Date() > new Date(payload.groupOrder.expiresAt));
-    });
-
-    socket.on('group:feastStarted', (payload) => {
-      setGroup(payload.groupOrder);
-      toast.success('🎉 Group Feast has started! Everyone can now add items.');
-    });
-
-    socket.on('group:chatMessage', (payload) => {
-      if (payload?.message) {
-        setChatMessages((prev) => {
-          const msgId = payload.message.messageId || payload.message._id;
-          const exists = prev.some((m) => (m.messageId && m.messageId === msgId) || (m._id && m._id === msgId));
-          if (exists) return prev;
-          return [...prev, payload.message];
-        });
-        if (!showChat) {
-          setUnreadCount((prev) => prev + 1);
+      socket.on('group:joined', (payload) => {
+        setGroup(payload.groupOrder);
+        setActivities(payload.groupOrder.activities || []);
+        if (payload.groupOrder.chatMessages) {
+          setChatMessages(payload.groupOrder.chatMessages);
         }
-      }
-    });
+        setJoined(true);
+        setExpired(payload.groupOrder.isExpired || new Date() > new Date(payload.groupOrder.expiresAt));
+      });
 
-    socket.on('group:notification', (payload) => {
-      if (payload?.message) {
-        toast(payload.message, {
-          icon: payload.type === 'member_joined' ? '👋' : payload.type === 'cart_updated' ? '🍕' : payload.type === 'lock_toggled' ? '🔒' : '🔔',
-          duration: 3500,
+      socket.on('group:updated', (payload) => {
+        setGroup(payload.groupOrder);
+        setActivities(payload.groupOrder.activities || []);
+        if (payload.groupOrder.chatMessages) {
+          setChatMessages(payload.groupOrder.chatMessages);
+        }
+        setExpired(payload.groupOrder.isExpired || new Date() > new Date(payload.groupOrder.expiresAt));
+      });
+
+      socket.on('group:feastStarted', (payload) => {
+        setGroup(payload.groupOrder);
+        toast.success('🎉 Group Feast has started! Everyone can now add items.');
+      });
+
+      socket.on('group:chatMessage', (payload) => {
+        if (payload?.message) {
+          setChatMessages((prev) => {
+            const msgId = payload.message.messageId || payload.message._id;
+            const exists = prev.some((m) => (m.messageId && m.messageId === msgId) || (m._id && m._id === msgId));
+            if (exists) return prev;
+            return [...prev, payload.message];
+          });
+          if (!showChat) {
+            setUnreadCount((prev) => prev + 1);
+          }
+        }
+      });
+
+      socket.on('group:notification', (payload) => {
+        if (payload?.message) {
+          toast(payload.message, {
+            icon: payload.type === 'member_joined' ? '👋' : payload.type === 'cart_updated' ? '🍕' : payload.type === 'lock_toggled' ? '🔒' : '🔔',
+            duration: 3500,
+            style: {
+              borderRadius: '12px',
+              background: '#0f172a',
+              color: '#ffffff',
+              fontWeight: '600',
+              fontSize: '14px',
+            },
+          });
+        }
+      });
+
+      socket.on('group:checkoutStarted', (payload) => {
+        toast.success('💳 Host started checkout! Navigating to checkout...');
+        if (payload?.groupOrder?.cartItems?.length) {
+          const itemsToAdd = payload.groupOrder.cartItems.map((item) => ({ itemId: item.itemId, quantity: item.quantity }));
+          addItemsToCart(itemsToAdd);
+          localStorage.setItem('groupOrderCheckout', JSON.stringify(payload.groupOrder.cartItems));
+          localStorage.setItem('groupOrderCode', groupCode);
+        }
+        setTimeout(() => {
+          navigate('/order');
+        }, 1200);
+      });
+
+      socket.on('group:kicked', (payload) => {
+        toast.error(payload?.message || 'You were removed from the Group Feast by the host.');
+        setJoined(false);
+        navigate('/home');
+      });
+
+      socket.on('group:remind', ({ senderName }) => {
+        toast(`🔔 ${senderName} sent a payment reminder to all members!`, {
+          icon: '💰',
+          duration: 5000,
           style: {
-            borderRadius: '12px',
-            background: '#0f172a',
-            color: '#ffffff',
-            fontWeight: '600',
-            fontSize: '14px',
+            border: '1px solid #eab308',
+            padding: '16px',
+            color: '#854d0e',
+            background: '#fef9c3',
           },
         });
-      }
-    });
-
-    socket.on('group:checkoutStarted', (payload) => {
-      toast.success('💳 Host started checkout! Navigating to checkout...');
-      if (payload?.groupOrder?.cartItems?.length) {
-        const itemsToAdd = payload.groupOrder.cartItems.map((item) => ({ itemId: item.itemId, quantity: item.quantity }));
-        addItemsToCart(itemsToAdd);
-        localStorage.setItem('groupOrderCheckout', JSON.stringify(payload.groupOrder.cartItems));
-        localStorage.setItem('groupOrderCode', groupCode);
-      }
-      setTimeout(() => {
-        navigate('/order');
-      }, 1200);
-    });
-
-    socket.on('group:kicked', (payload) => {
-      toast.error(payload?.message || 'You were removed from the Group Feast by the host.');
-      setJoined(false);
-      navigate('/home');
-    });
-
-    socket.on('group:remind', ({ senderName }) => {
-      toast(`🔔 ${senderName} sent a payment reminder to all members!`, {
-        icon: '💰',
-        duration: 5000,
-        style: {
-          border: '1px solid #eab308',
-          padding: '16px',
-          color: '#854d0e',
-          background: '#fef9c3',
-        },
       });
-    });
 
-    socket.on('group:expired', () => {
-      setExpired(true);
-      toast.error('This group order has expired');
-    });
+      socket.on('group:expired', () => {
+        setExpired(true);
+        toast.error('This group order has expired');
+      });
 
-    socketRef.current = socket;
+      socketRef.current = socket;
+    } catch (err) {
+      console.error('Socket.IO connection error:', err);
+    }
   }, []);
 
   useEffect(() => {

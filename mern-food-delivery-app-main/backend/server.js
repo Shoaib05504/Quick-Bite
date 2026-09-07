@@ -45,6 +45,7 @@ initSocket(httpServer);
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   process.env.ADMIN_URL || 'http://localhost:5174',
+  'https://quickbite-9qd2.onrender.com',
 ].map(url => url.replace(/\/$/, ''));
 
 app.use(cors({
