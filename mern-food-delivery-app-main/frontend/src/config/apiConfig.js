@@ -86,6 +86,12 @@ export const resolveServerBaseUrl = () => {
 
     // If loaded on non-localhost domain in browser (production web deployment)
     if (!isLocalhost) {
+      if (envUrl && envUrl.trim()) {
+        return envUrl.trim().replace(/\/api\/?$/, '').replace(/\/$/, '');
+      }
+      if (import.meta.env.VITE_PRODUCTION_API_URL && import.meta.env.VITE_PRODUCTION_API_URL.trim()) {
+        return import.meta.env.VITE_PRODUCTION_API_URL.trim().replace(/\/api\/?$/, '').replace(/\/$/, '');
+      }
       return window.location.origin.replace(/\/$/, '');
     }
   }
