@@ -111,10 +111,12 @@ const LoginPopup = ({ setShowLogin }) => {
           throw new Error('Google Sign-In failed: No account selected.');
         }
 
+        const stableUid = googleUser.id || googleUser.authentication?.idToken || (googleUser.email ? `google_${btoa(googleUser.email).replace(/[^a-zA-Z0-9]/g, '')}` : `google_${Date.now()}`);
+
         const userObj = {
           displayName: googleUser.displayName || googleUser.name || (googleUser.givenName ? `${googleUser.givenName} ${googleUser.familyName || ''}`.trim() : 'Google User'),
           email: googleUser.email || '',
-          uid: googleUser.id || googleUser.authentication?.idToken || 'google_' + Date.now(),
+          uid: stableUid,
           photoURL: googleUser.imageUrl || '',
         };
 

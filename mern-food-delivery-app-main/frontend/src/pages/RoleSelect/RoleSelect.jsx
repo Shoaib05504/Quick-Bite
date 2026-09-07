@@ -16,6 +16,16 @@ const RoleSelect = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const goAdmin = () => {
+    const existingToken = localStorage.getItem("token");
+    const existingRole = localStorage.getItem("role");
+    if (existingToken && existingRole === "admin") {
+      if (window.location.port === "5173") {
+        window.location.href = "http://localhost:5174/admin/";
+      } else {
+        window.location.href = "/admin/";
+      }
+      return;
+    }
     setShowLogin(true);
   };
 

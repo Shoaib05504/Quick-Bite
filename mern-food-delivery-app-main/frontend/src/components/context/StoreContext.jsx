@@ -165,6 +165,9 @@ const StoreContextProvider = (props) => {
       const response = await profileAPI.getProfile();
       if (response.success && response.user) {
         setUserProfile(response.user);
+        if (response.user._id) localStorage.setItem('userId', response.user._id);
+        if (response.user.role) localStorage.setItem('role', response.user.role);
+        console.log('📱 [Auth Context] Loaded User Profile:', response.user._id, 'Role:', response.user.role);
         return response.user;
       }
       if (response.message && response.message.includes('401')) {
