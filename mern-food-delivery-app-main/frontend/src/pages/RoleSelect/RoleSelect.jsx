@@ -6,8 +6,9 @@ import "./RoleSelect.css";
 
 import axios from "axios";
 import { API_BASE_URL } from "../../config/apiConfig";
-
 import { getAuthUser, setAuthUser } from "../../services/storageService";
+import { Browser } from "@capacitor/browser";
+import { Capacitor } from "@capacitor/core";
 
 const RoleSelect = () => {
   const navigate = useNavigate();
@@ -17,10 +18,25 @@ const RoleSelect = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const openAdminUrl = async () => {
+    const isMobile = Capacitor.isNativePlatform() || /Capacitor|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const targetUrl = isMobile ? "https://quickbite-9qd2.onrender.com/admin/?source=apk" : "https://quickbite-9qd2.onrender.com/admin/";
+
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await Browser.open({ url: targetUrl });
+        return;
+      } catch (err) {
+        console.warn('Browser.open fallback to window.location:', err);
+      }
+    }
+    window.location.href = targetUrl;
+  };
+
   const goAdmin = async () => {
     const { token: existingToken, role: existingRole } = await getAuthUser();
     if (existingToken && (existingRole === "admin" || !existingRole)) {
-      window.location.href = "https://quickbite-9qd2.onrender.com/admin/";
+      await openAdminUrl();
       return;
     }
     setShowLogin(true);
@@ -67,7 +83,7 @@ const RoleSelect = () => {
           userId: response.data.userId,
           adminName: name || "Admin"
         });
-        window.location.href = "https://quickbite-9qd2.onrender.com/admin/";
+        await openAdminUrl();
       } else {
         setError("Access denied. Admin role required ❌");
       }

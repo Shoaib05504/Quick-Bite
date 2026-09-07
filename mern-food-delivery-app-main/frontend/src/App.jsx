@@ -24,6 +24,8 @@ import SmartSplitBill from './pages/SmartSplitBill/SmartSplitBill';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { StoreContext } from './components/context/StoreContext';
 import GroupOrderModal from './components/GroupOrderModal/GroupOrderModal';
+import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -40,6 +42,30 @@ const App = () => {
       setShowLogin(true);
     }
   }, [searchParams, token]);
+
+  // Deep link listener for quickbite://home return flow from Admin Panel
+  useEffect(() => {
+    let listenerHandler = null;
+    const setupDeepLink = async () => {
+      try {
+        listenerHandler = await CapacitorApp.addListener('appUrlOpen', (event) => {
+          const url = event?.url;
+          console.log('📱 Deep Link received:', url);
+          if (url && (url === 'quickbite://home' || url.startsWith('quickbite://home') || url.startsWith('quickbite://'))) {
+            navigate('/');
+          }
+        });
+      } catch (err) {
+        console.warn('Capacitor App listener notice:', err?.message || err);
+      }
+    };
+    setupDeepLink();
+    return () => {
+      if (listenerHandler && typeof listenerHandler.remove === 'function') {
+        listenerHandler.remove();
+      }
+    };
+  }, [navigate]);
 
   // Handle food search submission when Enter key is pressed
   const handleSearchSubmit = (queryText) => {

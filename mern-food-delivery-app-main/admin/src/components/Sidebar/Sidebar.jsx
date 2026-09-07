@@ -22,14 +22,24 @@ const Sidebar = () => {
   const getTarget = (targetPath) => (path.startsWith("/admin") ? `/admin${targetPath}` : targetPath);
 
   const handleLogout = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
+
+    const isApkSession =
+      (typeof localStorage !== "undefined" && localStorage.getItem("admin_apk_session") === "true") ||
+      (typeof window !== "undefined" && window.location.search.includes("source=apk")) ||
+      (typeof navigator !== "undefined" && /Capacitor|Android/i.test(navigator.userAgent));
+
     await clearAuthUser();
     if (typeof localStorage !== "undefined") localStorage.clear();
     if (typeof sessionStorage !== "undefined") sessionStorage.clear();
     window.dispatchEvent(new Event("storage"));
-    
-    // Redirect to main QuickBite landing/home page
-    window.location.href = window.location.origin + "/";
+
+    if (isApkSession) {
+      console.log("🚪 APK Logout — Redirecting back to QuickBite APK via quickbite://home");
+      window.location.href = "quickbite://home";
+    } else {
+      window.location.href = window.location.origin + "/";
+    }
   };
 
   return (

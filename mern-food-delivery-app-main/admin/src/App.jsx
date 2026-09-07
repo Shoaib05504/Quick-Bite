@@ -33,6 +33,15 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("source") === "apk" || document.referrer.includes("capacitor") || /Capacitor/i.test(navigator.userAgent)) {
+        localStorage.setItem("admin_apk_session", "true");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     const initAuth = async () => {
       setLoading(true);
       try {
