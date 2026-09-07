@@ -1,9 +1,10 @@
 import React from "react";
 import "./Sidebar.css";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const path = location.pathname;
 
   const isDashboardActive =
@@ -16,9 +17,24 @@ const Sidebar = () => {
   const isAddActive = path === "/add" || path === "/admin/add";
   const isListActive = path === "/list" || path === "/admin/list";
   const isOrdersActive = path === "/orders" || path === "/admin/orders";
-  const isLogoutActive = path === "/logout" || path === "/admin/logout";
 
   const getTarget = (targetPath) => (path.startsWith("/admin") ? `/admin${targetPath}` : targetPath);
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("adminName");
+    window.dispatchEvent(new Event("storage"));
+    
+    // Navigate to root/login or reload to trigger Login component display
+    if (window.location.port === "5174" || window.location.pathname.startsWith("/admin")) {
+      window.location.href = window.location.origin + (window.location.port === "5174" ? "/" : "/admin/");
+    } else {
+      navigate("/");
+    }
+  };
 
   return (
     <div className="sidebar">
@@ -59,13 +75,15 @@ const Sidebar = () => {
         <span>Orders</span>
       </NavLink>
 
-      <NavLink
-        to={getTarget("/logout")}
-        className={isLogoutActive ? 'sidebar-item active logout-item' : 'sidebar-item logout-item'}
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="sidebar-item logout-item"
+        style={{ cursor: 'pointer', width: '100%', border: 'none', background: 'transparent', textAlign: 'left' }}
       >
         <span>🚪</span>
         <span>Logout</span>
-      </NavLink>
+      </button>
     </div>
   );
 };
