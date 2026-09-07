@@ -63,55 +63,43 @@ const apiUrl = url || import.meta.env.VITE_API_URL || "http://localhost:8000";
   return (
     <div className="add-page">
       <div className="add-card">
-        <div className="add-card-header">
-          <h2>Add New Product</h2>
-          <p className="add-card-subtitle">Fill in the details below to add a new dish to the QuickBite menu</p>
-        </div>
+        <h2>Add New Product</h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="food-image-url">Image URL</label>
-            <input
-              id="food-image-url"
-              type="text"
-              placeholder="Enter image URL (e.g. https://...)"
-              value={data.image || ""}
-              onChange={(e) =>
-                setData({ ...data, image: e.target.value })
-              }
-            />
-          </div>
+          <label>Upload Image</label>
+          <label>Image URL</label>
+<input
+  type="text"
+  placeholder="Enter image URL"
+  value={data.image || ""}
+  onChange={(e) =>
+    setData({ ...data, image: e.target.value })
+  }
+/>
 
-          <div className="form-group">
-            <label htmlFor="food-product-name">Product Name</label>
-            <input
-              id="food-product-name"
-              type="text"
-              placeholder="Enter product name"
-              value={data.name}
-              onChange={(e) =>
-                setData({ ...data, name: e.target.value })
-              }
-            />
-          </div>
+          <label>Product Name</label>
+          <input
+            type="text"
+            placeholder="Enter product name"
+            value={data.name}
+            onChange={(e) =>
+              setData({ ...data, name: e.target.value })
+            }
+          />
 
-          <div className="form-group">
-            <label htmlFor="food-description">Description</label>
-            <textarea
-              id="food-description"
-              placeholder="Enter product description"
-              value={data.description}
-              onChange={(e) =>
-                setData({ ...data, description: e.target.value })
-              }
-            />
-          </div>
+          <label>Description</label>
+          <textarea
+            placeholder="Enter description"
+            value={data.description}
+            onChange={(e) =>
+              setData({ ...data, description: e.target.value })
+            }
+          />
 
           <div className="row">
-            <div className="form-group">
-              <label htmlFor="food-category">Category</label>
+            <div>
+              <label>Category</label>
               <select
-                id="food-category"
                 value={data.category}
                 onChange={(e) =>
                   setData({ ...data, category: e.target.value })
@@ -130,12 +118,11 @@ const apiUrl = url || import.meta.env.VITE_API_URL || "http://localhost:8000";
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="food-price">Price (₹)</label>
+            <div>
+              <label>Price</label>
               <input
-                id="food-price"
                 type="number"
-                placeholder="100"
+                placeholder="₹100"
                 value={data.price}
                 onChange={(e) =>
                   setData({ ...data, price: e.target.value })
@@ -144,7 +131,7 @@ const apiUrl = url || import.meta.env.VITE_API_URL || "http://localhost:8000";
             </div>
           </div>
 
-          <button type="submit" className="add-submit-btn">ADD ITEM</button>
+          <button type="submit">ADD ITEM</button>
         </form>
       </div>
     </div>

@@ -80,11 +80,7 @@ const Dashboard = ({ url }) => {
     return mapping[status] || '#8884d8';
   };
 
-  const formatCurrency = (value) => {
-    const num = Number(value) || 0;
-    if (isNaN(num)) return '₹0';
-    return `₹${num.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
-  };
+  const formatCurrency = (value) => `₹${Number(value || 0).toLocaleString()}`;
 
   const orderCards = [
     { label: 'Total Orders', value: summary.totalOrders, accent: 'rgba(108, 92, 231, 0.15)' },
@@ -139,12 +135,12 @@ const Dashboard = ({ url }) => {
                   ))}
                 </div>
               </div>
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={ordersData} margin={{ top: 15, right: 10, left: -15, bottom: 5 }}>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={ordersData} margin={{ top: 20, right: 12, left: -10, bottom: 5 }}>
                   <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="4 4" />
-                  <XAxis dataKey="label" tick={{ fill: '#cbd5e1', fontSize: 11 }} />
-                  <YAxis tick={{ fill: '#cbd5e1', fontSize: 11 }} width={35} />
-                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', color: '#fff', borderRadius: '12px' }} />
+                  <XAxis dataKey="label" tick={{ fill: '#cbd5e1', fontSize: 12 }} />
+                  <YAxis tick={{ fill: '#cbd5e1', fontSize: 12 }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', color: '#fff' }} />
                   <Line type="monotone" dataKey="value" stroke="#6c5ce7" strokeWidth={3} dot={{ r: 4, stroke: '#fff', strokeWidth: 2 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -168,13 +164,13 @@ const Dashboard = ({ url }) => {
                   ))}
                 </div>
               </div>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={revenueData} margin={{ top: 15, right: 10, left: -15, bottom: 5 }}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={revenueData} margin={{ top: 20, right: 12, left: -10, bottom: 5 }}>
                   <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="4 4" />
-                  <XAxis dataKey="label" tick={{ fill: '#cbd5e1', fontSize: 11 }} />
-                  <YAxis tick={{ fill: '#cbd5e1', fontSize: 11 }} width={35} />
-                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', color: '#fff', borderRadius: '12px' }} />
-                  <Bar dataKey="value" fill="#00b894" radius={[8, 8, 0, 0]} />
+                  <XAxis dataKey="label" tick={{ fill: '#cbd5e1', fontSize: 12 }} />
+                  <YAxis tick={{ fill: '#cbd5e1', fontSize: 12 }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', color: '#fff' }} />
+                  <Bar dataKey="value" fill="#00b894" radius={[12, 12, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -186,14 +182,14 @@ const Dashboard = ({ url }) => {
                   <p>Delivered, preparing, pending, cancelled</p>
                 </div>
               </div>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart style={{ width: '100%', height: '100%' }}>
-                  <Pie data={statusBreakdown} dataKey="value" nameKey="label" innerRadius="55%" outerRadius="82%" paddingAngle={4}>
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie data={statusBreakdown} dataKey="value" nameKey="label" innerRadius={70} outerRadius={100} paddingAngle={4}>
                     {statusBreakdown.map((entry, index) => (
                       <Cell key={`slice-${entry.label}`} fill={renderStatusLabel(entry.label)} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', color: '#fff', borderRadius: '12px' }} />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', color: '#fff' }} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="status-legend">
@@ -254,13 +250,11 @@ const Dashboard = ({ url }) => {
                 </div>
                 {recentOrders.map((order) => (
                   <div key={order.orderId} className="orders-table-row">
-                    <span className="order-id">#{String(order.orderId).slice(-6)}</span>
-                    <span className="order-customer">{order.customer}</span>
-                    <span className="order-amount">{formatCurrency(order.amount)}</span>
-                    <div className="order-row-footer">
-                      <span className={`status-badge ${order.status.toLowerCase().replace(/\s+/g, '-')}`}>{order.status}</span>
-                      <span className="order-date">{new Date(order.date).toLocaleDateString()}</span>
-                    </div>
+                    <span>{String(order.orderId).slice(-6)}</span>
+                    <span>{order.customer}</span>
+                    <span>{formatCurrency(order.amount)}</span>
+                    <span className={`status-badge ${order.status.toLowerCase().replace(/\s+/g, '-')}`}>{order.status}</span>
+                    <span>{new Date(order.date).toLocaleDateString()}</span>
                   </div>
                 ))}
               </div>

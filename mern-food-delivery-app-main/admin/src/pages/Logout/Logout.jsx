@@ -12,7 +12,7 @@ const Logout = () => {
     localStorage.removeItem('adminName');
     setTimeout(() => {
       if (window.location.port === "5174") {
-        window.location.href = `${window.location.protocol}//${window.location.hostname}:5173/`;
+        window.location.href = 'http://localhost:5173/';
       } else {
         window.location.href = '/';
       }

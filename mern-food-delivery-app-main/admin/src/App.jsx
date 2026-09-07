@@ -47,10 +47,10 @@ const App = () => {
       <ToastContainer />
       <Navbar />
 
-      <div className="admin-app-container">
+      <div className="app-content">
         <Sidebar />
 
-        <div className="admin-main-content">
+        <div style={{ flex: 1, padding: "24px 26px", minHeight: '100vh' }}>
           <Routes>
             <Route path="/" element={<Dashboard url={url} />} />
             <Route path="/dashboard" element={<Dashboard url={url} />} />
