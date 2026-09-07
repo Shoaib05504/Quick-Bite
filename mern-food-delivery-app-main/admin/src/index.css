@@ -11,35 +11,53 @@
     font-family: Outfit, 'Poppins', sans-serif;
   }
 
-  body{
-    min-height: 100vh;
-    background-color: #fcfcfc;
-  }
+  body {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: Outfit, 'Poppins', sans-serif;
+  color: #0f172a;
+}
 
-  a{
+a {
   text-decoration: none;
   color: inherit;
 }
 
-hr{
-    border: none;
-    height: 1px;
-    background-color: #a9a9a9;
+hr {
+  border: none;
+  height: 1px;
+  background-color: #e2e8f0;
 }
 
-.app-content{
+.app-content {
   display: flex;
+  min-height: calc(100vh - 68px);
+  background-color: #f8fafc;
 }
 
-.flex-col{
+.admin-main-content {
+  flex: 1;
+  padding: 28px 32px;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 68px);
+  box-sizing: border-box;
+}
+
+.flex-col {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.cursor{
+.cursor {
   cursor: pointer;
 }
-body{
-  font-family:'Poppins',sans-serif;
+
+@media (max-width: 768px) {
+  .app-content {
+    flex-direction: column;
+  }
+  .admin-main-content {
+    padding: 20px 16px;
+  }
 }

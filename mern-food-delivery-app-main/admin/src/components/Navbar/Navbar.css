@@ -2,22 +2,45 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
-  background: linear-gradient(90deg, #ff4b2b, #ff416c);
-  color: white;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .nav-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.nav-left h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  margin: 0;
 }
 
 .logo {
-  width: 40px;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .profile {
-  width: 35px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

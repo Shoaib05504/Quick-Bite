@@ -83,10 +83,10 @@ const Dashboard = ({ url }) => {
   const formatCurrency = (value) => `₹${Number(value || 0).toLocaleString()}`;
 
   const orderCards = [
-    { label: 'Total Orders', value: summary.totalOrders, accent: 'rgba(108, 92, 231, 0.15)' },
-    { label: 'Total Revenue', value: formatCurrency(summary.totalRevenue), accent: 'rgba(0, 184, 148, 0.15)' },
-    { label: 'Total Users', value: summary.totalUsers, accent: 'rgba(255, 234, 167, 0.15)' },
-    { label: 'Food Items', value: summary.totalFoodItems, accent: 'rgba(162, 155, 254, 0.15)' },
+    { label: 'Total Orders', value: summary.totalOrders, accentColor: '#3b82f6', icon: '📦' },
+    { label: 'Total Revenue', value: formatCurrency(summary.totalRevenue), accentColor: '#10b981', icon: '💰' },
+    { label: 'Total Users', value: summary.totalUsers, accentColor: '#f59e0b', icon: '👥' },
+    { label: 'Food Items', value: summary.totalFoodItems, accentColor: '#8b5cf6', icon: '🍕' },
   ];
 
   const ordersData = ordersOverview[ordersMode] || [];
@@ -96,7 +96,7 @@ const Dashboard = ({ url }) => {
     <div className="dashboard-page">
       <div className="dashboard-topbar">
         <div>
-          <p className="dashboard-subtitle">Admin Analytics</p>
+          <p className="dashboard-subtitle">ADMIN ANALYTICS</p>
           <h1>Premium QuickBite Dashboard</h1>
         </div>
       </div>
@@ -109,9 +109,12 @@ const Dashboard = ({ url }) => {
         <>
           <div className="dashboard-summary-grid">
             {orderCards.map((card) => (
-              <div key={card.label} className="dashboard-summary-card" style={{ background: card.accent }}>
-                <h3>{card.label}</h3>
-                <p>{card.value}</p>
+              <div key={card.label} className="dashboard-summary-card" style={{ borderTop: `4px solid ${card.accentColor}` }}>
+                <div className="card-header-flex">
+                  <h3>{card.label}</h3>
+                  <span className="card-icon">{card.icon}</span>
+                </div>
+                <p style={{ color: card.accentColor }}>{card.value}</p>
               </div>
             ))}
           </div>
@@ -239,6 +242,9 @@ const Dashboard = ({ url }) => {
             <div className="dashboard-list-card recent-orders-card">
               <div className="list-card-header">
                 <h3>Recent Orders</h3>
+                <button className="view-all-btn" onClick={() => navigate('/orders')}>
+                  View All →
+                </button>
               </div>
               <div className="orders-table">
                 <div className="orders-table-head">

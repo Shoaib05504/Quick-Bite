@@ -50,7 +50,7 @@ const App = () => {
       <div className="app-content">
         <Sidebar />
 
-        <div style={{ flex: 1, padding: "24px 26px", minHeight: '100vh' }}>
+        <div className="admin-main-content">
           <Routes>
             <Route path="/" element={<Dashboard url={url} />} />
             <Route path="/dashboard" element={<Dashboard url={url} />} />
