@@ -20,11 +20,7 @@ const RoleSelect = () => {
   const goAdmin = async () => {
     const { token: existingToken, role: existingRole } = await getAuthUser();
     if (existingToken && (existingRole === "admin" || !existingRole)) {
-      if (window.location.port === "5173") {
-        window.location.href = "http://localhost:5174/admin/";
-      } else {
-        window.location.href = "/admin/";
-      }
+      window.location.href = "https://quickbite-9qd2.onrender.com/admin/";
       return;
     }
     setShowLogin(true);
@@ -71,11 +67,7 @@ const RoleSelect = () => {
           userId: response.data.userId,
           adminName: name || "Admin"
         });
-        if (window.location.port === "5173") {
-          window.location.href = "http://localhost:5174/admin/";
-        } else {
-          window.location.href = "/admin/";
-        }
+        window.location.href = "https://quickbite-9qd2.onrender.com/admin/";
       } else {
         setError("Access denied. Admin role required ❌");
       }

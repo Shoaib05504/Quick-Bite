@@ -29,11 +29,7 @@ const Sidebar = () => {
     window.dispatchEvent(new Event("storage"));
     
     // Redirect to main QuickBite landing/home page
-    if (window.location.port === "5174") {
-      window.location.href = "http://localhost:5173/";
-    } else {
-      window.location.href = window.location.origin + "/";
-    }
+    window.location.href = window.location.origin + "/";
   };
 
   return (

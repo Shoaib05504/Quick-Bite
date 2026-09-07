@@ -2,11 +2,7 @@ import React, { useEffect } from "react";
 
 const Admin = () => {
   useEffect(() => {
-    if (window.location.port === "5173") {
-      window.location.href = "http://localhost:5174/admin/";
-    } else {
-      window.location.href = "/admin/";
-    }
+    window.location.href = "https://quickbite-9qd2.onrender.com/admin/";
   }, []);
 
   return (

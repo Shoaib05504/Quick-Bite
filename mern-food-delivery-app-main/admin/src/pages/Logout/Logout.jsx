@@ -10,11 +10,7 @@ const Logout = () => {
       if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
       window.dispatchEvent(new Event('storage'));
       setTimeout(() => {
-        if (window.location.port === '5174') {
-          window.location.href = 'http://localhost:5173/';
-        } else {
-          window.location.href = window.location.origin + '/';
-        }
+        window.location.href = window.location.origin + '/';
       }, 150);
     };
     performLogout();
