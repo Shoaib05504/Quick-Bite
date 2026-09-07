@@ -1,41 +1,19 @@
-import React from "react";
-import AddFood from "./AddFood.jsx";
-import ListFood from "./ListFood.jsx";
-import Orders from "./Orders.jsx";
+import React, { useEffect } from "react";
 
 const Admin = () => {
+  useEffect(() => {
+    if (window.location.port === "5173") {
+      window.location.href = "http://localhost:5174/admin/";
+    } else {
+      window.location.href = "/admin/";
+    }
+  }, []);
+
   return (
-  <div className="admin-container">
-    <h2 className="admin-title">Admin Panel</h2>
-
-    {/* Add Food */}
-    <div className="card">
-      <h3>Add Food</h3>
-      <div className="form-row">
-        <input placeholder="Name" />
-        <input placeholder="Description" />
-        <input placeholder="Price" />
-        <input placeholder="Category" />
-        <input type="file" />
-        <button>Add</button>
-      </div>
+    <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
+      <p>Redirecting to Admin Dashboard…</p>
     </div>
-
-    {/* Food List */}
-    <div className="card">
-      <h3>Food List</h3>
-      <div className="food-list">
-       
-      </div>
-    </div>
-
-    {/* Orders */}
-    <div className="card">
-      <h3>Orders</h3>
-      
-    </div>
-  </div>
-);
+  );
 };
 
 export default Admin;

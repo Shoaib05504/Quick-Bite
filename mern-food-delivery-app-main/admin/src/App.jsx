@@ -52,12 +52,31 @@ const App = () => {
 
         <div className="admin-main-content">
           <Routes>
+            {/* Dashboard routes */}
             <Route path="/" element={<Dashboard url={url} />} />
+            <Route path="/admin" element={<Dashboard url={url} />} />
+            <Route path="/admin/" element={<Dashboard url={url} />} />
             <Route path="/dashboard" element={<Dashboard url={url} />} />
+            <Route path="/admin/dashboard" element={<Dashboard url={url} />} />
+
+            {/* Add item routes */}
             <Route path="/add" element={<Add url={url} />} />
+            <Route path="/admin/add" element={<Add url={url} />} />
+
+            {/* List items routes */}
             <Route path="/list" element={<List url={url} />} />
+            <Route path="/admin/list" element={<List url={url} />} />
+
+            {/* Orders routes */}
             <Route path="/orders" element={<Orders url={url} />} />
+            <Route path="/admin/orders" element={<Orders url={url} />} />
+
+            {/* Logout routes */}
             <Route path="/logout" element={<Logout />} />
+            <Route path="/admin/logout" element={<Logout />} />
+
+            {/* Catch-all route to prevent blank page on refresh */}
+            <Route path="*" element={<Dashboard url={url} />} />
           </Routes>
         </div>
       </div>
