@@ -152,6 +152,11 @@ const LoginPopup = ({ setShowLogin }) => {
         }
       }
     } else {
+      if (!auth || !googleProvider) {
+        setGoogleLoading(false);
+        toast.error('Google Sign-In requires Firebase configuration. Please set VITE_FIREBASE_* environment variables in Render.');
+        return;
+      }
       try {
         const result = await signInWithPopup(auth, googleProvider);
         if (result && result.user) {

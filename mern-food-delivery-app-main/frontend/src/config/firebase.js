@@ -12,14 +12,24 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
 };
 
-// Initialize Firebase App singleton safely
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+let app = null;
+let auth = null;
+let googleProvider = null;
 
-googleProvider.setCustomParameters({
-  prompt: 'select_account',
-});
+try {
+  if (firebaseConfig.apiKey && firebaseConfig.apiKey.trim()) {
+    app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({
+      prompt: 'select_account',
+    });
+  } else {
+    console.warn('[QuickBite Auth Warning] VITE_FIREBASE_API_KEY is missing or empty. Firebase Google Sign-In is temporarily disabled until environment variables are configured.');
+  }
+} catch (err) {
+  console.warn('[QuickBite Auth Warning] Firebase initialization error:', err);
+}
 
 // Initialize GoogleAuth safely for native Capacitor Android/iOS apps
 if (Capacitor.isNativePlatform()) {
