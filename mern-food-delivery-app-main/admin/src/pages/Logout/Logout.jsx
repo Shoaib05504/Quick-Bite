@@ -1,29 +1,30 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { clearAuthUser } from '../../services/storageService';
 import './Logout.css';
 
 const Logout = () => {
-  const navigate = useNavigate();
-
   useEffect(() => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('adminName');
-    setTimeout(() => {
-      if (window.location.port === "5174") {
-        window.location.href = 'http://localhost:5173/';
-      } else {
-        window.location.href = '/';
-      }
-    }, 350);
-  }, [navigate]);
+    const performLogout = async () => {
+      await clearAuthUser();
+      if (typeof localStorage !== 'undefined') localStorage.clear();
+      if (typeof sessionStorage !== 'undefined') sessionStorage.clear();
+      window.dispatchEvent(new Event('storage'));
+      setTimeout(() => {
+        if (window.location.port === '5174') {
+          window.location.href = 'http://localhost:5173/';
+        } else {
+          window.location.href = window.location.origin + '/';
+        }
+      }, 150);
+    };
+    performLogout();
+  }, []);
 
   return (
     <div className="logout-page">
       <div className="logout-card">
         <h2>Logging out</h2>
-        <p>Redirecting to the main webpage…</p>
+        <p>Redirecting to QuickBite landing page…</p>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React from "react";
 import "./Sidebar.css";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { clearAuthUser } from "../../services/storageService";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -20,19 +21,18 @@ const Sidebar = () => {
 
   const getTarget = (targetPath) => (path.startsWith("/admin") ? `/admin${targetPath}` : targetPath);
 
-  const handleLogout = (e) => {
+  const handleLogout = async (e) => {
     e.preventDefault();
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("adminName");
+    await clearAuthUser();
+    if (typeof localStorage !== "undefined") localStorage.clear();
+    if (typeof sessionStorage !== "undefined") sessionStorage.clear();
     window.dispatchEvent(new Event("storage"));
     
-    // Navigate to root/login or reload to trigger Login component display
-    if (window.location.port === "5174" || window.location.pathname.startsWith("/admin")) {
-      window.location.href = window.location.origin + (window.location.port === "5174" ? "/" : "/admin/");
+    // Redirect to main QuickBite landing/home page
+    if (window.location.port === "5174") {
+      window.location.href = "http://localhost:5173/";
     } else {
-      navigate("/");
+      window.location.href = window.location.origin + "/";
     }
   };
 
