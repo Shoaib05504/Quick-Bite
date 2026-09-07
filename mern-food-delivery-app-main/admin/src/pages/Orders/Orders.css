@@ -10,13 +10,13 @@
 }
 
 .order {
-  color: #e2e8f0;
+  color: #0f172a;
 }
 
 .order h3 {
   font-size: 1.75rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: 800;
+  color: #0f172a;
   margin-bottom: 28px;
   letter-spacing: 0.05em;
 }
@@ -31,8 +31,8 @@
   grid-template-columns: auto 2fr 0.8fr 1fr 0.9fr;
   align-items: center;
   gap: 20px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 20px;
   padding: 20px 24px;
   font-size: 0.95rem;
@@ -41,9 +41,19 @@
 }
 
 .order-item:hover {
-  background: rgba(52, 103, 255, 0.08);
-  border-color: rgba(108, 92, 231, 0.3);
-  box-shadow: 0 8px 24px rgba(108, 92, 231, 0.1);
+  background: #1e293b;
+  border-color: #6c5ce7;
+  box-shadow: 0 10px 30px rgba(108, 92, 231, 0.2);
+}
+
+.order-item:hover .order-item-food,
+.order-item:hover .order-item-name,
+.order-item:hover > p {
+  color: #ffffff !important;
+}
+
+.order-item:hover .order-item-address {
+  color: #e2e8f0 !important;
 }
 
 .order-item img {

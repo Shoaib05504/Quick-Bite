@@ -12,16 +12,18 @@
 }
 
 .dashboard-subtitle {
-  color: #94a3b8;
+  color: #475569;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 700;
   margin-bottom: 8px;
 }
 
 .dashboard-topbar h1 {
   font-size: 2.25rem;
-  color: #fff;
+  color: #0f172a;
+  font-weight: 800;
 }
 
 .dashboard-loading,
@@ -29,10 +31,11 @@
   height: 420px;
   display: grid;
   place-items: center;
-  color: #94a3b8;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  color: #f8fafc;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 28px;
+  font-weight: 600;
 }
 
 .dashboard-summary-grid {
@@ -44,45 +47,41 @@
 
 .dashboard-summary-card {
   padding: 26px;
-  border-radius: 30px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
-  backdrop-filter: blur(18px);
-  transition: all 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+  border-radius: 24px;
+  background: #0f172a !important;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
   cursor: pointer;
 }
 
 .dashboard-summary-card:hover {
-  background: rgba(30, 44, 72, 0.95);
-  border: 1px solid rgba(108, 92, 231, 0.3);
-  box-shadow: 0 25px 80px rgba(108, 92, 231, 0.25), 0 0 40px rgba(108, 92, 231, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.08);
-  transform: translateY(-8px) scale(1.03);
-  backdrop-filter: blur(22px);
+  background: #1e293b !important;
+  border-color: #6c5ce7;
+  box-shadow: 0 15px 35px rgba(108, 92, 231, 0.25);
+  transform: translateY(-4px);
 }
 
 .dashboard-summary-card:hover h3 {
-  color: #94d9ff;
-  text-shadow: 0 0 20px rgba(148, 217, 255, 0.3);
+  color: #a29bfe;
 }
 
 .dashboard-summary-card:hover p {
-  color: #fff;
-  text-shadow: 0 0 20px rgba(108, 92, 231, 0.25);
+  color: #ffffff;
 }
 
 .dashboard-summary-card h3 {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   letter-spacing: 0.12em;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 18px;
-  color: #cbd5e1;
+  margin-bottom: 14px;
+  color: #94a3b8;
 }
 
 .dashboard-summary-card p {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #ffffff;
 }
 

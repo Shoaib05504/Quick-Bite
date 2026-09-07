@@ -10,13 +10,13 @@
 }
 
 .list {
-  color: #e2e8f0;
+  color: #0f172a;
 }
 
 .list > p {
   font-size: 1.75rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: 800;
+  color: #0f172a;
   margin-bottom: 28px;
   letter-spacing: 0.05em;
 }
@@ -32,16 +32,17 @@
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 20px;
-  background: rgba(15, 23, 42, 0.85);
+  background: #0f172a;
   font-size: 0.95rem;
   transition: all 0.2s ease;
+  color: #f8fafc;
 }
 
 .list-table-format.title {
-  background: rgba(15, 23, 42, 0.95);
-  border-color: rgba(108, 92, 231, 0.2);
+  background: #0f172a;
+  border-color: rgba(108, 92, 231, 0.3);
   padding: 14px 20px;
   font-weight: 700;
   text-transform: uppercase;
@@ -51,9 +52,17 @@
 }
 
 .list-table-format:not(.title):hover {
-  background: rgba(52, 103, 255, 0.08);
-  border-color: rgba(108, 92, 231, 0.3);
-  box-shadow: 0 8px 24px rgba(108, 92, 231, 0.1);
+  background: #1e293b;
+  border-color: #6c5ce7;
+  box-shadow: 0 10px 30px rgba(108, 92, 231, 0.2);
+}
+
+.list-table-format:not(.title):hover p {
+  color: #ffffff !important;
+}
+
+.list-table-format:not(.title):hover p:last-child {
+  color: #ef4444 !important;
 }
 
 .list-table-format img {
