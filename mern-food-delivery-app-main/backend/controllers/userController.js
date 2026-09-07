@@ -27,21 +27,6 @@ const loginUser = async (req, res) => {
 
     let user = await userModel.findOne(query);
 
-    // Auto-create default admin account if admin requested and no admin exists
-    if (!user && (inputClean === 'admin' || inputClean === 'admin@quickbite.com')) {
-      try {
-        const hashedPassword = await bcrypt.hash(password || '1234', 10);
-        user = await userModel.create({
-          name: 'Admin User',
-          email: 'admin@quickbite.com',
-          password: hashedPassword,
-          role: 'admin',
-        });
-      } catch (e) {
-        console.error('Failed to auto-create admin user:', e.message);
-      }
-    }
-
     const INVALID_MSG = 'Invalid email or password.';
 
     if (!user) {

@@ -10,6 +10,7 @@ import { signInWithPopup, GoogleAuthProvider, signInWithCredential } from 'fireb
 import { Capacitor } from '@capacitor/core';
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { API_BASE_URL } from '../../config/apiConfig';
+import { setAuthUser } from '../../services/storageService';
 
 const LoginPopup = ({ setShowLogin }) => {
   const { setToken, loadCartData, loadUserProfile } = useContext(StoreContext);
@@ -71,9 +72,7 @@ const LoginPopup = ({ setShowLogin }) => {
       if (response && response.data && response.data.success) {
         const { token, userId, role, name } = response.data;
         setToken(token);
-        localStorage.setItem('token', token);
-        localStorage.setItem('userId', userId);
-        if (role) localStorage.setItem('role', role);
+        await setAuthUser({ token, userId, role: role || 'user', adminName: name });
 
         await Promise.all([loadCartData(token), loadUserProfile(token)]);
         toast.success(`Welcome to QuickBite, ${name || googleUser.displayName || 'Foodie'}! 🎉`);
@@ -212,9 +211,7 @@ const LoginPopup = ({ setShowLogin }) => {
       if (response.data && response.data.success) {
         const { token, userId, role } = response.data;
         setToken(token);
-        localStorage.setItem('token', token);
-        localStorage.setItem('userId', userId);
-        if (role) localStorage.setItem('role', role);
+        await setAuthUser({ token, userId, role: role || 'user', adminName: data.name });
 
         await Promise.all([loadCartData(token), loadUserProfile(token)]);
         toast.success(currentState === 'Login' ? 'Welcome back to QuickBite!' : 'Account created successfully!');

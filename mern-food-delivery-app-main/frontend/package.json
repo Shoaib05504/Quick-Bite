@@ -16,6 +16,7 @@
     "@capacitor/cli": "^6.2.2",
     "@capacitor/core": "^6.2.2",
     "@capacitor/device": "^6.0.2",
+    "@capacitor/preferences": "^6.0.0",
     "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
     "axios": "^1.7.2",
     "core-js": "^3.49.0",

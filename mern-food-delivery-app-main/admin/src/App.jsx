@@ -11,6 +11,9 @@ import Login from "./pages/Login/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { getAuthUser, setAuthUser, clearAuthUser } from "./services/storageService";
+import axios from "axios";
+
 const getBackendUrl = () => {
   const customUrl = typeof localStorage !== "undefined" ? localStorage.getItem("quickbite_api_url") : null;
   if (customUrl && customUrl.trim()) return customUrl.trim().replace(/\/api\/?$/, "").replace(/\/$/, "");
@@ -24,35 +27,93 @@ const getBackendUrl = () => {
 const url = getBackendUrl();
 
 const App = () => {
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
-  const [role, setRole] = useState(localStorage.getItem("role") || "");
+  const [token, setToken] = useState("");
+  const [role, setRole] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const currentToken = localStorage.getItem("token") || "";
-    const currentUserId = localStorage.getItem("userId") || "None";
-    const currentRole = localStorage.getItem("role") || "None";
+    const initAuth = async () => {
+      setLoading(true);
+      try {
+        const { token: savedToken, userId: savedUserId, role: savedRole } = await getAuthUser();
 
-    console.log("📱 [Admin Auth Debug] Current API URL:", url);
-    console.log("📱 [Admin Auth Debug] Token Exists:", Boolean(currentToken));
-    console.log("📱 [Admin Auth Debug] Current Authenticated User ID:", currentUserId);
-    console.log("📱 [Admin Auth Debug] Saved User Role:", currentRole);
+        console.log("API URL:", url);
+        console.log("AUTH TOKEN EXISTS:", !!savedToken);
+        console.log("CURRENT USER ID:", savedUserId || "Not loaded yet");
 
-    const handleStorageChange = () => {
-      setToken(localStorage.getItem("token") || "");
-      setRole(localStorage.getItem("role") || "");
+        if (savedToken) {
+          setToken(savedToken);
+          setRole(savedRole);
+
+          // Verify token against backend profile API
+          try {
+            const res = await axios.get(`${url}/api/user/profile`, {
+              headers: { Authorization: `Bearer ${savedToken}` },
+              timeout: 45000,
+            });
+
+            if (res.data?.success && res.data?.user) {
+              const u = res.data.user;
+              setCurrentUser(u);
+              setRole(u.role || savedRole || "admin");
+              console.log("CURRENT USER ID:", u._id);
+              console.log("CURRENT USER:", u);
+
+              await setAuthUser({
+                token: savedToken,
+                userId: u._id,
+                role: u.role || "admin",
+                adminName: u.name,
+              });
+            } else {
+              console.warn("Profile check response unsuccessful:", res.data);
+            }
+          } catch (profileErr) {
+            console.warn("Profile fetch warning:", profileErr.message || profileErr);
+          }
+        } else {
+          console.log("CURRENT USER:", null);
+        }
+      } catch (err) {
+        console.error("Init auth error:", err);
+      } finally {
+        setLoading(false);
+      }
     };
+
+    initAuth();
+
+    const handleStorageChange = async () => {
+      const { token: t, role: r } = await getAuthUser();
+      setToken(t);
+      setRole(r);
+    };
+
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const handleLoginSuccess = (newToken) => {
+  const handleLoginSuccess = async (newToken, userDetails) => {
     setToken(newToken);
     setRole("admin");
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("role", "admin");
+    await setAuthUser({
+      token: newToken,
+      userId: userDetails?.userId,
+      role: "admin",
+      adminName: userDetails?.adminName || "Admin",
+    });
   };
 
   const isAdminAuthenticated = Boolean(token && (role === "admin" || !role));
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#090d16", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8" }}>
+        <p>Loading Admin Session…</p>
+      </div>
+    );
+  }
 
   if (!isAdminAuthenticated) {
     return (

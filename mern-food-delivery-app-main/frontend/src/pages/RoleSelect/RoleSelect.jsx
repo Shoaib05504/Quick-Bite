@@ -7,6 +7,8 @@ import "./RoleSelect.css";
 import axios from "axios";
 import { API_BASE_URL } from "../../config/apiConfig";
 
+import { getAuthUser, setAuthUser } from "../../services/storageService";
+
 const RoleSelect = () => {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(false);
@@ -15,10 +17,9 @@ const RoleSelect = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const goAdmin = () => {
-    const existingToken = localStorage.getItem("token");
-    const existingRole = localStorage.getItem("role");
-    if (existingToken && existingRole === "admin") {
+  const goAdmin = async () => {
+    const { token: existingToken, role: existingRole } = await getAuthUser();
+    if (existingToken && (existingRole === "admin" || !existingRole)) {
       if (window.location.port === "5173") {
         window.location.href = "http://localhost:5174/admin/";
       } else {
@@ -64,14 +65,16 @@ const RoleSelect = () => {
       });
 
       if (response.data.success && response.data.role === 'admin') {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("role", "admin");
-        localStorage.setItem("userId", response.data.userId);
-        localStorage.setItem("adminName", name || "Admin");
+        await setAuthUser({
+          token: response.data.token,
+          role: "admin",
+          userId: response.data.userId,
+          adminName: name || "Admin"
+        });
         if (window.location.port === "5173") {
           window.location.href = "http://localhost:5174/admin/";
         } else {
-          navigate("/admin");
+          window.location.href = "/admin/";
         }
       } else {
         setError("Access denied. Admin role required ❌");

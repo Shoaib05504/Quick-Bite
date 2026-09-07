@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './Login.css';
+import { setAuthUser } from '../../services/storageService';
 
 const Login = ({ url, onLoginSuccess }) => {
   const [email, setEmail] = useState('');
@@ -25,10 +26,13 @@ const Login = ({ url, onLoginSuccess }) => {
 
       if (response.data.success) {
         if (response.data.role === 'admin') {
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('role', 'admin');
-          localStorage.setItem('userId', response.data.userId);
-          onLoginSuccess(response.data.token);
+          await setAuthUser({
+            token: response.data.token,
+            userId: response.data.userId,
+            role: 'admin',
+            adminName: email.trim(),
+          });
+          onLoginSuccess(response.data.token, { userId: response.data.userId, adminName: email.trim() });
         } else {
           setError('Access forbidden. Account does not have admin privileges.');
         }
